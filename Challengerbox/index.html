@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>挑戰者幸運箱累計計數器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 75%;
+            max-width: 960px;
+            background-color: #fff;
+            /* 調整 padding-top 和 padding-bottom，因為橫幅會佔用頂部空間 */
+            padding: 0 20px 20px 20px; /* 移除頂部 padding，橫幅會填滿 */
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            overflow: hidden; /* 確保內容超出邊界時會被隱藏，讓圖片能融入圓角 */
+        }
+
+        /* 修正橫幅圖片樣式 */
+        .banner-image {
+            width: 100%; /* 填滿容器寬度 */
+            height: auto; /* 讓圖片高度根據寬度自動調整，完整顯示 */
+            object-fit: contain; /* 確保圖片完整顯示，不裁切。如果比例不符，會有留白 */
+            /* 如果您希望圖片填滿且可能裁切，但高度自動，可以嘗試 object-fit: cover; */
+            /* 但因為您希望完整呈現，object-fit: contain; 更適合 */
+
+            /* 讓圖片與容器頂部和圓角融合 */
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: block; /* 移除圖片底部的額外空白 */
+            margin-bottom: 20px; /* 橫幅與標題間距 */
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 2em;
+            color: #333;
+        }
+
+        .total-count-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding: 10px;
+            background-color: #eaf2f8;
+            border-radius: 5px;
+        }
+        .total-count-wrapper img {
+            height: 30px;
+            vertical-align: middle;
+        }
+        .total-count-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #555;
+        }
+        #totalQuantityDisplay {
+            color: #d9534f;
+            font-size: 1.3em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #e0e0e0;
+            color: #333;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .quantity-controls button {
+            width: 35px;
+            height: 35px;
+            font-size: 20px;
+            margin: 0 8px;
+            cursor: pointer;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            background-color: #6a82fb;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .quantity-controls button:hover {
+            background-color: #4b62d8;
+            transform: translateY(-1px);
+        }
+        .quantity-controls button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .quantity-display {
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #222;
+        }
+        #loading {
+            font-style: italic;
+            color: #777;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://ppt.cc/f9Almx@.png" alt="挑戰者幸運箱橫幅" class="banner-image">
+
+        <header>
+            <h1>挑戰者幸運箱累計計數器</h1>
+
+            <div class="total-count-wrapper">
+                <img src="https://ppt.cc/fTZvpx@.png" alt="小圖示">
+                <span class="total-count-text">目前統計總數量：</span>
+                <span id="totalQuantityDisplay">0</span>
+            </div>
+        </header>
+
+        <div id="loading">載入中...</div>
+        <table id="itemTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>物品名稱</th>
+                    <th>數量</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbziwj_OdirRAlPJY0PpgWb_r0Q5TlDGv0sVXrpWtMi-q5CHd6GNmkdbFSWP4STo4gBPtg/exec'; // *** IMPORTANT: Replace with your Google Apps Script Web App URL ***
+
+        async function fetchData() {
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+
+                renderTable(data.itemData);
+                document.getElementById('totalQuantityDisplay').textContent = data.totalCount;
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('itemTable').style.display = 'table';
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('loading').textContent = '載入資料失敗。請檢查您的網路或Google Apps Script設定。';
+            }
+        }
+
+        function renderTable(itemData) {
+            const tbody = document.querySelector('#itemTable tbody');
+            tbody.innerHTML = '';
+
+            itemData.forEach((item, index) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = item.name;
+
+                const quantityCell = row.insertCell(1);
+                quantityCell.innerHTML = `
+                    <div class="quantity-controls">
+                        <button data-index="${index}" data-change="-1">-</button>
+                        <span class="quantity-display">${item.quantity}</span>
+                        <button data-index="${index}" data-change="1">+</button>
+                    </div>
+                `;
+            });
+
+            tbody.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', handleQuantityChange);
+            });
+        }
+
+        async function handleQuantityChange(event) {
+            const button = event.target;
+            const rowIndex = parseInt(button.dataset.index);
+            const change = parseInt(button.dataset.change);
+            const quantityDisplay = button.parentElement.querySelector('.quantity-display');
+            const totalQuantityDisplay = document.getElementById('totalQuantityDisplay');
+
+            let currentQuantity = parseInt(quantityDisplay.textContent);
+            let currentTotalQuantity = parseInt(totalQuantityDisplay.textContent);
+
+            let newQuantity = currentQuantity + change;
+            if (newQuantity < 0) newQuantity = 0;
+
+            let newTotalQuantity = currentTotalQuantity + change;
+            if (newTotalQuantity < 0) newTotalQuantity = 0;
+
+            quantityDisplay.textContent = newQuantity;
+            totalQuantityDisplay.textContent = newTotalQuantity;
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ rowIndex, change }),
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    console.error('Server update failed:', result.message);
+                    quantityDisplay.textContent = currentQuantity;
+                    totalQuantityDisplay.textContent = currentTotalQuantity;
+                    alert('更新數量失敗：' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+                quantityDisplay.textContent = currentQuantity;
+                totalQuantityDisplay.textContent = currentTotalQuantity;
+                alert('網路錯誤，無法更新數量。');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchData);
+    </script>
+</body>
+</html>
