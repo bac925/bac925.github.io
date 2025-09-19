@@ -2,6 +2,9 @@
 # lib/data_table/config.dart 파일에 설정 값이 더 있습니다
 
 mapleBalls:
+  - name: 蓮
+    imageFileName: "ball_race_char_51.png"
+    color: 0xFF9e3434
   - name: 琳恩
     imageFileName: "ball_race_char_50.png"
     color: 0xFF379CB5
