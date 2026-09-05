@@ -1,0 +1,183 @@
+{
+  "date": null,
+  "character_class": "凱內西斯",
+  "final_stat": [
+    {
+      "stat_name": "最低屬性攻擊力",
+      "stat_value": "83683534"
+    },
+    {
+      "stat_name": "最高屬性攻擊力",
+      "stat_value": "89025032"
+    },
+    {
+      "stat_name": "傷害",
+      "stat_value": "102.00"
+    },
+    {
+      "stat_name": "BOSS怪物傷害",
+      "stat_value": "479.00"
+    },
+    {
+      "stat_name": "最終傷害",
+      "stat_value": "243.85"
+    },
+    {
+      "stat_name": "無視防禦率",
+      "stat_value": "98.55"
+    },
+    {
+      "stat_name": "爆擊機率",
+      "stat_value": "121"
+    },
+    {
+      "stat_name": "爆擊傷害",
+      "stat_value": "152.00"
+    },
+    {
+      "stat_name": "狀態異常耐性",
+      "stat_value": "62"
+    },
+    {
+      "stat_name": "格擋",
+      "stat_value": "100"
+    },
+    {
+      "stat_name": "防禦力",
+      "stat_value": "16817"
+    },
+    {
+      "stat_name": "移動速度",
+      "stat_value": "160"
+    },
+    {
+      "stat_name": "跳躍力",
+      "stat_value": "123"
+    },
+    {
+      "stat_name": "星力",
+      "stat_value": "292"
+    },
+    {
+      "stat_name": "神秘力量",
+      "stat_value": "1470"
+    },
+    {
+      "stat_name": "真實之力",
+      "stat_value": "460"
+    },
+    {
+      "stat_name": "STR",
+      "stat_value": "2983"
+    },
+    {
+      "stat_name": "DEX",
+      "stat_value": "3007"
+    },
+    {
+      "stat_name": "INT",
+      "stat_value": "48420"
+    },
+    {
+      "stat_name": "LUK",
+      "stat_value": "6079"
+    },
+    {
+      "stat_name": "HP",
+      "stat_value": "92135"
+    },
+    {
+      "stat_name": "MP",
+      "stat_value": "51316"
+    },
+    {
+      "stat_name": "AP配點STR",
+      "stat_value": "4"
+    },
+    {
+      "stat_name": "AP配點DEX",
+      "stat_value": "4"
+    },
+    {
+      "stat_name": "AP配點INT",
+      "stat_value": "1428"
+    },
+    {
+      "stat_name": "AP配點LUK",
+      "stat_value": "4"
+    },
+    {
+      "stat_name": "AP配點HP",
+      "stat_value": "0"
+    },
+    {
+      "stat_name": "AP配點MP",
+      "stat_value": "0"
+    },
+    {
+      "stat_name": "道具掉落率",
+      "stat_value": "20"
+    },
+    {
+      "stat_name": "楓幣獲得量",
+      "stat_value": "40"
+    },
+    {
+      "stat_name": "Buff持續時間",
+      "stat_value": "92"
+    },
+    {
+      "stat_name": "攻擊速度",
+      "stat_value": "4"
+    },
+    {
+      "stat_name": "一般怪物傷害",
+      "stat_value": "262.00"
+    },
+    {
+      "stat_name": "冷卻時間減少(秒)",
+      "stat_value": "0"
+    },
+    {
+      "stat_name": "冷卻時間減少(％)",
+      "stat_value": "5"
+    },
+    {
+      "stat_name": "未套用冷卻時間",
+      "stat_value": "0"
+    },
+    {
+      "stat_name": "無視屬性耐性",
+      "stat_value": "5.00"
+    },
+    {
+      "stat_name": "狀態異常追加傷害",
+      "stat_value": "4.00"
+    },
+    {
+      "stat_name": "武器熟練度",
+      "stat_value": "94"
+    },
+    {
+      "stat_name": "獲得額外經驗值",
+      "stat_value": "112.50"
+    },
+    {
+      "stat_name": "攻擊力",
+      "stat_value": "2032"
+    },
+    {
+      "stat_name": "魔法攻擊力",
+      "stat_value": "5347"
+    },
+    {
+      "stat_name": "戰鬥力",
+      "stat_value": "130449743"
+    },
+    {
+      "stat_name": "召喚獸持續時間增加",
+      "stat_value": "10"
+    }
+  ],
+  "remain_ap": 0
+}
