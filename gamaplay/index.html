@@ -2,11 +2,12 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
+
+    <meta name="robots" content="noindex, nofollow">
 
     <title>GamaPlay Deep Link</title>
 
@@ -18,11 +19,9 @@
         body {
             margin: 0;
             min-height: 100vh;
-
             display: flex;
             justify-content: center;
             align-items: center;
-
             padding: 20px;
 
             font-family:
@@ -39,10 +38,9 @@
         .card {
             width: 100%;
             max-width: 620px;
-
             padding: 28px;
 
-            background: #ffffff;
+            background: white;
             border-radius: 16px;
 
             box-shadow:
@@ -52,13 +50,11 @@
         h1 {
             margin-top: 0;
             margin-bottom: 8px;
-
             font-size: 24px;
         }
 
         .description {
             margin-bottom: 20px;
-
             color: #666;
             line-height: 1.6;
         }
@@ -66,7 +62,6 @@
         textarea {
             width: 100%;
             min-height: 140px;
-
             padding: 12px;
 
             border: 1px solid #ccc;
@@ -82,7 +77,6 @@
 
         input {
             width: 100%;
-
             padding: 12px;
 
             border: 1px solid #ccc;
@@ -94,7 +88,6 @@
 
         button {
             width: 100%;
-
             margin-top: 12px;
             padding: 13px;
 
@@ -131,7 +124,7 @@
             display: block;
 
             margin-top: 20px;
-            padding: 14px 20px;
+            padding: 15px 20px;
 
             background: #ff7a00;
             color: white;
@@ -170,17 +163,30 @@
             text-align: center;
             font-size: 14px;
         }
+
+        .debug {
+            margin-top: 20px;
+            padding: 12px;
+
+            background: #f2f2f2;
+            border-radius: 8px;
+
+            font-family: Consolas, monospace;
+            font-size: 11px;
+
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
-
 
 <body>
 
 <div class="card">
 
-    <!-- =========================================
-         連結產生器
-         ========================================= -->
+    <!-- ==============================
+         產生器
+         ============================== -->
 
     <div id="generator">
 
@@ -188,8 +194,8 @@
 
         <div class="description">
             貼上 GamaPlay Deep Link，
-            系統會產生可透過 LINE、Discord、Messenger
-            或其他方式分享的 HTTPS 網址。
+            系統會將完整連結轉換成 Base64，
+            並放入網址 Fragment (#)。
         </div>
 
         <textarea
@@ -210,8 +216,6 @@
             style="display:none"
         ></div>
 
-
-        <!-- 產生結果 -->
 
         <div
             id="resultArea"
@@ -248,9 +252,9 @@
     </div>
 
 
-    <!-- =========================================
-         手機 Deep Link 跳轉頁
-         ========================================= -->
+    <!-- ==============================
+         Redirect 頁面
+         ============================== -->
 
     <div
         id="redirect"
@@ -266,7 +270,7 @@
             </p>
 
             <p>
-                如果 App 沒有自動開啟，
+                如果沒有自動開啟，
                 請點擊下方按鈕。
             </p>
 
@@ -282,9 +286,14 @@
         </a>
 
 
+        <!--
+            測試階段保留 Debug 資訊。
+            確認成功後可以刪除。
+        -->
+
         <div
-            id="targetInfo"
-            class="small"
+            id="debugInfo"
+            class="debug"
         ></div>
 
     </div>
@@ -295,17 +304,13 @@
 <script>
 
     /*
-     * ============================================
-     * GitHub Pages Base URL
-     * ============================================
+     * ============================================================
+     * Base URL
+     * ============================================================
      *
-     * 不寫死 bac925.github.io。
-     *
-     * 假設目前頁面：
+     * 例如：
      *
      * https://bac925.github.io/gamaplay/
-     *
-     * 就會自動使用這個網址。
      */
 
     const BASE_URL =
@@ -314,15 +319,9 @@
 
 
     /*
-     * ============================================
-     * 驗證 GamaPlay Deep Link
-     * ============================================
-     *
-     * 只允許：
-     *
-     * gameplapp://gameplhost/deeplink?
-     *
-     * 避免這個網站變成任意 URL Redirector。
+     * ============================================================
+     * Deep Link 驗證
+     * ============================================================
      */
 
     function isValidGameplLink(url) {
@@ -340,9 +339,66 @@
 
 
     /*
-     * ============================================
+     * ============================================================
+     * UTF-8 String → Base64
+     * ============================================================
+     *
+     * 不直接：
+     *
+     * btoa(str)
+     *
+     * 因為 btoa 本身主要處理 byte string。
+     *
+     * TextEncoder 可以先把字串轉成 UTF-8 bytes。
+     */
+
+    function stringToBase64(str) {
+
+        const bytes =
+            new TextEncoder().encode(str);
+
+        let binary = "";
+
+        for (let i = 0; i < bytes.length; i++) {
+
+            binary +=
+                String.fromCharCode(bytes[i]);
+        }
+
+        return btoa(binary);
+    }
+
+
+    /*
+     * ============================================================
+     * Base64 → UTF-8 String
+     * ============================================================
+     */
+
+    function base64ToString(base64) {
+
+        const binary =
+            atob(base64);
+
+        const bytes =
+            new Uint8Array(binary.length);
+
+
+        for (let i = 0; i < binary.length; i++) {
+
+            bytes[i] =
+                binary.charCodeAt(i);
+        }
+
+
+        return new TextDecoder().decode(bytes);
+    }
+
+
+    /*
+     * ============================================================
      * 產生分享網址
-     * ============================================
+     * ============================================================
      */
 
     function generateLink() {
@@ -362,7 +418,7 @@
 
 
         /*
-         * 空白
+         * 檢查輸入
          */
 
         if (!input) {
@@ -377,13 +433,13 @@
 
 
         /*
-         * 格式驗證
+         * Deep Link 格式檢查
          */
 
         if (!isValidGameplLink(input)) {
 
             message.textContent =
-                "連結格式不正確，必須以 " +
+                "格式錯誤。網址必須以 " +
                 "gameplapp://gameplhost/deeplink? 開頭。";
 
             message.style.display = "block";
@@ -392,55 +448,74 @@
         }
 
 
-        /*
-         * ========================================
-         * 重要：
-         *
-         * 原始網址內的 code 本身已經 URL Encode。
-         *
-         * 例如：
-         *
-         * %2B
-         * %2F
-         * %3D
-         *
-         * 這裡必須把「整條 Deep Link」
-         * 再 Encode 一次。
-         *
-         * 不可以先 decode code。
-         * ========================================
-         */
+        try {
 
-        const encoded =
-            encodeURIComponent(input);
+            /*
+             * ========================================
+             * 重要
+             * ========================================
+             *
+             * 不修改原始 Deep Link。
+             *
+             * 不做：
+             *
+             * decodeURIComponent()
+             *
+             * 也不重新處理 code。
+             *
+             * 直接把完整字串轉 Base64。
+             */
 
-
-        const redirectUrl =
-            BASE_URL +
-            "?url=" +
-            encoded;
+            const encoded =
+                stringToBase64(input);
 
 
-        document
-            .getElementById("resultUrl")
-            .value = redirectUrl;
+            /*
+             * 使用：
+             *
+             * https://xxx/#BASE64
+             *
+             * 而不是：
+             *
+             * https://xxx/?url=...
+             */
+
+            const redirectUrl =
+                BASE_URL +
+                "#" +
+                encoded;
 
 
-        document
-            .getElementById("resultArea")
-            .style.display = "block";
+            document
+                .getElementById("resultUrl")
+                .value = redirectUrl;
 
 
-        document
-            .getElementById("copyMessage")
-            .style.display = "none";
+            document
+                .getElementById("resultArea")
+                .style.display = "block";
+
+
+            document
+                .getElementById("copyMessage")
+                .style.display = "none";
+
+        }
+        catch (error) {
+
+            message.textContent =
+                "Base64 編碼失敗：" +
+                error.message;
+
+            message.style.display = "block";
+        }
     }
 
 
     /*
-     * ============================================
-     * 複製網址
-     * ============================================
+     * ============================================================
+     * 複製分享網址
+     * ============================================================
      */
 
     async function copyLink() {
@@ -460,18 +535,10 @@
 
         try {
 
-            /*
-             * 新版 Clipboard API
-             */
-
             await navigator.clipboard.writeText(value);
 
         }
         catch (error) {
-
-            /*
-             * 舊瀏覽器 fallback
-             */
 
             resultInput.focus();
             resultInput.select();
@@ -499,65 +566,69 @@
 
 
     /*
-     * ============================================
-     * Deep Link Redirect
-     * ============================================
+     * ============================================================
+     * Redirect 模式
+     * ============================================================
      */
 
     function checkRedirect() {
 
         /*
-         * 讀取：
+         * 沒有 #
          *
-         * ?url=xxxxxxxx
+         * → 普通產生器模式
          */
 
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-
-        const target =
-            params.get("url");
-
-
-        /*
-         * 沒有 ?url
-         *
-         * 代表目前是產生器模式。
-         */
-
-        if (!target) {
+        if (
+            !window.location.hash ||
+            window.location.hash.length <= 1
+        ) {
 
             return;
         }
 
 
         /*
-         * 再做一次安全驗證。
-         *
-         * 即使有人手動修改網址，
-         * 也不能跳到其他 Scheme。
+         * 取得 # 後面的 Base64
+         */
+
+        const raw =
+            window.location.hash.slice(1);
+
+
+        let target = "";
+
+
+        try {
+
+            /*
+             * Base64 還原
+             */
+
+            target =
+                base64ToString(raw);
+
+        }
+        catch (error) {
+
+            showInvalidLink(
+                "Base64 Decode 失敗：" +
+                error.message
+            );
+
+            return;
+        }
+
+
+        /*
+         * 安全檢查
          */
 
         if (!isValidGameplLink(target)) {
 
-            document
-                .getElementById("generator")
-                .style.display = "block";
-
-
-            const message =
-                document.getElementById("inputMessage");
-
-
-            message.textContent =
-                "無效的 GamaPlay Deep Link。";
-
-
-            message.style.display = "block";
-
+            showInvalidLink(
+                "還原後不是有效的 GamaPlay Deep Link。"
+            );
 
             return;
         }
@@ -565,7 +636,7 @@
 
         /*
          * ========================================
-         * 切換成 Redirect UI
+         * 顯示 Redirect UI
          * ========================================
          */
 
@@ -580,58 +651,94 @@
 
 
         /*
-         * 手動開啟按鈕
+         * ========================================
+         * 設定手動開啟按鈕
+         * ========================================
          */
 
         const openButton =
             document.getElementById("openApp");
 
 
+        /*
+         * 直接把原始 Deep Link 放進 href。
+         *
+         * 不重新 encode。
+         * 不重新 decode。
+         */
+
         openButton.href = target;
 
 
         /*
-         * 顯示目標網址
+         * ========================================
+         * Debug
+         * ========================================
          *
-         * 如果之後正式發布不想讓使用者看到，
-         * 可以直接把下面這段刪掉。
+         * 測試 Discord 時先保留。
          */
 
         document
-            .getElementById("targetInfo")
+            .getElementById("debugInfo")
             .textContent =
-                "Deep Link：" + target;
+                "Deep Link decode OK\n\n" +
+                target;
 
 
         /*
          * ========================================
-         * 自動嘗試喚起 GamaPlay
+         * 自動喚起
          * ========================================
          *
-         * 部分手機瀏覽器允許自動開啟。
+         * 故意不使用 setTimeout。
          *
-         * 部分瀏覽器（尤其 App 內建瀏覽器）
-         * 可能要求 user gesture。
-         *
-         * 所以即使自動跳轉失敗，
-         * 上面的「開啟 GamaPlay」按鈕仍可使用。
+         * 盡可能貼近你提供的參考實作。
          */
 
-        setTimeout(
-            function () {
+        try {
 
-                window.location.href = target;
+            window.location.href =
+                target;
 
-            },
-            300
-        );
+        }
+        catch (error) {
+
+            document
+                .getElementById("debugInfo")
+                .textContent +=
+                    "\n\nAuto open error:\n" +
+                    error.message;
+        }
     }
 
 
     /*
-     * ============================================
-     * 網頁啟動
-     * ============================================
+     * ============================================================
+     * 無效網址
+     * ============================================================
+     */
+
+    function showInvalidLink(message) {
+
+        document
+            .getElementById("generator")
+            .style.display = "block";
+
+
+        const msg =
+            document.getElementById("inputMessage");
+
+
+        msg.textContent = message;
+
+        msg.style.display = "block";
+    }
+
+
+    /*
+     * ============================================================
+     * Start
+     * ============================================================
      */
 
     checkRedirect();
