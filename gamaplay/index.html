@@ -2,10 +2,13 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>GamaPlay Link</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <title>GamaPlay Deep Link</title>
 
     <style>
         * {
@@ -15,9 +18,11 @@
         body {
             margin: 0;
             min-height: 100vh;
+
             display: flex;
             justify-content: center;
             align-items: center;
+
             padding: 20px;
 
             font-family:
@@ -33,10 +38,11 @@
 
         .card {
             width: 100%;
-            max-width: 600px;
+            max-width: 620px;
+
             padding: 28px;
 
-            background: white;
+            background: #ffffff;
             border-radius: 16px;
 
             box-shadow:
@@ -46,18 +52,20 @@
         h1 {
             margin-top: 0;
             margin-bottom: 8px;
+
             font-size: 24px;
         }
 
         .description {
             margin-bottom: 20px;
+
             color: #666;
             line-height: 1.6;
         }
 
         textarea {
             width: 100%;
-            min-height: 110px;
+            min-height: 140px;
 
             padding: 12px;
 
@@ -68,6 +76,20 @@
 
             font-family: Consolas, monospace;
             font-size: 14px;
+
+            word-break: break-all;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #ccc;
+            border-radius: 8px;
+
+            font-family: Consolas, monospace;
+            font-size: 13px;
         }
 
         button {
@@ -100,18 +122,6 @@
             display: none;
         }
 
-        .result input {
-            width: 100%;
-
-            padding: 12px;
-
-            border: 1px solid #ccc;
-            border-radius: 8px;
-
-            font-family: Consolas, monospace;
-            font-size: 13px;
-        }
-
         .status {
             text-align: center;
             line-height: 1.7;
@@ -130,57 +140,87 @@
 
             text-decoration: none;
             text-align: center;
+
+            font-size: 17px;
             font-weight: 600;
         }
 
         .small {
-            margin-top: 14px;
+            margin-top: 16px;
 
             color: #888;
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.6;
 
             word-break: break-all;
         }
+
+        .success {
+            margin-top: 10px;
+
+            color: #16863c;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .error {
+            margin-top: 10px;
+
+            color: #c62828;
+            text-align: center;
+            font-size: 14px;
+        }
     </style>
 </head>
+
 
 <body>
 
 <div class="card">
 
-    <!--
-        =========================================================
-        產生連結模式
-        =========================================================
-    -->
+    <!-- =========================================
+         連結產生器
+         ========================================= -->
+
     <div id="generator">
 
         <h1>GamaPlay 連結產生器</h1>
 
         <div class="description">
-            貼上 gamaplay:// 連結，
-            系統會產生可以分享的 HTTPS 跳轉網址。
+            貼上 GamaPlay Deep Link，
+            系統會產生可透過 LINE、Discord、Messenger
+            或其他方式分享的 HTTPS 網址。
         </div>
 
         <textarea
-            id="gamaplayInput"
-            placeholder="gamaplay://..."
+            id="gameplInput"
+            placeholder="gameplapp://gameplhost/deeplink?type=1&action=web&code=..."
         ></textarea>
 
         <button
             class="primary"
             onclick="generateLink()"
         >
-            產生連結
+            產生分享連結
         </button>
+
+        <div
+            id="inputMessage"
+            class="error"
+            style="display:none"
+        ></div>
+
+
+        <!-- 產生結果 -->
 
         <div
             id="resultArea"
             class="result"
         >
 
-            <p>產生的網址：</p>
+            <p>
+                產生的 HTTPS 網址：
+            </p>
 
             <input
                 id="resultUrl"
@@ -195,16 +235,23 @@
                 複製網址
             </button>
 
+            <div
+                id="copyMessage"
+                class="success"
+                style="display:none"
+            >
+                已複製網址
+            </div>
+
         </div>
 
     </div>
 
 
-    <!--
-        =========================================================
-        手機跳轉模式
-        =========================================================
-    -->
+    <!-- =========================================
+         手機 Deep Link 跳轉頁
+         ========================================= -->
+
     <div
         id="redirect"
         style="display:none"
@@ -215,11 +262,16 @@
             <h1>正在開啟 GamaPlay...</h1>
 
             <p>
-                如果沒有自動開啟，
+                正在嘗試開啟 GamaPlay。
+            </p>
+
+            <p>
+                如果 App 沒有自動開啟，
                 請點擊下方按鈕。
             </p>
 
         </div>
+
 
         <a
             id="openApp"
@@ -228,6 +280,7 @@
         >
             開啟 GamaPlay
         </a>
+
 
         <div
             id="targetInfo"
@@ -242,77 +295,130 @@
 <script>
 
     /*
-     * =========================================================
-     * 設定
-     * =========================================================
+     * ============================================
+     * GitHub Pages Base URL
+     * ============================================
      *
-     * 如果你的 GitHub Pages 網址是：
+     * 不寫死 bac925.github.io。
+     *
+     * 假設目前頁面：
      *
      * https://bac925.github.io/gamaplay/
      *
-     * 就維持下面這個設定。
+     * 就會自動使用這個網址。
      */
 
     const BASE_URL =
-        "https://bac925.github.io/gamaplay/";
+        window.location.origin +
+        window.location.pathname;
 
 
     /*
-     * =========================================================
-     * 產生 HTTPS 跳轉網址
-     * =========================================================
+     * ============================================
+     * 驗證 GamaPlay Deep Link
+     * ============================================
+     *
+     * 只允許：
+     *
+     * gameplapp://gameplhost/deeplink?
+     *
+     * 避免這個網站變成任意 URL Redirector。
+     */
+
+    function isValidGameplLink(url) {
+
+        if (!url) {
+            return false;
+        }
+
+        return url
+            .toLowerCase()
+            .startsWith(
+                "gameplapp://gameplhost/deeplink?"
+            );
+    }
+
+
+    /*
+     * ============================================
+     * 產生分享網址
+     * ============================================
      */
 
     function generateLink() {
 
         const input =
             document
-                .getElementById("gamaplayInput")
+                .getElementById("gameplInput")
                 .value
                 .trim();
 
 
+        const message =
+            document.getElementById("inputMessage");
+
+
+        message.style.display = "none";
+
+
+        /*
+         * 空白
+         */
+
         if (!input) {
 
-            alert("請輸入 GamaPlay 連結");
+            message.textContent =
+                "請貼上 GamaPlay Deep Link。";
+
+            message.style.display = "block";
 
             return;
         }
 
 
         /*
-         * 基本檢查
+         * 格式驗證
          */
 
-        if (!input.toLowerCase().startsWith("gamaplay://")) {
+        if (!isValidGameplLink(input)) {
 
-            alert(
-                "連結格式不正確。\n\n" +
-                "必須以 gamaplay:// 開頭。"
-            );
+            message.textContent =
+                "連結格式不正確，必須以 " +
+                "gameplapp://gameplhost/deeplink? 開頭。";
+
+            message.style.display = "block";
 
             return;
         }
 
 
         /*
-         * encodeURIComponent 很重要
+         * ========================================
+         * 重要：
          *
-         * 因為 gamaplay URL 本身可能包含：
+         * 原始網址內的 code 本身已經 URL Encode。
          *
-         * ?
-         * &
-         * =
-         * +
+         * 例如：
          *
-         * 如果不 encode，
-         * 外層 HTTPS Query String 可能會被拆壞。
+         * %2B
+         * %2F
+         * %3D
+         *
+         * 這裡必須把「整條 Deep Link」
+         * 再 Encode 一次。
+         *
+         * 不可以先 decode code。
+         * ========================================
          */
+
+        const encoded =
+            encodeURIComponent(input);
+
 
         const redirectUrl =
             BASE_URL +
             "?url=" +
-            encodeURIComponent(input);
+            encoded;
 
 
         document
@@ -323,55 +429,88 @@
         document
             .getElementById("resultArea")
             .style.display = "block";
+
+
+        document
+            .getElementById("copyMessage")
+            .style.display = "none";
     }
 
 
     /*
-     * =========================================================
+     * ============================================
      * 複製網址
-     * =========================================================
+     * ============================================
      */
 
     async function copyLink() {
 
+        const resultInput =
+            document.getElementById("resultUrl");
+
+
         const value =
-            document
-                .getElementById("resultUrl")
-                .value;
+            resultInput.value;
+
+
+        if (!value) {
+            return;
+        }
 
 
         try {
 
-            await navigator.clipboard.writeText(value);
-
-            alert("已複製網址");
-
-        }
-        catch {
-
             /*
-             * Clipboard API 被瀏覽器禁止時的 fallback
+             * 新版 Clipboard API
              */
 
-            const input =
-                document.getElementById("resultUrl");
+            await navigator.clipboard.writeText(value);
 
-            input.select();
+        }
+        catch (error) {
+
+            /*
+             * 舊瀏覽器 fallback
+             */
+
+            resultInput.focus();
+            resultInput.select();
 
             document.execCommand("copy");
-
-            alert("已複製網址");
         }
+
+
+        const message =
+            document.getElementById("copyMessage");
+
+
+        message.style.display = "block";
+
+
+        setTimeout(
+            function () {
+
+                message.style.display = "none";
+
+            },
+            2000
+        );
     }
 
 
     /*
-     * =========================================================
-     * 判斷目前是不是 Redirect 模式
-     * =========================================================
+     * ============================================
+     * Deep Link Redirect
+     * ============================================
      */
 
     function checkRedirect() {
+
+        /*
+         * 讀取：
+         *
+         * ?url=xxxxxxxx
+         */
 
         const params =
             new URLSearchParams(
@@ -384,9 +523,9 @@
 
 
         /*
-         * 沒有 ?url=
+         * 沒有 ?url
          *
-         * → 顯示產生器
+         * 代表目前是產生器模式。
          */
 
         if (!target) {
@@ -396,28 +535,38 @@
 
 
         /*
-         * 安全檢查
+         * 再做一次安全驗證。
          *
-         * 只允許 gamaplay://
-         *
-         * 避免這個 GitHub Pages
-         * 被拿去當任意 URL Redirector。
+         * 即使有人手動修改網址，
+         * 也不能跳到其他 Scheme。
          */
 
-        if (
-            !target
-                .toLowerCase()
-                .startsWith("gamaplay://")
-        ) {
+        if (!isValidGameplLink(target)) {
 
-            alert("無效的 GamaPlay 連結");
+            document
+                .getElementById("generator")
+                .style.display = "block";
+
+
+            const message =
+                document.getElementById("inputMessage");
+
+
+            message.textContent =
+                "無效的 GamaPlay Deep Link。";
+
+
+            message.style.display = "block";
+
 
             return;
         }
 
 
         /*
-         * 切換 UI
+         * ========================================
+         * 切換成 Redirect UI
+         * ========================================
          */
 
         document
@@ -431,35 +580,41 @@
 
 
         /*
-         * 設定手動按鈕
+         * 手動開啟按鈕
          */
 
         const openButton =
             document.getElementById("openApp");
 
+
         openButton.href = target;
 
 
         /*
-         * Debug / 顯示實際目標
+         * 顯示目標網址
+         *
+         * 如果之後正式發布不想讓使用者看到，
+         * 可以直接把下面這段刪掉。
          */
 
         document
             .getElementById("targetInfo")
             .textContent =
-                "目標：" + target;
+                "Deep Link：" + target;
 
 
         /*
-         * =====================================================
-         * 自動嘗試開啟 App
-         * =====================================================
+         * ========================================
+         * 自動嘗試喚起 GamaPlay
+         * ========================================
          *
-         * 某些瀏覽器會允許。
+         * 部分手機瀏覽器允許自動開啟。
          *
-         * iOS Safari / Chrome 等環境
-         * 可能要求使用者操作，
-         * 所以下面仍然保留按鈕。
+         * 部分瀏覽器（尤其 App 內建瀏覽器）
+         * 可能要求 user gesture。
+         *
+         * 所以即使自動跳轉失敗，
+         * 上面的「開啟 GamaPlay」按鈕仍可使用。
          */
 
         setTimeout(
@@ -474,7 +629,9 @@
 
 
     /*
-     * 網頁載入完成後執行
+     * ============================================
+     * 網頁啟動
+     * ============================================
      */
 
     checkRedirect();
