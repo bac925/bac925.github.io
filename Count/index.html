@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>伯爵的遺忘之作 - 完整小品 v1.5</title>
+    <title>伯爵的遺忘之作 - 完整小品 v1.6</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
         body, html {
             width: 100%;
@@ -23,17 +25,22 @@
         /* 遊戲主容器 (支援主選單背景與遊戲區切換) */
         #game-container {
             position: relative;
+            touch-action: none;
             width: 100vw;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: radial-gradient(ellipse at 50% 30%, rgba(139,150,172,.22), transparent 33%), linear-gradient(155deg, transparent 38%, #111722 39%, #111722 48%, transparent 49%), linear-gradient(205deg, transparent 33%, #151a25 34%, #151a25 50%, transparent 51%), linear-gradient(#171923, #07090e 70%, #020204);
+            background-image: linear-gradient(rgba(0,0,0,.35), rgba(5,5,10,.72)), url("background.jpg"), linear-gradient(#171923,#07090e 70%,#020204);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             transition: background 0.8s ease;
         }
+
+        /* 長按與雙擊只作遊戲操作，避免選中文字造成方向鍵中斷。 */
+        #game-container, #game-container * { user-select:none!important; -webkit-user-select:none!important; -webkit-touch-callout:none!important; }
+        #game-container ::selection { background:transparent; }
 
         /* 主選單介面層 */
         #main-menu {
@@ -497,7 +504,7 @@
         <label for="brightness-range">遊戲亮度　<span id="brightness-display">50%</span></label><input id="brightness-range" type="range" min="0" max="100" value="50" oninput="setBrightness(this.value)" style="width:100%;margin:12px 0 26px;accent-color:#c9a268;">
         <button class="menu-btn" onclick="closeOptions()" style="width:100%;">返回遊戲</button>
     </div>
-    <div id="version-info">完整小品 v1.5</div>
+    <div id="version-info">完整小品 v1.6</div>
 </div>
 
 <script>
@@ -527,7 +534,7 @@ const dialogText = document.getElementById('dialog-text');
 const promptEl = document.getElementById('interaction-prompt');
 
 let gameState = {
-    version: '1.5',
+    version: '1.6',
     difficulty: 'investigator',
     currentScene: 'OUTSIDE',
     oil: 1,
@@ -654,7 +661,7 @@ function setBrightness(v){settings.brightness=Number(v);document.getElementById(
 
 function openCredits() {
     playClickSound();
-    alert("【製作團隊】\nGame Dev Architect Prototype\nBackground Art: Gothic Castle & Lantern Girl");
+    alert("【製作團隊】\n製作人：騷花、BAC\n程式設計：Gemini、ChatGPT-6 Sol");
 }
 
 // --- 鍵盤監聽 ---
@@ -723,6 +730,10 @@ function syncTouchControls(){const root=document.getElementById('touch-controls'
  const interact=document.getElementById('touch-interact');interact.textContent=gameState.isDialogActive?'下一句':gameState.activeInteractable?'調查':'互動';
 }
 setupTouchControls();
+const gameRoot=document.getElementById('game-container');
+gameRoot.addEventListener('selectstart',e=>e.preventDefault());
+gameRoot.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('visibilitychange',()=>{if(document.hidden)for(const key of Object.keys(keys))keys[key]=false;});
 
 // --- 音效引擎 ---
 function initAudio() {
