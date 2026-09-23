@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>伯爵的遺忘之作 - 完整小品 v1.5</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: "Courier New", Courier, monospace, "Microsoft JhengHei";
+            background-color: #020204;
+            color: #d3c7b8;
+        }
+
+        /* 遊戲主容器 (支援主選單背景與遊戲區切換) */
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(ellipse at 50% 30%, rgba(139,150,172,.22), transparent 33%), linear-gradient(155deg, transparent 38%, #111722 39%, #111722 48%, transparent 49%), linear-gradient(205deg, transparent 33%, #151a25 34%, #151a25 50%, transparent 51%), linear-gradient(#171923, #07090e 70%, #020204);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background 0.8s ease;
+        }
+
+        /* 主選單介面層 */
+        #main-menu {
+            position: absolute;
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: rgba(5, 5, 8, 0.75);
+            padding: 40px 60px;
+            border: 2px solid #544233;
+            border-radius: 8px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            transition: opacity 0.8s ease;
+        }
+
+        .game-title {
+            font-size: 38px;
+            font-weight: bold;
+            color: #f0e6d2;
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .game-subtitle {
+            font-size: 14px;
+            color: #9c8a75;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .menu-btn {
+            background: rgba(20, 16, 13, 0.85);
+            color: #d3c7b8;
+            border: 1px solid #7d6349;
+            padding: 12px 36px;
+            margin: 8px 0;
+            font-size: 16px;
+            font-family: inherit;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 220px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+        }
+
+        .menu-btn:hover {
+            background: rgba(61, 46, 35, 0.9);
+            color: #fff8e7;
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .menu-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 遊戲畫布與 UI 容器 */
+        #game-canvas-wrapper {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            border: 4px solid #4a3828;
+            box-shadow: 0 0 35px rgba(0, 0, 0, 0.95);
+            background-color: #000;
+            display: none; /* 初始隱藏，點擊開始遊戲後顯示 */
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+
+        #hud {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+            z-index: 10;
+        }
+
+        .stat-box {
+            background: rgba(15, 12, 10, 0.85);
+            padding: 8px 14px;
+            border: 1px solid #8c6d53;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        #dialog-box {
+            position: absolute;
+            bottom: 20px;
+            left: 40px;
+            right: 40px;
+            background: rgba(12, 10, 10, 0.94);
+            border: 2px solid #a67c52;
+            border-radius: 6px;
+            padding: 18px 24px;
+            color: #ece0d1;
+            font-size: 16px;
+            line-height: 1.6;
+            display: none;
+            z-index: 20;
+            box-shadow: 0 0 20px rgba(0,0,0,0.9);
+        }
+
+        #dialog-speaker {
+            color: #e5c158;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        #interaction-prompt {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 15, 10, 0.9);
+            border: 1px solid #d4af37;
+            color: #fff8e7;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+            z-index: 15;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1.0; }
+            100% { opacity: 0.6; }
+        }
+
+        #version-info {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 12px;
+            color: #6e5f52;
+            z-index: 25;
+            pointer-events: none;
+        }
+        #choice-controls button {font:inherit;color:#eee0ca;background:#28212a;border:1px solid #af8555;padding:8px 12px;cursor:pointer;}
+        #choice-controls button:hover {background:#57402d;}
+        #game-canvas-wrapper {max-width:96vw;max-height:96vh;aspect-ratio:4/3;width:min(800px,96vw);height:auto;}
+        #gameCanvas {height:100%;}
+        #main-menu {max-width:92vw;padding:28px;}
+        #choice-panel.choice-enter {animation:choiceSlide .42s cubic-bezier(.13,.76,.22,1) forwards;}
+        #choice-panel.choice-exit {animation:choiceExit .23s ease-in forwards;}
+        @keyframes choiceSlide {from{transform:translate(108%,-50%);opacity:.15}to{transform:translate(0,-50%);opacity:1}}
+        @keyframes choiceExit {from{transform:translate(0,-50%);opacity:1}to{transform:translate(108%,-50%);opacity:0}}
+        .cinematic-option {display:flex;align-items:center;gap:16px;width:100%;text-align:left;margin:8px 0;padding:11px 15px;background:#1b1c25;border:1px solid #514947;color:#e8dfd2;cursor:pointer;font:16px "Microsoft JhengHei",sans-serif;transition:background .13s,transform .13s,border-color .13s;}
+        .cinematic-option.selected,.cinematic-option:hover {background:#493b34;border-color:#dbb275;transform:translateX(-7px);box-shadow:0 0 17px #ae784250;}
+        .option-index {flex:none;min-width:43px;text-align:center;font:bold 24px Georgia,serif;color:#d9ae6d;border-right:1px solid #836947;padding-right:12px;}
+        .option-label {font:16px/1.5 "Microsoft JhengHei",sans-serif;letter-spacing:1px;}
+        .option-label.numeric-answer {font:bold 21px/1.3 Consolas,monospace;color:#f2d9ab;letter-spacing:3px;}
+
+        .difficulty-list {display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+        .difficulty-list button {font-family:inherit;text-align:left;min-height:112px;background:#22202a;border:1px solid #766049;color:#e8d7bd;padding:16px;cursor:pointer;transition:transform .2s,background .2s;}
+        .difficulty-list button:hover {transform:translateY(-5px);background:#493a38;border-color:#d3a66b;}
+        .difficulty-list strong {display:block;font-size:17px;letter-spacing:2px;margin-bottom:9px;}
+        .difficulty-list small {display:block;color:#b8aba1;line-height:1.55;font-size:12px;}
+        @media(max-width:600px){.difficulty-list{grid-template-columns:1fr}.difficulty-list button{min-height:65px}}
+        #flame-field {position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;}
+        .flame-set {position:absolute;width:30px;height:46px;transform:translate(-50%,-67%);filter:drop-shadow(0 0 5px #f8a74d);animation:flameSway 1.7s ease-in-out infinite alternate;}
+        .wall-flame:nth-child(2){animation-delay:-.7s}.wall-flame:nth-child(3){animation-delay:-1.2s}
+        .flame-glow {position:absolute;left:-22px;top:-25px;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle,#ffb65378 0%,#f48b2333 30%,transparent 71%);animation:glowPulse 1.35s ease-in-out infinite alternate;}
+        .flame-body {position:absolute;left:8px;top:6px;width:14px;height:26px;background:linear-gradient(65deg,#f36b22,#ffb839 45%,#ffdc7b);border-radius:65% 15% 55% 55%;transform:rotate(23deg);clip-path:polygon(58% 0%,95% 44%,100% 72%,80% 100%,18% 100%,0 73%,22% 45%);animation:flameDance .31s ease-in-out infinite alternate;}
+        .flame-core {position:absolute;left:12px;top:17px;width:7px;height:13px;background:#fff7c8;border-radius:70% 35% 60% 40%;animation:flameDance .43s ease-in-out infinite alternate-reverse;}
+        @keyframes flameDance {from{transform:rotate(-8deg) scale(.83,1.18);opacity:.8}to{transform:rotate(11deg) scale(1.18,.76);opacity:1}}
+        @keyframes flameSway {from{transform:translate(-50%,-67%) rotate(-3deg)}to{transform:translate(-50%,-67%) rotate(4deg)}}
+        @keyframes glowPulse {from{opacity:.52;transform:scale(.82)}to{opacity:1;transform:scale(1.35)}}
+        #dialog-box.portrait-visible {padding-left:178px;min-height:135px;}
+        #lily-portrait {display:none;position:absolute;left:-12px;bottom:0;width:170px;height:211px;overflow:hidden;filter:drop-shadow(3px 0 9px #000);animation:portraitRise .35s ease-out both;}
+        #dialog-box.portrait-visible #lily-portrait {display:block;}
+        @keyframes portraitRise {from{transform:translateY(15px);opacity:.3}to{transform:translateY(0);opacity:1}}
+        #lily-portrait>div {position:absolute;}
+        .portrait-shadow {inset:6px 4px 0;background:radial-gradient(ellipse at 48% 55%,#6a4d3d99,transparent 64%);}
+        .portrait-body {left:12px;bottom:-10px;width:153px;height:99px;background:linear-gradient(115deg,#a98748 0%,#594e38 42%,#302e32 75%,#1a1d25);clip-path:polygon(15% 34%,39% 15%,60% 16%,86% 30%,100% 100%,0 100%);border-radius:40px 40px 0 0;}
+        .portrait-shirt {left:61px;bottom:0;width:57px;height:81px;background:#dad1b7;clip-path:polygon(0 0,100% 0,75% 100%,30% 100%);}
+        .portrait-neck {left:75px;top:96px;width:34px;height:45px;background:linear-gradient(90deg,#a67560,#e2b59a 55%,#956d5e);border-radius:8px;}
+        .portrait-hair-back {left:40px;top:12px;width:101px;height:142px;background:linear-gradient(90deg,#533b31 4%,#8d6445 36%,#be8a57 60%,#3c2b30 92%);border-radius:48% 50% 25% 28%;box-shadow:inset -12px -8px 0 #493430;}
+        .portrait-face {left:57px;top:37px;width:75px;height:88px;background:linear-gradient(95deg,#a57766 0%,#ecc4a6 33%,#e2b49a 75%,#966c61);clip-path:polygon(12% 4%,80% 0,99% 24%,92% 69%,72% 94%,43% 100%,15% 82%,0 35%);}
+        .portrait-ear {left:119px;top:82px;width:14px;height:19px;border-radius:40%;background:#bb8876;}
+        .portrait-eyes {left:69px;top:75px;width:54px;height:10px;display:flex;justify-content:space-between;}
+        .portrait-eyes i {width:17px;height:8px;border-top:2px solid #513d3a;background:#f6e3cf;border-radius:45% 45% 40% 40%;}
+        .portrait-eyes i:after {content:"";display:block;width:6px;height:7px;margin-left:7px;background:#4a4b4b;border-radius:50%;}
+        .portrait-brows {left:69px;top:68px;width:54px;display:flex;justify-content:space-between;}
+        .portrait-brows i {width:17px;height:3px;background:#6c4a3d;transform:rotate(-5deg);}
+        .portrait-nose {left:96px;top:83px;width:7px;height:18px;border-right:2px solid #aa776b;border-bottom:2px solid #bb8274;border-radius:0 0 50% 0;}
+        .portrait-mouth {left:86px;top:108px;width:20px;height:4px;border-bottom:2px solid #9f5e5b;border-radius:50%;}
+        .portrait-hair-front {left:53px;top:28px;width:85px;height:48px;background:linear-gradient(115deg,#3f3031,#b48355 48%,#5a3c35);clip-path:polygon(0 13%,72% 0,100% 45%,83% 54%,64% 43%,40% 86%,5% 100%);}
+        .portrait-strand {left:46px;top:60px;width:23px;height:81px;background:linear-gradient(90deg,#5c4035,#a16c47);clip-path:polygon(0 0,100% 0,67% 100%,15% 94%);}
+        .portrait-collar {left:46px;top:121px;width:91px;height:35px;background:#b29d6e;clip-path:polygon(0 0,30% 38%,51% 100%,75% 30%,100% 0,91% 100%,10% 100%);}
+        .portrait-lamp {right:9px;bottom:8px;width:27px;height:44px;background:linear-gradient(#cba85e,#5b492f);border:4px solid #413124;border-radius:4px;box-shadow:0 0 18px #edb55491;}
+        .portrait-lamp:after {content:"";position:absolute;left:6px;top:6px;width:7px;height:19px;background:#f7cb72;box-shadow:0 0 12px #ffb34b;animation:glowPulse 1.4s infinite alternate;}
+        #lily-portrait.tense .portrait-brows i:first-child {transform:rotate(14deg)}
+        #lily-portrait.tense .portrait-brows i:last-child {transform:rotate(-14deg)}
+        #lily-portrait.tense .portrait-mouth {height:8px;border:2px solid #9f5e5b;background:#543a3d;}
+        /* 莉莉：原創金髮調查員，立繪與行走圖共用金髮／深紅雨衣配色。 */
+        #lily-portrait {width:181px;height:220px;}
+        .portrait-body {left:11px;bottom:-10px;width:158px;height:98px;background:linear-gradient(105deg,#593840,#8a5662 34%,#342a36 76%,#241e2a);clip-path:polygon(10% 42%,30% 15%,48% 30%,70% 13%,91% 44%,100% 100%,0 100%);}
+        .portrait-shirt {left:66px;bottom:12px;width:52px;height:74px;background:linear-gradient(#e7dfca,#bcae9e);clip-path:polygon(0 0,100% 0,74% 100%,27% 100%);}
+        .portrait-neck {left:79px;top:107px;width:30px;height:37px;background:linear-gradient(90deg,#af7969,#f1c9a8 48%,#ac7768);}
+        .portrait-hair-back {left:38px;top:8px;width:112px;height:151px;background:linear-gradient(94deg,#7b5438 2%,#dfaa5f 25%,#f9d989 54%,#be8347 78%,#65432e 100%);border-radius:50% 49% 23% 31%;box-shadow:inset -10px -8px 0 #8d5f3c,3px 8px 9px #1c1920;}
+        .portrait-face {left:61px;top:43px;width:73px;height:89px;background:linear-gradient(98deg,#b87969,#efd0b3 32%,#f3d1b5 62%,#bc8874);clip-path:polygon(13% 1%,81% 0,100% 27%,89% 74%,64% 97%,41% 100%,14% 83%,0 31%);}
+        .portrait-eyes {left:72px;top:80px;width:52px;}
+        .portrait-eyes i {width:16px;height:7px;border-top:2px solid #5d4a43;background:#f1e6d4;box-shadow:0 -3px 0 #ba8068;}
+        .portrait-eyes i:after {margin-left:6px;background:radial-gradient(circle at 40% 35%,#b6ac85 0 18%,#666d67 19% 62%,#252c31 64%);}
+        .portrait-brows {left:73px;top:72px;width:51px;}
+        .portrait-nose {left:101px;top:90px;height:16px;border-color:#b98579;}
+        .portrait-mouth {left:90px;top:114px;width:17px;border-color:#9b666a;}
+        .portrait-hair-front {left:52px;top:21px;width:94px;height:61px;background:linear-gradient(115deg,#95673c,#f5cf7d 35%,#d49650 78%,#7c5738);clip-path:polygon(0 22%,15% 3%,54% 0,89% 9%,100% 48%,84% 49%,70% 35%,53% 65%,39% 96%,15% 76%,0 100%);}
+        .portrait-strand {left:44px;top:60px;width:27px;height:95px;background:linear-gradient(90deg,#795139,#e6af64 60%,#ad713d);clip-path:polygon(0 0,100% 0,72% 100%,9% 91%);}
+        .portrait-collar {left:42px;top:133px;width:102px;height:33px;background:linear-gradient(100deg,#d7c7ab,#f5e6c2,#a89082);clip-path:polygon(0 0,31% 37%,53% 90%,75% 29%,100% 0,92% 100%,9% 100%);}
+        .portrait-bow {left:120px;top:83px;width:27px;height:20px;background:#ba7d78;clip-path:polygon(0 15%,42% 38%,51% 29%,100% 0,83% 90%,52% 62%,46% 66%,7% 100%);filter:drop-shadow(1px 2px #643d45);}
+        .portrait-hair-shine {left:81px;top:22px;width:31px;height:38px;border-left:5px solid #fff0ab;border-radius:52%;transform:rotate(30deg);opacity:.62;}
+        .portrait-coat-seam {left:116px;bottom:0;width:3px;height:62px;background:#c6988f;transform:rotate(-21deg);opacity:.65;}
+        .portrait-lamp {right:5px;bottom:5px;}
+        @media(max-width:620px){#dialog-box.portrait-visible{padding-left:91px}#lily-portrait{transform:scale(.55);transform-origin:bottom left;left:0;animation:none}}
+        .puzzle-card {position:relative;width:min(590px,96%);max-height:96%;overflow:auto;padding:24px 26px;text-align:center;color:#e7d5b6;background:linear-gradient(145deg,#2b2421,#111116 76%);border:5px double #98754e;box-shadow:0 0 0 5px #151016,0 22px 65px #000,inset 0 0 40px #0008;animation:puzzleEnter .38s ease-out;}
+        @keyframes puzzleEnter {from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+        .puzzle-kicker {font:11px Georgia,serif;letter-spacing:4px;color:#a8855e;}
+        .puzzle-card h2 {font:normal 26px/1.4 "Microsoft JhengHei",sans-serif;letter-spacing:3px;margin:5px 0 7px;}
+        .puzzle-card p {font-size:13px;color:#b3a59b;line-height:1.6;}
+        .puzzle-close {position:absolute;right:8px;top:5px;background:none;border:0;color:#cbb99d;font-size:30px;cursor:pointer;z-index:2;}
+        .puzzle-close:hover {color:#fff;}
+        .puzzle-submit {margin:15px 0 2px;padding:10px 24px;background:#58412c;border:1px solid #cbad78;color:#f7dfb1;font:16px "Microsoft JhengHei",sans-serif;letter-spacing:2px;cursor:pointer;box-shadow:0 4px 0 #251a18;}
+        .puzzle-submit:hover {background:#79583a;}
+        .puzzle-feedback {min-height:21px;margin-top:12px;font-size:13px;color:#cebb9d;}
+        .puzzle-feedback.error {color:#e18983;animation:puzzleShake .35s linear;}
+        @keyframes puzzleShake {25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+        .safe-lid {position:relative;margin:20px auto 0;padding:15px 12px 17px;max-width:450px;background:repeating-linear-gradient(90deg,#5b3b27 0 35px,#563922 36px 38px);border:8px ridge #7a5e3f;box-shadow:inset 0 0 0 3px #b18a5a,inset 0 0 24px #1b130f,0 10px 20px #0009;}
+        .safe-inscription {font:13px Georgia,serif;letter-spacing:15px;color:#c6a477;text-shadow:0 1px #2f1d14;}
+        .safe-wheels {display:flex;justify-content:center;gap:12px;padding:13px 2px;}
+        .safe-wheel {display:flex;flex-direction:column;align-items:center;gap:3px;}
+        .safe-wheel button {width:49px;height:27px;background:#42352e;border:1px solid #a38456;color:#dfbe82;font-size:15px;cursor:pointer;}
+        .safe-wheel button:hover {background:#705437;}
+        .wheel-digit {width:49px;height:63px;line-height:59px;background:linear-gradient(#756a5a 0%,#d4c4a4 25%,#ad9880 52%,#e0caa4 78%,#655648);border:3px solid #382d28;box-shadow:inset 0 0 8px #1d1417,0 0 0 2px #a4855f;color:#241c1a;font:bold 37px Georgia,serif;font-variant-numeric:tabular-nums;}
+        .wheel-digit.turn {animation:wheelTurn .2s ease-in-out;}
+        @keyframes wheelTurn {50%{transform:translateY(3px) scaleY(.77);filter:brightness(.72)}}
+        .safe-keyhole {margin:4px auto 0;width:20px;height:24px;background:#211b1b;clip-path:polygon(28% 0,72% 0,100% 35%,64% 58%,72% 100%,28% 100%,36% 58%,0 35%);box-shadow:0 0 0 4px #bc9662;}
+        .clock-card {min-height:540px;}
+        .clock-wide {display:flex;flex-direction:column;align-items:center;}
+        .grand-clock {position:relative;width:154px;height:339px;margin:12px auto 0;filter:drop-shadow(10px 15px 8px #000);transform-origin:center 42%;}
+        .grand-crown {position:absolute;left:12px;top:0;width:130px;height:25px;background:linear-gradient(90deg,#36201a,#a07749,#4b2b1e);clip-path:polygon(0 100%,5% 30%,15% 18%,29% 50%,50% 0,72% 50%,85% 18%,96% 30%,100% 100%);}
+        .grand-head {position:absolute;top:20px;left:9px;width:136px;height:144px;border:11px ridge #76502c;background:#241d1c;border-radius:54px 54px 8px 8px;box-shadow:inset 0 0 18px #000;}
+        .grand-small-face {position:absolute;inset:15px;border:6px ridge #aa8652;border-radius:50%;background:radial-gradient(circle,#e3d4ac,#aa9676);}
+        .grand-small-face i,.grand-small-face b {position:absolute;left:50%;top:50%;width:2px;height:32px;transform-origin:bottom;bottom:50%;background:#332826;}
+        .grand-small-face i {transform:translate(-50%,-100%) rotate(110deg)}
+        .grand-small-face b {transform:translate(-50%,-100%) rotate(240deg);height:26px;}
+        .grand-column {position:absolute;left:24px;top:164px;width:106px;height:146px;border:12px ridge #684426;background:linear-gradient(90deg,#120f13,#64482e,#151013);}
+        .grand-pendulum {position:absolute;left:39px;top:12px;width:5px;height:80px;background:#bc9456;}
+        .grand-pendulum:after {content:"";position:absolute;left:-10px;bottom:-22px;width:25px;height:25px;border-radius:50%;background:radial-gradient(circle,#e3be77,#684529);}
+        .grand-base {position:absolute;bottom:0;left:8px;width:138px;height:31px;background:linear-gradient(#aa7950,#54351f);border:6px ridge #7d532f;}
+        .clock-detail {display:none;opacity:0;transform:scale(.68);transition:opacity .7s,transform .7s;}
+        .clock-card.zooming .clock-wide {animation:clockWideExit .65s ease-in forwards;}
+        @keyframes clockWideExit {to{opacity:0;transform:scale(1.7)}}
+        .clock-card.zoomed .clock-detail {display:block;opacity:1;transform:scale(1);animation:clockCloseup .7s ease-out;}
+        @keyframes clockCloseup {from{opacity:0;transform:scale(.68)}to{opacity:1;transform:scale(1)}}
+        .clock-card.zoomed .clock-wide {display:none;}
+        .clock-face {position:relative;width:min(286px,55vw);aspect-ratio:1;margin:15px auto;border:16px ridge #875e35;border-radius:50%;background:radial-gradient(circle,#ddc8a0 0 58%,#a68556 84%,#4b352b 86%);box-shadow:0 0 0 5px #32241d,inset 0 0 24px #5d4c3e;touch-action:none;cursor:grab;}
+        .clock-face:active {cursor:grabbing;}
+        .clock-roman {position:absolute;font:bold 22px Georgia,serif;color:#4b3b32;transform:translate(-50%,-50%);}
+        .r12{top:10%;left:50%}.r3{top:50%;left:90%}.r6{top:89%;left:50%}.r9{top:50%;left:10%}
+        .clock-hour-hand,.clock-minute-hand {position:absolute;left:50%;bottom:50%;width:8px;height:26%;margin-left:-4px;background:linear-gradient(90deg,#3c2e28,#a07c50,#29201d);clip-path:polygon(50% 0,100% 25%,100% 100%,0 100%,0 25%);transform-origin:50% 100%;transition:transform .25s ease-out;pointer-events:none;}
+        .clock-minute-hand {width:5px;height:38%;margin-left:-2.5px;background:#302521;}
+        .clock-pin {position:absolute;left:50%;top:50%;width:14px;height:14px;transform:translate(-50%,-50%);border-radius:50%;background:#c7a365;border:3px solid #4d3628;pointer-events:none;}
+        .clock-readout {display:flex;justify-content:center;align-items:center;gap:10px;color:#c5a574;font:bold 26px Georgia,serif;}
+        .clock-readout div {display:flex;align-items:center;gap:5px;font:13px "Microsoft JhengHei",sans-serif;}
+        .clock-readout span {font:bold 25px Georgia,serif;color:#ebd2a1;min-width:36px;}
+        .clock-readout button {border:1px solid #876e50;background:#2a2424;color:#e3c69d;padding:6px;cursor:pointer;}
+        .puzzle-note {margin-top:12px;}
+        /* 手機方向鍵在畫布下方，橫向時浮在兩側；不遮住對話與謎題。 */
+        #touch-controls {display:none;position:absolute;left:0;right:0;bottom:-139px;height:130px;z-index:23;justify-content:space-between;align-items:center;padding:0 8px;touch-action:none;transition:opacity .18s;}
+        .touch-pad {position:relative;width:130px;height:125px;flex:none;}
+        .touch-key,.touch-round {border:1px solid #a98a63;background:#2e2836df;color:#f1d5a1;box-shadow:0 4px 0 #17131e,0 0 10px #0009;touch-action:none;-webkit-tap-highlight-color:transparent;font-family:inherit;}
+        .touch-key {position:absolute;width:42px;height:42px;border-radius:8px;font-size:20px;}
+        .touch-key.up {left:44px;top:0}.touch-key.down {left:44px;top:84px}.touch-key.left {left:0;top:42px}.touch-key.right {left:88px;top:42px}
+        .touch-key:active,.touch-round:active,.touch-key.pressed {background:#846643;transform:translateY(3px);box-shadow:0 1px 0 #17131e;}
+        .touch-actions {display:flex;align-items:center;gap:10px;justify-content:flex-end;}
+        .touch-round {width:63px;height:63px;border-radius:50%;font-size:14px;font-weight:bold;}
+        .touch-round.primary {width:74px;height:74px;background:#68452bdc;border-color:#e2b974;}
+        .touch-round.small {width:39px;height:39px;font-size:19px;}
+        @media (pointer:coarse) {
+            #touch-controls {display:flex;}
+            #game-container.playing {padding-bottom:140px;}
+            #game-canvas-wrapper {width:min(800px,96vw,calc((100dvh - 155px)*4/3));max-height:calc(100dvh - 155px);}
+            #main-menu,#difficulty-screen,#settings-panel {max-height:94dvh;overflow-y:auto;}
+            #main-menu .game-title {font-size:clamp(21px,6vw,36px);}
+            #hud {top:7px;left:7px;right:7px;font-size:clamp(10px,2.5vw,15px);}
+            .stat-box {padding:5px 6px;}
+            #scene-name {top:31px;font-size:11px;}
+            #objective {top:60px!important;left:7px!important;max-width:90%!important;padding:4px 6px!important;font-size:10px!important;}
+            #dialog-box {left:5px;right:5px;bottom:7px;padding:9px 11px;font-size:clamp(11px,2.8vw,14px);line-height:1.4;max-height:65%;overflow-y:auto;}
+            #dialog-box.portrait-visible {padding-left:88px;min-height:82px;}
+            #lily-portrait {transform:scale(.52);transform-origin:bottom left;left:0;animation:none;}
+            #interaction-prompt {bottom:8px;font-size:11px;padding:4px 8px;white-space:nowrap;}
+            #choice-panel {width:92%;padding:12px 15px;max-height:94%;}
+            #choice-title {font-size:16px!important;margin-bottom:8px!important;}
+            .cinematic-option {margin:5px 0;padding:6px 8px;font-size:13px;}
+            .option-index {font-size:17px;min-width:30px;padding-right:5px;}
+            .option-label,.option-label.numeric-answer {font-size:13px;}
+            .puzzle-card {padding:12px 13px;}
+            .puzzle-card h2 {font-size:17px;}
+            .puzzle-card p {font-size:11px;}
+            .safe-lid {margin:5px auto 0;padding:6px;}
+            .safe-wheels {gap:6px;padding:6px 1px;}
+            .safe-wheel button,.wheel-digit {width:37px;}
+            .wheel-digit {height:43px;line-height:40px;font-size:26px;}
+            .safe-wheel button {height:26px;}
+            .clock-card {min-height:0;}
+            .grand-clock {transform:scale(.62);height:220px;margin-top:-30px;margin-bottom:-15px;}
+            .clock-face {width:min(220px,50vw);border-width:10px;margin:5px auto;}
+            .clock-readout {gap:4px;}.clock-readout span{font-size:17px;min-width:25px;}.clock-readout button{padding:4px;}
+            .puzzle-submit {font-size:13px;padding:7px 12px;margin:7px 0 2px;}
+        }
+        @media (pointer:coarse) and (orientation:landscape) {
+            #game-container.playing {padding-bottom:0;}
+            #game-canvas-wrapper {width:min(800px,96vw,calc(96dvh*4/3));max-height:96dvh;}
+            #touch-controls {bottom:7px;height:90px;align-items:end;}
+            .touch-pad {transform:scale(.68);transform-origin:bottom left;margin-bottom:-7px;}
+            .touch-actions {transform:scale(.72);transform-origin:bottom right;margin-bottom:4px;}
+            #dialog-box {left:90px;right:90px;bottom:6px;max-height:65%;}
+            #interaction-prompt {bottom:85px;}
+        }
+        #scene-name {position:absolute;left:50%;transform:translateX(-50%);top:0;white-space:nowrap;}
+        @media(max-width:650px) and (pointer:fine){#scene-name{top:46px;font-size:12px;}#objective{top:85px!important;font-size:11px!important;}}
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- 主選單畫面 -->
+    <div id="main-menu">
+        <div class="game-title">伯爵的遺忘之作</div>
+        <div class="game-subtitle">- The Forgotten Work -</div>
+        
+        <button class="menu-btn" onclick="showDifficulty()">開始遊戲</button>
+        <button class="menu-btn" onclick="openOptions()">遊戲設定</button>
+        <button class="menu-btn" onclick="openCredits()">製作團隊</button>
+    </div>
+
+    <div id="difficulty-screen" style="display:none;position:absolute;z-index:31;width:min(680px,94vw);padding:30px;background:#0b0a10f2;border:2px solid #866b4d;text-align:center;box-shadow:0 22px 70px #000;">
+        <div style="font-size:11px;color:#b08d63;letter-spacing:4px;">SELECT YOUR EXPERIENCE</div>
+        <h2 style="font-size:26px;color:#ead2ab;margin:12px 0 6px;">選擇調查方式</h2>
+        <p style="font-size:13px;color:#aa9d91;line-height:1.6;margin-bottom:20px;">難度影響莉莉的觀察與提示程度；謎題、路線及結局相同。</p>
+        <div class="difficulty-list">
+            <button onclick="startGame('explorer')"><strong>尋光者</strong><small>莉莉會說出更多觀察；提示可逐步揭露。</small></button>
+            <button onclick="startGame('investigator')"><strong>調查者</strong><small>對白保留線索，提示止於推理方向。</small></button>
+            <button onclick="startGame('silence')"><strong>無聲之夜</strong><small>對白更克制，提示僅給第一層暗示。</small></button>
+        </div>
+        <button class="menu-btn" onclick="hideDifficulty()" style="margin-top:18px;">返回</button>
+    </div>
+    <!-- 遊戲實際 Canvas 與介面容器 -->
+    <div id="game-canvas-wrapper">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="touch-controls" aria-label="觸控操作">
+            <div class="touch-pad" aria-label="方向鍵">
+                <button class="touch-key up" data-move="arrowup" aria-label="向上移動">▲</button>
+                <button class="touch-key left" data-move="arrowleft" aria-label="向左移動">◀</button>
+                <button class="touch-key down" data-move="arrowdown" aria-label="向下移動">▼</button>
+                <button class="touch-key right" data-move="arrowright" aria-label="向右移動">▶</button>
+            </div>
+            <div class="touch-actions">
+                <button id="touch-hint" class="touch-round secondary" onclick="touchHint()" aria-label="顯示提示">提示</button>
+                <button id="touch-interact" class="touch-round primary" onclick="touchInteract()" aria-label="調查或繼續對話">調查</button>
+                <button class="touch-round small" onclick="openOptions()" aria-label="開啟設定">⚙</button>
+            </div>
+        </div>
+        <div id="flame-field" aria-hidden="true">
+            <div id="player-flame" class="flame-set"><i class="flame-glow"></i><i class="flame-body"></i><i class="flame-core"></i></div>
+            <div class="wall-flame flame-set"><i class="flame-glow"></i><i class="flame-body"></i><i class="flame-core"></i></div>
+            <div class="wall-flame flame-set"><i class="flame-glow"></i><i class="flame-body"></i><i class="flame-core"></i></div>
+        </div>
+        
+        <div id="hud">
+            <div class="stat-box">🕯️ 油量: <span id="oil-val" style="color: #ffaa00;">1/5</span></div>
+            <div class="stat-box" id="scene-name" style="color:#e0c790;letter-spacing:2px;">暴雨中的城堡</div>
+            <div class="stat-box">🧠 心智值 (SAN): <span id="san-val" style="color: #55ff55;">100/100</span></div>
+        </div>
+
+        <div id="objective" style="display:none;position:absolute;top:62px;left:15px;z-index:12;padding:8px 12px;max-width:75%;background:#100e12df;border:1px solid #665044;font-size:13px;">目標：尋找光源</div>
+        <div id="interaction-prompt">[E / SPACE] 調查</div>
+
+        <div id="dialog-box" onclick="if(gameState.isDialogActive) advanceDialog()" title="點擊繼續">
+            <div id="lily-portrait" aria-hidden="true">
+                <div class="portrait-shadow"></div><div class="portrait-body"></div><div class="portrait-shirt"></div>
+                <div class="portrait-neck"></div><div class="portrait-hair-back"></div><div class="portrait-face"></div>
+                <div class="portrait-ear"></div><div class="portrait-eyes"><i></i><i></i></div>
+                <div class="portrait-brows"><i></i><i></i></div><div class="portrait-nose"></div><div class="portrait-mouth"></div>
+                <div class="portrait-hair-front"></div><div class="portrait-strand"></div><div class="portrait-collar"></div>
+                <div class="portrait-bow"></div><div class="portrait-hair-shine"></div><div class="portrait-coat-seam"></div><div class="portrait-lamp"></div>
+            </div>
+            <div id="dialog-speaker">L (莉莉)</div>
+            <div id="dialog-text">……</div>
+            <div id="choice-controls" style="display:none;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
+        </div>
+        <div id="choice-backdrop" style="display:none;position:absolute;inset:0;z-index:24;background:rgba(2,3,8,.65);pointer-events:none;"></div>
+        <div id="choice-panel" role="dialog" aria-label="抉擇" style="display:none;position:absolute;right:0;top:50%;z-index:26;width:min(530px,90%);max-height:86%;overflow:auto;padding:23px 26px;background:linear-gradient(110deg,#1a1821f7,#090b11fa);border:2px solid #b69a6e;border-right:0;box-shadow:-20px 15px 65px #000, inset 4px 0 #614837;transform:translate(108%,-50%);">
+            <div style="font-size:11px;letter-spacing:4px;color:#ab8e68;margin-bottom:9px;">DECISION / 抉擇</div>
+            <div id="choice-title" style="color:#f0d9ac;font-size:21px;margin-bottom:20px;font-weight:bold;"></div>
+            <div id="cinematic-options"></div>
+            <div style="font-size:11px;color:#817a7a;margin-top:13px;">↑ ↓ 切換　Enter／空白鍵決定　1–9 直接選擇</div>
+        </div>
+        <div id="puzzle-overlay" role="dialog" aria-modal="true" aria-label="謎題" style="display:none;position:absolute;inset:0;z-index:27;align-items:center;justify-content:center;background:#080911ed;padding:16px;">
+            <div id="safe-puzzle" class="puzzle-card" style="display:none;">
+                <button class="puzzle-close" onclick="closePuzzle()" aria-label="離開密碼鎖">×</button>
+                <div class="puzzle-kicker">THE COUNT'S LOCKBOX</div><h2>伯爵的舊箱子</h2>
+                <p>齒輪生了鏽，仍能一格一格轉動。</p>
+                <div class="safe-lid"><div class="safe-inscription">A · V · H</div>
+                    <div id="safe-wheels" class="safe-wheels"></div>
+                    <div class="safe-keyhole"></div>
+                </div>
+                <div id="safe-feedback" class="puzzle-feedback" aria-live="polite">轉動四個數字輪，再扳動鎖扣。</div>
+                <button class="puzzle-submit" onclick="submitSafe()">扳動鎖扣</button>
+            </div>
+            <div id="clock-puzzle" class="puzzle-card clock-card" style="display:none;">
+                <button class="puzzle-close" onclick="closePuzzle()" aria-label="離開古鐘">×</button>
+                <div class="puzzle-kicker">A MOMENT PRESERVED</div><h2>被停止的時間</h2>
+                <div id="clock-wide" class="clock-wide"><div class="grand-clock">
+                    <div class="grand-crown"></div><div class="grand-head"><div class="grand-small-face"><i></i><b></b></div></div>
+                    <div class="grand-column"><div class="grand-pendulum"></div></div><div class="grand-base"></div>
+                </div><p>灰塵裡，古鐘像一個沉默的守夜人。</p><button class="puzzle-submit" onclick="zoomClock()">靠近鐘面</button></div>
+                <div id="clock-detail" class="clock-detail">
+                    <div id="clock-face" class="clock-face" aria-label="可拖動的鐘面">
+                        <div class="clock-roman r12">XII</div><div class="clock-roman r3">III</div><div class="clock-roman r6">VI</div><div class="clock-roman r9">IX</div>
+                        <div class="clock-hour-hand" id="hour-hand"></div><div class="clock-minute-hand" id="minute-hand"></div><div class="clock-pin"></div>
+                    </div>
+                    <div class="clock-readout"><div>時 <button onclick="turnClock('hour',-1)" aria-label="時針逆轉">◀</button><span id="clock-hour">03</span><button onclick="turnClock('hour',1)" aria-label="時針順轉">▶</button></div><span>:</span><div>分 <button onclick="turnClock('minute',-1)" aria-label="分針逆轉">◀</button><span id="clock-minute">40</span><button onclick="turnClock('minute',1)" aria-label="分針順轉">▶</button></div></div>
+                    <p class="puzzle-note">按住鐘面轉動分針；也可以使用左右箭頭。</p>
+                    <div id="clock-feedback" class="puzzle-feedback" aria-live="polite">鏡中殘留的時間，究竟停在哪一刻？</div>
+                    <button class="puzzle-submit" onclick="submitClock()">按下鐘心</button>
+                </div>
+            </div>
+        </div>
+        <div id="ending" style="display:none;position:absolute;inset:0;z-index:28;background:#08080df2;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px;gap:22px;">
+            <h1 id="ending-title" style="color:#e6c487;font-size:34px;"></h1><p id="ending-body" style="white-space:pre-line;line-height:1.9;max-width:600px;"></p>
+            <button class="menu-btn" onclick="location.reload()">重新開始</button>
+        </div>
+    </div>
+
+    <div id="settings-panel" role="dialog" aria-label="遊戲設定" style="display:none;position:absolute;z-index:60;width:min(390px,90vw);padding:30px;background:#120f16f5;border:2px solid #a98759;border-radius:8px;box-shadow:0 0 50px #000;">
+        <h2 style="margin-bottom:8px;color:#ebd2a6;">遊戲設定</h2><p style="font-size:13px;color:#af9d8e;margin-bottom:25px;">ESC 暫停／繼續</p>
+        <label for="volume-range">音量　<span id="volume-display">70%</span></label><input id="volume-range" type="range" min="0" max="100" value="70" oninput="setVolume(this.value)" style="width:100%;margin:12px 0 26px;accent-color:#c9a268;">
+        <label for="brightness-range">遊戲亮度　<span id="brightness-display">50%</span></label><input id="brightness-range" type="range" min="0" max="100" value="50" oninput="setBrightness(this.value)" style="width:100%;margin:12px 0 26px;accent-color:#c9a268;">
+        <button class="menu-btn" onclick="closeOptions()" style="width:100%;">返回遊戲</button>
+    </div>
+    <div id="version-info">完整小品 v1.5</div>
+</div>
+
+<script>
+// ==========================================
+// 伯爵的遺忘之作 - 整合主選單與遊戲核心
+// ==========================================
+
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 600;
+const TILE_SIZE = 40;
+const GRID_COLS = 20;
+const GRID_ROWS = 15;
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const lightCanvas = document.createElement('canvas');
+lightCanvas.width = CANVAS_WIDTH;
+lightCanvas.height = CANVAS_HEIGHT;
+const lightCtx = lightCanvas.getContext('2d');
+
+const oilValEl = document.getElementById('oil-val');
+const sanValEl = document.getElementById('san-val');
+const dialogBox = document.getElementById('dialog-box');
+const dialogSpeaker = document.getElementById('dialog-speaker');
+const dialogText = document.getElementById('dialog-text');
+const promptEl = document.getElementById('interaction-prompt');
+
+let gameState = {
+    version: '1.5',
+    difficulty: 'investigator',
+    currentScene: 'OUTSIDE',
+    oil: 1,
+    maxOil: 5,
+    san: 100,
+    hasFlashlight: true,
+    hasOilLamp: false,
+    flashlightBroken: false,
+    switches: {
+        S000_StormON: true,
+        S001_EntranceLocked: false,
+        S002_NotePicked: false,
+        S011_HallPuzzleDone: false
+    },
+    activeInteractable: null,
+    isDialogActive: false,
+    dialogQueue: [],
+    ghostVisible: false,
+    ghostAlpha: 0,
+    flickerTimer: 0,
+    waterTimer: 0,
+    lightningTimer: 0,
+    lightningAlpha: 0,
+    gameStarted: false
+};
+
+const player = {
+    x: 9 * TILE_SIZE + 6,
+    y: 13 * TILE_SIZE + 2,
+    width: 28,
+    height: 36,
+    speed: 3,
+    direction: 'up',
+    isMoving: false,
+    animFrame: 0,
+    animTimer: 0
+};
+
+const rainDrops = [];
+for (let i = 0; i < 60; i++) {
+    rainDrops.push({
+        x: Math.random() * CANVAS_WIDTH,
+        y: Math.random() * CANVAS_HEIGHT,
+        length: Math.random() * 12 + 8,
+        speed: Math.random() * 8 + 12,
+        opacity: Math.random() * 0.4 + 0.2
+    });
+}
+
+const keys = {};
+
+// --- 主選單互動與遊戲啟動 ---
+let audioCtx = null;
+let rainGainNode = null;
+let masterGain = null;
+const settings = { volume:70, brightness:50, open:false };
+function ensureMaster(){if(audioCtx && !masterGain){masterGain=audioCtx.createGain();masterGain.gain.value=settings.volume/100;masterGain.connect(audioCtx.destination);}}
+let bgmOscillators = [];
+
+function playClickSound() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    ensureMaster();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(580, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.1);
+    
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+}
+
+function showDifficulty(){playClickSound();document.getElementById('main-menu').style.display='none';document.getElementById('difficulty-screen').style.display='block';}
+function hideDifficulty(){document.getElementById('difficulty-screen').style.display='none';document.getElementById('main-menu').style.display='flex';}
+function startGame(mode='investigator') {
+    gameState.difficulty=mode;
+    document.getElementById('difficulty-screen').style.display='none';
+    playClickSound();
+    
+    const menu = document.getElementById('main-menu');
+    const canvasWrapper = document.getElementById('game-canvas-wrapper');
+    const container = document.getElementById('game-container');
+
+    // 選單淡出並切換場景
+    menu.style.opacity = '0';
+    setTimeout(() => {
+        menu.style.display = 'none';
+        canvasWrapper.style.display = 'block';
+        document.getElementById('objective').style.display = 'block';
+        container.style.backgroundImage = 'none';
+        container.style.backgroundColor = '#050508';
+        container.classList.add('playing');
+        
+        // 啟動音效與遊戲迴圈
+        initAudio();
+        gameState.gameStarted = true;
+        lastTime = performance.now();
+        requestAnimationFrame(gameLoop);
+        updateObjective();
+        const opening={explorer:'暴雨幾乎抹去了來時的足跡。石牆後似乎還留著一些未被帶走的東西。',investigator:'石牆高得看不見盡頭。今晚，只有我一個人記得自己為何而來。',silence:'雨聲太大。城堡沒有一扇窗亮著。'};
+        showDialog("L（莉莉）", ["什麼才是真正的永存？", opening[mode], "WASD／方向鍵移動；E／空白鍵調查；H 提示；ESC 設定。"]);
+    }, 800);
+}
+
+function openOptions() {
+    if (settings.open) return;
+    settings.open=true;
+    for(const k of Object.keys(keys)) keys[k]=false;
+    document.getElementById('settings-panel').style.display='block';
+    document.getElementById('volume-range').value=settings.volume;
+    document.getElementById('brightness-range').value=settings.brightness;
+}
+function closeOptions(){settings.open=false;document.getElementById('settings-panel').style.display='none';lastTime=performance.now();}
+function setVolume(v){settings.volume=Number(v);document.getElementById('volume-display').textContent=v+'%';if(masterGain)masterGain.gain.value=settings.volume/100;}
+function setBrightness(v){settings.brightness=Number(v);document.getElementById('brightness-display').textContent=v+'%';}
+
+function openCredits() {
+    playClickSound();
+    alert("【製作團隊】\nGame Dev Architect Prototype\nBackground Art: Gothic Castle & Lantern Girl");
+}
+
+// --- 鍵盤監聽 ---
+window.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    if (key === 'escape') { e.preventDefault(); if(gameState.isPuzzleActive)closePuzzle();else settings.open ? closeOptions() : openOptions(); return; }
+    if (settings.open || !gameState.gameStarted || gameState.ended) return;
+    if (gameState.isPuzzleActive) {
+        if(gameState.puzzleType==='safe' && /^[0-9]$/.test(key)){dialWheel(gameState.activeWheel,Number(key)-safeDigits[gameState.activeWheel]);gameState.activeWheel=Math.min(3,gameState.activeWheel+1);}
+        else if(gameState.puzzleType==='clock' && key==='enter')submitClock();
+        return;
+    }
+    keys[key] = true;
+    keys[e.code] = true;
+
+    if ([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(key)) e.preventDefault();
+    if (gameState.isChoiceActive) {
+        if (/^[1-9]$/.test(key)) choose(Number(key)-1);
+        else if (key === 'arrowup' || key === 'w') selectChoice((selectedChoice+gameState.choiceOptions.length-1)%gameState.choiceOptions.length);
+        else if (key === 'arrowdown' || key === 's') selectChoice((selectedChoice+1)%gameState.choiceOptions.length);
+        else if ((key === 'enter' || key === ' ') && !e.repeat) choose(selectedChoice);
+        return;
+    }
+    if (key === "h" && !gameState.isDialogActive) { revealHint(); return; }
+    if (e.repeat && (key === "e" || key === " ")) return;
+    if (key === 'e' || key === ' ' || e.code === 'Space') {
+        if (gameState.isDialogActive) {
+            advanceDialog();
+        } else if (gameState.activeInteractable) {
+            triggerInteraction(gameState.activeInteractable);
+        }
+    }
+});
+
+window.addEventListener('keyup', (e) => {
+    if (!gameState.gameStarted) return;
+    const key = e.key.toLowerCase();
+    keys[key] = false;
+    keys[e.code] = false;
+});
+
+// 觸控方向鍵與鍵盤共用 keys 狀態，按住連續移動，手指離開即停止。
+function setupTouchControls(){
+ document.querySelectorAll('[data-move]').forEach(button=>{
+  const direction=button.dataset.move;
+  const release=e=>{keys[direction]=false;button.classList.remove('pressed');};
+  button.addEventListener('pointerdown',e=>{e.preventDefault();button.setPointerCapture(e.pointerId);keys[direction]=true;button.classList.add('pressed');});
+  button.addEventListener('pointerup',release);
+  button.addEventListener('pointercancel',release);
+  button.addEventListener('lostpointercapture',release);
+ });
+ window.addEventListener('blur',()=>{for(const k of Object.keys(keys))keys[k]=false;});
+}
+function touchInteract(){
+ if(!gameState.gameStarted||settings.open||gameState.ended||gameState.isPuzzleActive)return;
+ if(gameState.isChoiceActive){choose(selectedChoice);return;}
+ if(gameState.isDialogActive){advanceDialog();return;}
+ if(gameState.activeInteractable)triggerInteraction(gameState.activeInteractable);
+}
+function touchHint(){
+ if(gameState.gameStarted&&!settings.open&&!gameState.ended&&!gameState.isPuzzleActive&&!gameState.isChoiceActive&&!gameState.isDialogActive)revealHint();
+}
+function syncTouchControls(){const root=document.getElementById('touch-controls');
+ const blocked=settings.open||gameState.isPuzzleActive||gameState.isChoiceActive||gameState.ended;
+ root.style.visibility=blocked?'hidden':'visible';
+ const interact=document.getElementById('touch-interact');interact.textContent=gameState.isDialogActive?'下一句':gameState.activeInteractable?'調查':'互動';
+}
+setupTouchControls();
+
+// --- 音效引擎 ---
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    ensureMaster();
+    startRainAudio();
+    startAmbientBGM();
+}
+
+function startRainAudio() {
+    if (!audioCtx) return;
+    const bufferSize = audioCtx.sampleRate * 2;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+    }
+    const whiteNoise = audioCtx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 800;
+    filter.Q.value = 0.5;
+
+    rainGainNode = audioCtx.createGain();
+    rainGainNode.gain.value = 0.08;
+
+    whiteNoise.connect(filter);
+    filter.connect(rainGainNode);
+    rainGainNode.connect(masterGain);
+    whiteNoise.start();
+}
+
+function startAmbientBGM() {
+    if (!audioCtx) return;
+    const freqs = [110.00, 130.81, 164.81];
+    freqs.forEach(freq => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start();
+        bgmOscillators.push({ osc, gain });
+    });
+}
+
+function playThunderSFX() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 1.2);
+    gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.2);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1.2);
+}
+
+function playFallAndDropSFX() {
+    if (!audioCtx) return;
+    const fallOsc = audioCtx.createOscillator();
+    const fallGain = audioCtx.createGain();
+    fallOsc.type = 'sawtooth';
+    fallOsc.frequency.setValueAtTime(120, audioCtx.currentTime);
+    fallOsc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.3);
+    fallGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    fallGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    fallOsc.connect(fallGain);
+    fallGain.connect(audioCtx.destination);
+    fallOsc.start();
+    fallOsc.stop(audioCtx.currentTime + 0.3);
+
+    setTimeout(() => {
+        if (!audioCtx) return;
+        const dropOsc = audioCtx.createOscillator();
+        const dropGain = audioCtx.createGain();
+        dropOsc.type = 'square';
+        dropOsc.frequency.setValueAtTime(650, audioCtx.currentTime);
+        dropOsc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.25);
+        dropGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        dropGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        dropOsc.connect(dropGain);
+        dropGain.connect(audioCtx.destination);
+        dropOsc.start();
+        dropOsc.stop(audioCtx.currentTime + 0.25);
+    }, 200);
+}
+
+function playSFX(freq, duration, type='sine') {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+// 原創 Web Audio 合成音效；沒有外部音檔與網路依賴。
+function tone(freq,duration,type='sine',volume=.12,start=0){if(!audioCtx)return;
+ const t=audioCtx.currentTime+start,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+ osc.type=type;osc.frequency.setValueAtTime(freq,t);osc.frequency.exponentialRampToValueAtTime(Math.max(35,freq*.55),t+duration);
+ gain.gain.setValueAtTime(.001,t);gain.gain.exponentialRampToValueAtTime(volume,t+.015);
+ gain.gain.exponentialRampToValueAtTime(.001,t+duration);
+ osc.connect(gain);gain.connect(masterGain);osc.start(t);osc.stop(t+duration+.01);
+}
+function playChoiceOpen(){tone(90,.42,'sawtooth',.075);tone(175,.27,'triangle',.08,.07);tone(440,.22,'sine',.10,.16);}
+function playChoiceMove(){tone(250,.075,'triangle',.065);tone(580,.10,'sine',.045,.025);}
+function playChoiceConfirm(){tone(110,.44,'sawtooth',.10);tone(330,.36,'triangle',.10,.06);tone(660,.4,'sine',.12,.12);tone(990,.3,'sine',.07,.19);}
+
+// --- 地圖與互動定義 ---
+const maps = {
+    OUTSIDE: [
+        [1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,3,0,0,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1],
+        [4,4,4,4,4,4,4,4,0,0,4,4,4,4,4,4,4,4,4,4],
+        [4,4,4,4,4,4,4,4,0,0,4,4,4,4,4,4,4,4,4,4],
+        [5,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5],
+        [5,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5],
+        [5,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5],
+        [5,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5],
+        [5,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5],
+        [5,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5],
+        [5,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5]
+    ],
+    HALL: [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,3,3,0,0,0,3,3,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,3,3,0,0,0,3,3,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    ]
+};
+
+const interactables = {
+    OUTSIDE: [
+        { id: 'lamp_stone', name: '老舊的油燈', x: 7, y: 4, action: pickLamp },
+        { id: 'castle_gate', name: '城堡鐵柵門', x: 8, y: 0, action: enterCastle }
+    ],
+    HALL: [
+        { id: 'statue_A', name: '雕像 A', tileX: 6, tileY: 6, action: () => inspectStatue('A') },
+        { id: 'statue_B', name: '雕像 B', tileX: 7, tileY: 6, action: () => inspectStatue('B') },
+        { id: 'statue_C', name: '雕像 C', tileX: 11, tileY: 6, action: () => inspectStatue('C') },
+        { id: 'statue_D', name: '雕像 D', tileX: 12, tileY: 6, action: () => inspectStatue('D') },
+        { id: 'note', name: '揉皺的紙條', tileX: 3, tileY: 9, action: readNote },
+        { id: 'gallery_door', name: '畫廊暗門', tileX: 19, tileY: 4, action: enterGallery }
+    ]
+};
+
+// --- 對話系統 ---
+function showDialog(speaker, textArray, onComplete = null) {
+    gameState.dialogQueue = textArray.map(txt => ({ speaker, text: txt }));
+    gameState.dialogOnComplete = onComplete;
+    gameState.isDialogActive = true;
+    dialogBox.style.display = 'block';
+    advanceDialog();
+}
+
+function showScript(lines,onComplete=null){
+ gameState.dialogQueue=lines;gameState.dialogOnComplete=onComplete;gameState.isDialogActive=true;
+ dialogBox.style.display='block';advanceDialog();
+}
+function advanceDialog() {
+    if (gameState.dialogQueue.length === 0) {
+        dialogBox.style.display = 'none';
+        gameState.isDialogActive = false;
+        if (gameState.dialogOnComplete) {
+            const cb = gameState.dialogOnComplete;
+            gameState.dialogOnComplete = null;
+            cb();
+        }
+        return;
+    }
+    const current = gameState.dialogQueue.shift();
+    dialogSpeaker.innerText = current.speaker;
+    dialogText.innerText = current.text;
+    const lily=/^(L|莉莉)/.test(current.speaker), portrait=document.getElementById('lily-portrait');
+    dialogBox.classList.toggle('portrait-visible',lily);
+    portrait.classList.toggle('tense',/驚|痛|怕|不！|怎麼可能|恐|該死/.test(current.text));
+    playSFX(440, 0.05, 'triangle');
+}
+
+function triggerInteraction(item) {
+    if (item.action) item.action();
+}
+
+function inspectStatue(id) {
+    if (!gameState.switches.S002_NotePicked) {
+        showDialog("L (莉莉)", ["這是一座背對中心的石膏雕像。目前看不出特別之處。"]);
+        return;
+    }
+    if (id === 'D') {
+        if (!gameState.switches.S011_HallPuzzleDone) {
+            showDialog("L (莉莉)", ["基座深處傳來齒輪的聲音。"], () => {
+                playSFX(150, 0.8, 'sawtooth');
+                gameState.switches.S011_HallPuzzleDone = true;
+                updateObjective();
+                gameState.oil = Math.min(gameState.maxOil, gameState.oil + 4);
+                updateHUD();
+                
+                gameState.ghostVisible = true;
+                gameState.ghostAlpha = 0.85;
+                setTimeout(() => { gameState.ghostVisible = false; }, 800);
+
+                showDialog("系統", [
+                    "沉重的金屬摩擦聲迴盪在大廳中，雕像 D 在原地轉向歸位背對中央！",
+                    "獲得了「油罐」！油量增加了 4 點！",
+                    "雕像後方的牆壁露出一條通往畫廊的暗門。"
+                ], () => {
+                    showDialog("L (莉莉)", ["「修復，是為了被記住。」……這就是伯爵想讓我做的事嗎？"]);
+                });
+            });
+        } else {
+            showDialog("L (莉莉)", ["這座雕像已經轉動歸位過了。"]);
+        }
+    } else {
+        showDialog("L (莉莉)", ["這座雕像背對著中央，紋絲不動。也許它不是正確的機關。"]);
+    }
+}
+
+function readNote() {
+    if (gameState.switches.S002_NotePicked) return;
+
+    gameState.switches.S002_NotePicked = true;
+    showDialog("伯爵手稿", [
+        "「只有被遺忘的人才懂得孤獨的真諦。」",
+        "「世人皆追求對稱與平衡，卻不知道非對稱才是藝術的靈魂……尤其是當它被遺棄之時。」"
+    ], () => {
+        showDialog("L (莉莉)", [gameState.difficulty==='explorer'?"他反覆寫著『非對稱』。大廳裡有哪裡不一樣？":"手稿邊緣沾著石膏粉。"]);
+    });
+}
+
+function pickLamp() {
+    if (!gameState.hasOilLamp) {
+        gameState.hasOilLamp = true;
+        gameState.oil = 1;
+        updateHUD();
+        playSFX(520, 0.2, 'sine');
+        showDialog("L (莉莉)", [
+            "這盞老舊的油燈居然是被點亮著的……微弱但能勉強照亮四周。",
+            "手電筒已經壞了，就用這盞油燈吧。"
+        ]);
+    }
+}
+
+function enterCastle() {
+    if (!gameState.hasOilLamp) {
+        showDialog("L (莉莉)", ["周圍太暗了，我需要先找到光源才能進入。"]);
+        return;
+    }
+    gameState.currentScene = 'HALL';
+    updateObjective();
+    player.x = 9 * TILE_SIZE + 6;
+    player.y = 12 * TILE_SIZE + 2;
+    gameState.switches.S001_EntranceLocked = true;
+    gameState.san -= 5;
+    updateHUD();
+
+    if (rainGainNode) rainGainNode.gain.value = 0.01;
+
+    playSFX(100, 0.5, 'square');
+    showDialog("L (莉莉)", [
+        "大門在我背後重重關上。",
+        gameState.difficulty==='explorer'?"入口變成裂開的石牆。得先看清這座大廳。":"回頭時，門所在的地方只剩一道裂縫。"
+    ]);
+}
+
+function enterGallery() {
+    if (gameState.switches.S011_HallPuzzleDone) {
+        goScene("GALLERY", 2, 11, "畫廊裡滿是被毀壞的作品。 ");
+    } else {
+        showDialog("L (莉莉)", ["這面牆壁看似有所鬆動，但目前無法開啟。"]);
+    }
+}
+
+// --- 碰撞檢測 ---
+function isSolid(tileX, tileY) {
+    if (tileX < 0 || tileX >= GRID_COLS || tileY < 0 || tileY >= GRID_ROWS) return true;
+    const map = maps[gameState.currentScene];
+    const tile = map[tileY][tileX];
+    
+    if (gameState.currentScene === 'HALL' && gameState.switches.S001_EntranceLocked && tileY === 13 && tileX === 9) {
+        return true;
+    }
+
+    if (gameState.currentScene === 'OUTSIDE' && tileY === 4 && tileX === 7) {
+        return !gameState.hasOilLamp;
+    }
+
+    if (gameState.currentScene === 'HALL' && tileY === 9 && tileX === 3) {
+        return !gameState.switches.S002_NotePicked;
+    }
+
+    // 雕像只由下方的實體底座判定；上半身與所在格可以靠近調查。
+    if (gameState.currentScene === 'HALL' && tile === 3) return false;
+    return tile === 1 || tile === 3 || tile === 4 || tile === 5;
+}
+
+function checkCollisions(newX, newY) {
+    const margin = 6;
+    const pLeft = newX + margin;
+    const pRight = newX + player.width - margin;
+    const pTop = newY + player.height / 2;
+    const pBottom = newY + player.height - 2;
+
+    const gridLeft = Math.floor(pLeft / TILE_SIZE);
+    const gridRight = Math.floor(pRight / TILE_SIZE);
+    const gridTop = Math.floor(pTop / TILE_SIZE);
+    const gridBottom = Math.floor(pBottom / TILE_SIZE);
+
+    if (isSolid(gridLeft, gridTop) || isSolid(gridRight, gridTop) || 
+        isSolid(gridLeft, gridBottom) || isSolid(gridRight, gridBottom)) {
+        return true;
+    }
+
+    if (gameState.currentScene === 'HALL') {
+        const statuesList = [
+            { x: 6 * TILE_SIZE, y: 6 * TILE_SIZE },
+            { x: 7 * TILE_SIZE, y: 6 * TILE_SIZE },
+            { x: 11 * TILE_SIZE, y: 6 * TILE_SIZE },
+            { x: 12 * TILE_SIZE, y: 6 * TILE_SIZE }
+        ];
+
+        for (let s of statuesList) {
+            const sLeft = s.x + 6;
+            const sRight = s.x + 34;
+            const sTop = s.y + 20;
+            const sBottom = s.y + 33;
+
+            if (pRight > sLeft && pLeft < sRight && pBottom > sTop && pTop < sBottom) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// --- 主邏輯更新 ---
+let lastTime = performance.now();
+let sanTimer = 0;
+
+function update(dt) {
+    if (settings.open || gameState.isDialogActive || gameState.isChoiceActive || gameState.isPuzzleActive || gameState.ended) return;
+
+    let dx = 0, dy = 0;
+    if (keys['arrowup'] || keys['w']) { dy -= 1; player.direction = 'up'; }
+    if (keys['arrowdown'] || keys['s']) { dy += 1; player.direction = 'down'; }
+    if (keys['arrowleft'] || keys['a']) { dx -= 1; player.direction = 'left'; }
+    if (keys['arrowright'] || keys['d']) { dx += 1; player.direction = 'right'; }
+
+    if (dx !== 0 && dy !== 0) {
+        dx *= 0.7071;
+        dy *= 0.7071;
+    }
+
+    const nextX = player.x + dx * player.speed;
+    const nextY = player.y + dy * player.speed;
+
+    if (!checkCollisions(nextX, player.y)) player.x = nextX;
+    if (!checkCollisions(player.x, nextY)) player.y = nextY;
+
+    player.isMoving = (dx !== 0 || dy !== 0);
+
+    if (player.isMoving) {
+        player.animTimer += dt;
+        if (player.animTimer > 0.15) {
+            player.animFrame = (player.animFrame + 1) % 4;
+            player.animTimer = 0;
+        }
+    } else {
+        player.animFrame = 0;
+    }
+
+    checkTriggerEvents();
+
+    if (gameState.currentScene === 'OUTSIDE') {
+        for (let drop of rainDrops) {
+            drop.y += drop.speed;
+            drop.x -= 1.5;
+            if (drop.y > CANVAS_HEIGHT) {
+                drop.y = -20;
+                drop.x = Math.random() * (CANVAS_WIDTH + 100);
+            }
+        }
+
+        gameState.lightningTimer += dt;
+        if (gameState.lightningTimer > 8 + Math.random() * 10) {
+            gameState.lightningTimer = 0;
+            gameState.lightningAlpha = 0.85;
+            playThunderSFX();
+        }
+
+        if (gameState.lightningAlpha > 0) {
+            gameState.lightningAlpha -= dt * 3;
+        }
+    }
+
+    sanTimer += dt;
+    if (sanTimer >= 10) {
+        gameState.san = Math.max(0, gameState.san - 1);
+        updateHUD();
+        sanTimer = 0;
+        if (gameState.san === 0 && !gameState.ended) { gameState.san = 30; showDialog("L（莉莉）", ["視野發白，幾乎忘了自己的名字。深呼吸後，我勉強找回了意識。"]); }
+    }
+
+    gameState.flickerTimer += dt * 4;
+    gameState.waterTimer += dt * 2;
+}
+
+// --- 互動與跌落觸發事件 ---
+function checkTriggerEvents() {
+    const pTileX = Math.floor((player.x + player.width / 2) / TILE_SIZE);
+    const pTileY = Math.floor((player.y + player.height / 2) / TILE_SIZE);
+
+    if (gameState.currentScene === 'OUTSIDE' && !gameState.flashlightBroken && pTileY <= 7) {
+        gameState.flashlightBroken = true;
+        gameState.hasFlashlight = false;
+        
+        playFallAndDropSFX();
+
+        showDialog("L (莉莉)", [
+            "哇叫一聲，腳下一滑重重跌倒在地！",
+            "手電筒從手中脫手，在吊橋石面上碰撞兩聲後……徹底熄滅了！",
+            "四周陷入暗影，還有什麼能用來照明？"
+        ]);
+    }
+
+    let foundInteractable = null;
+    let minDistance = 999;
+    const currentList = interactables[gameState.currentScene] || [];
+    
+    for (let item of currentList) {
+        if (item.id === 'note' && gameState.switches.S002_NotePicked) continue;
+        if (item.id === 'lamp_stone' && gameState.hasOilLamp) continue;
+
+        let itemX = item.tileX !== undefined ? item.tileX : item.x;
+        let itemY = item.tileY !== undefined ? item.tileY : item.y;
+
+        const distX = pTileX - itemX;
+        const distY = pTileY - itemY;
+        const totalDist = Math.abs(distX) + Math.abs(distY);
+
+        if (totalDist <= (item.id.startsWith('statue_') ? 2 : 1)) {
+            let isFacingTarget = false;
+            if (player.direction === 'up' && distY === 1 && distX === 0) isFacingTarget = true;
+            if (player.direction === 'down' && distY === -1 && distX === 0) isFacingTarget = true;
+            if (player.direction === 'left' && distX === 1 && distY === 0) isFacingTarget = true;
+            if (player.direction === 'right' && distX === -1 && distY === 0) isFacingTarget = true;
+            
+            let weight = totalDist;
+            if (isFacingTarget) weight -= 0.5;
+
+            if (weight < minDistance) {
+                minDistance = weight;
+                foundInteractable = item;
+            }
+        }
+    }
+
+    gameState.activeInteractable = foundInteractable;
+    if (foundInteractable && foundInteractable.name && !gameState.isDialogActive && !gameState.isChoiceActive) {
+        promptEl.style.display = 'block';
+        promptEl.innerText = `[E / SPACE] ${foundInteractable.name}`;
+    } else {
+        promptEl.style.display = 'none';
+    }
+}
+
+function updateHUD() {
+    oilValEl.innerText = `${gameState.oil}/${gameState.maxOil}`;
+    sanValEl.innerText = `${gameState.san}/100`;
+}
+
+// --- 程序化繪製 ---
+function drawTile(type, x, y) {
+    if (gameState.currentScene === 'OUTSIDE') {
+        if (type === 1) {
+            ctx.fillStyle = '#2d3742';
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = '#1d232a';
+            ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+        } else if (type === 2) {
+            ctx.fillStyle = '#3d3126';
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            ctx.fillStyle = '#73614d';
+            ctx.fillRect(x + 6, y, 6, TILE_SIZE);
+            ctx.fillRect(x + 26, y, 6, TILE_SIZE);
+        } else if (type === 4) {
+            ctx.fillStyle = '#122a40';
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            const waveOffset = Math.sin(gameState.waterTimer + x * 0.05) * 4;
+            ctx.fillStyle = '#1e4263';
+            ctx.fillRect(x, y + 10 + waveOffset, TILE_SIZE, 5);
+            ctx.fillStyle = '#2d5b85';
+            ctx.fillRect(x + 6, y + 24 - waveOffset, 18, 3);
+        } else if (type === 5) {
+            ctx.fillStyle = '#182b1d';
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            ctx.fillStyle = '#24422d';
+            ctx.beginPath();
+            ctx.arc(x + 20, y + 20, 16, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            if (y >= 6 * TILE_SIZE && y <= 7 * TILE_SIZE) {
+                ctx.fillStyle = '#5e422d';
+                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                ctx.strokeStyle = '#382619';
+                ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                ctx.fillStyle = '#825f43';
+                ctx.fillRect(x, y + 6, TILE_SIZE, 4);
+                ctx.fillRect(x, y + 26, TILE_SIZE, 4);
+            } else {
+                ctx.fillStyle = '#382c21';
+                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                ctx.fillStyle = '#292018';
+                ctx.fillRect(x + 8, y + 10, 12, 6);
+            }
+        }
+    } else { // HALL
+        if (type === 1) {
+            ctx.fillStyle = '#302227';
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            ctx.fillStyle = '#4f2836';
+            ctx.beginPath();
+            ctx.moveTo(x + 20, y + 5);
+            ctx.lineTo(x + 35, y + 20);
+            ctx.lineTo(x + 20, y + 35);
+            ctx.lineTo(x + 5, y + 20);
+            ctx.fill();
+
+            if (y === TILE_SIZE && (x === 4 * TILE_SIZE || x === 15 * TILE_SIZE)) {
+                ctx.fillStyle = '#543d2b';
+                ctx.fillRect(x + 6, y + 8, 28, 24);
+                ctx.fillStyle = '#1c1b22';
+                ctx.fillRect(x + 9, y + 11, 22, 18);
+                ctx.fillStyle = '#a67c52';
+                ctx.fillRect(x + 15, y + 16, 10, 8);
+            }
+        } else if (type === 2) {
+            ctx.fillStyle = '#4a3528';
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = '#291c15';
+            ctx.strokeRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+        } else {
+            const isEven = (Math.floor(x/TILE_SIZE) + Math.floor(y/TILE_SIZE)) % 2 === 0;
+            ctx.fillStyle = isEven ? '#47434a' : '#2e2b33';
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = '#1e1c21';
+            ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+
+            const cX = Math.floor(x / TILE_SIZE);
+            const cY = Math.floor(y / TILE_SIZE);
+            if (cY >= 5 && cY <= 11 && cX >= 8 && cX <= 11) {
+                ctx.fillStyle = '#5c1d24';
+                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 2;
+                if (cX === 8) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + TILE_SIZE); ctx.stroke(); }
+                if (cX === 11) { ctx.beginPath(); ctx.moveTo(x + TILE_SIZE, y); ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE); ctx.stroke(); }
+                if (cY === 5) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + TILE_SIZE, y); ctx.stroke(); }
+                if (cY === 11) { ctx.beginPath(); ctx.moveTo(x, y + TILE_SIZE); ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE); ctx.stroke(); }
+                ctx.lineWidth = 1;
+            }
+        }
+    }
+}
+
+// --- 角色繪製 ---
+function drawPlayer(p) {
+ // 原創 28×36 像素立繪：金髮、雨衣與圍巾，四方向／四幀行走。
+ const x=Math.round(p.x),y=Math.round(p.y),step=p.isMoving?Math.sin(p.animFrame*Math.PI/2)*3:0;
+ ctx.save();ctx.fillStyle='#06050980';ctx.beginPath();ctx.ellipse(x+14,y+35,11,4,0,0,Math.PI*2);ctx.fill();
+ const hairDark='#98704a',hair='#e0ad56',shine='#f6d684',coat='#4b3340',coatLight='#776070',outline='#29212e';
+ // 交替的靴子與腰帶讓步態、重心可被辨認。
+ block(x+7,y+29+step,6,5,outline);block(x+17,y+29-step,6,5,outline);
+ block(x+5,y+12,18,19,outline);block(x+7,y+14,14,16,coat);
+ block(x+8,y+15,3,12,coatLight);block(x+17,y+15,3,12,'#332732');
+ block(x+7,y+27,14,3,'#3b2937');block(x+13,y+18,2,10,'#b69c79');
+ if(p.direction==='up'){
+  block(x+4,y+3,20,16,hairDark);block(x+6,y+3,17,15,hair);block(x+9,y+3,4,14,shine);
+  block(x+18,y+8,3,13,hairDark);block(x+5,y+16,17,4,hairDark);
+  block(x+8,y+17,12,5,'#877d79');block(x+11,y+18,5,3,'#b2ada0');
+ }else if(p.direction==='left'||p.direction==='right'){
+  const left=p.direction==='left';
+  block(x+5,y+2,18,16,hairDark);block(x+7,y+3,15,15,hair);
+  block(x+9,y+8,12,9,'#dcb798');block(x+(left?9:19),y+11,2,2,'#37303a');
+  block(x+(left?4:21),y+12,5,15,hairDark);block(x+(left?5:22),y+13,4,12,hair);
+  block(x+8,y+3,11,4,shine);block(x+10,y+18,11,3,'#d0bfab');
+ }else{
+  block(x+5,y+3,18,15,hairDark);block(x+8,y+7,13,10,'#e5bf9e');
+  block(x+7,y+4,16,5,hair);block(x+8,y+3,9,4,shine);
+  block(x+5,y+7,4,15,hairDark);block(x+20,y+7,4,14,hairDark);
+  block(x+6,y+9,3,11,hair);block(x+21,y+9,3,10,hair);
+  block(x+10,y+12,2,2,'#39313b');block(x+18,y+12,2,2,'#39313b');
+  block(x+14,y+16,4,1,'#9d6d6d');block(x+9,y+19,11,3,'#d8c8ad');
+ }
+ // 雨衣袖口、手掌與側邊提燈。
+ block(x+4,y+19,4,10,coat);block(x+22,y+19,4,10,coat);
+ block(x+5,y+28,3,3,'#d4ad91');block(x+22,y+28,3,3,'#d4ad91');
+ if(p.direction!=='up'&&gameState.hasOilLamp){
+  block(x+23,y+25,5,8,'#413126');block(x+24,y+27,3,4,'#f0c568');block(x+23,y+24,5,2,'#a5824b');
+ }
+ ctx.restore();
+}
+
+// --- 雕像繪製 ---
+function drawStatue(x, y, id, isDShifted = false) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(x + 4, y + 28, 32, 8);
+
+    ctx.fillStyle = '#b5b0a5';
+    ctx.fillRect(x + 6, y + 22, 28, 10);
+    ctx.fillStyle = '#d4af37';
+    ctx.fillRect(x + 14, y + 25, 12, 5);
+
+    let isBackView = true;
+    let isFacingRight = false;
+
+    if (id === 'D' && !isDShifted) {
+        isBackView = false;
+        isFacingRight = true;
+    }
+
+    ctx.translate(x + 20, y + 14);
+
+    ctx.fillStyle = '#e8e4dc';
+    ctx.beginPath();
+    ctx.arc(0, -6, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(-8, 2, 16, 14);
+
+    if (isFacingRight) {
+        ctx.fillStyle = '#a19c91';
+        ctx.fillRect(2, -8, 4, 6);
+        ctx.fillRect(-6, 4, 4, 10);
+    } else if (isBackView) {
+        ctx.fillStyle = '#bebaa8';
+        ctx.fillRect(-6, -10, 12, 8);
+        ctx.fillRect(-7, 4, 14, 10);
+    }
+    ctx.restore();
+}
+
+function drawRain() {
+    if (gameState.currentScene !== 'OUTSIDE') return;
+    ctx.save();
+    ctx.strokeStyle = '#a3c7ff';
+    ctx.lineWidth = 1;
+    for (let drop of rainDrops) {
+        ctx.globalAlpha = drop.opacity;
+        ctx.beginPath();
+        ctx.moveTo(drop.x, drop.y);
+        ctx.lineTo(drop.x - 3, drop.y + drop.length);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+// --- 光源遮罩繪製 ---
+function renderLightOverlay() {
+    lightCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    const dynamicDarkAlpha = Math.max(0.40, Math.min(0.995, 0.98 - (settings.brightness-50)*0.009 + Math.sin(gameState.flickerTimer * 0.5)*0.01));
+    lightCtx.fillStyle = `rgba(3, 3, 5, ${dynamicDarkAlpha})`;
+    lightCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    lightCtx.globalCompositeOperation = 'destination-out';
+
+    let px = player.x + player.width / 2;
+    let py = player.y + player.height / 2;
+    const flicker = Math.sin(gameState.flickerTimer) * 3;
+
+    if (gameState.hasOilLamp) {
+        const tilesRadius = 1.5 + (gameState.oil - 1) * 0.5;
+        const lightRadius = tilesRadius * TILE_SIZE + flicker;
+
+        const clearGradient = lightCtx.createRadialGradient(px, py, 5, px, py, lightRadius);
+        clearGradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        clearGradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.85)');
+        clearGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        lightCtx.fillStyle = clearGradient;
+        lightCtx.beginPath();
+        lightCtx.arc(px, py, lightRadius, 0, Math.PI * 2);
+        lightCtx.fill();
+
+    } else if (gameState.hasFlashlight) {
+        let baseAngle = 0;
+        if (player.direction === 'up') {
+            baseAngle = -Math.PI / 2;
+            py -= 6;
+        } else if (player.direction === 'down') {
+            baseAngle = Math.PI / 2;
+            py += 6;
+        } else if (player.direction === 'left') {
+            baseAngle = Math.PI;
+            px -= 6;
+        } else if (player.direction === 'right') {
+            baseAngle = 0;
+            px += 6;
+        }
+
+        const coneRadius = 140 + flicker; 
+        const spreadAngle = Math.PI * 0.6;
+
+        const startAngle = baseAngle - spreadAngle / 2;
+        const endAngle = baseAngle + spreadAngle / 2;
+
+        const coneGradient = lightCtx.createRadialGradient(px, py, 2, px, py, coneRadius);
+        coneGradient.addColorStop(0, 'rgba(0, 0, 0, 0.98)');
+        coneGradient.addColorStop(0.4, 'rgba(0, 0, 0, 0.8)');
+        coneGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        lightCtx.fillStyle = coneGradient;
+        lightCtx.beginPath();
+        lightCtx.moveTo(px, py);
+        lightCtx.arc(px, py, coneRadius, startAngle, endAngle);
+        lightCtx.closePath();
+        lightCtx.fill();
+    }
+
+    lightCtx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(lightCanvas, 0, 0);
+
+    if (gameState.hasOilLamp) {
+        ctx.save();
+        const tilesRadius = 1.5 + (gameState.oil - 1) * 0.5;
+        const lightRadius = tilesRadius * TILE_SIZE + flicker;
+        const glowGradient = ctx.createRadialGradient(px, py, 5, px, py, lightRadius);
+        glowGradient.addColorStop(0, 'rgba(255, 210, 120, 0.16)');
+        glowGradient.addColorStop(0.6, 'rgba(255, 150, 30, 0.06)');
+        glowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        ctx.fillStyle = glowGradient;
+        ctx.beginPath();
+        ctx.arc(px, py, lightRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+function render() {
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    const map = maps[gameState.currentScene];
+    for (let r = 0; r < GRID_ROWS; r++) {
+        for (let c = 0; c < GRID_COLS; c++) {
+            const tile = map[r][c];
+            const x = c * TILE_SIZE;
+            const y = r * TILE_SIZE;
+
+            drawTile(tile, x, y);
+
+            if (gameState.currentScene === 'HALL' && gameState.switches.S001_EntranceLocked && r === 13 && c === 9) {
+                ctx.fillStyle = '#261f22';
+                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                ctx.strokeStyle = '#8c3b3b';
+                ctx.beginPath(); ctx.moveTo(x+5, y+5); ctx.lineTo(x+35, y+35); ctx.stroke();
+            }
+        }
+    }
+
+    if (gameState.currentScene === 'OUTSIDE') {
+        if (!gameState.hasOilLamp) {
+            ctx.fillStyle = '#4a3f35';
+            ctx.fillRect(7 * TILE_SIZE + 8, 4 * TILE_SIZE + 10, 24, 24);
+            ctx.fillStyle = '#ffaa00';
+            ctx.beginPath();
+            ctx.arc(7 * TILE_SIZE + 20, 4 * TILE_SIZE + 18, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        drawPlayer(player);
+    } else if (gameState.currentScene === 'HALL') {
+        drawHallDetails();
+        const statues = [
+            { x: 6 * TILE_SIZE, y: 6 * TILE_SIZE, id: 'A', shifted: false },
+            { x: 7 * TILE_SIZE, y: 6 * TILE_SIZE, id: 'B', shifted: false },
+            { x: 11 * TILE_SIZE, y: 6 * TILE_SIZE, id: 'C', shifted: false },
+            { x: 12 * TILE_SIZE, y: 6 * TILE_SIZE, id: 'D', shifted: gameState.switches.S011_HallPuzzleDone }
+        ];
+
+        let renderList = [];
+        statues.forEach(s => {
+            renderList.push({ type: 'statue', y: s.y + TILE_SIZE, draw: () => drawStatue(s.x, s.y, s.id, s.shifted) });
+        });
+        renderList.push({ type: 'player', y: player.y + player.height, draw: () => drawPlayer(player) });
+
+        renderList.sort((a, b) => a.y - b.y);
+        renderList.forEach(item => item.draw());
+
+        drawWallDoor(19,4,gameState.switches.S011_HallPuzzleDone);
+        if (!gameState.switches.S002_NotePicked) {
+            ctx.fillStyle = '#f7eed7';
+            ctx.fillRect(3 * TILE_SIZE + 12, 9 * TILE_SIZE + 12, 16, 16);
+            ctx.strokeStyle = '#8c6d53';
+            ctx.strokeRect(3 * TILE_SIZE + 12, 9 * TILE_SIZE + 12, 16, 16);
+        }
+    } else {
+        drawNewScene();
+    }
+
+    drawRain();
+
+    if (gameState.ghostVisible) {
+        ctx.save();
+        ctx.globalAlpha = gameState.ghostAlpha;
+        ctx.fillStyle = '#731c43';
+        ctx.fillRect(9 * TILE_SIZE + 4, 12 * TILE_SIZE, TILE_SIZE - 8, TILE_SIZE * 2);
+        ctx.restore();
+    }
+
+    renderLightOverlay();
+    updateFlames();
+
+    if (gameState.currentScene === 'OUTSIDE' && gameState.lightningAlpha > 0) {
+        ctx.save();
+        ctx.fillStyle = `rgba(255, 255, 250, ${gameState.lightningAlpha})`;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.restore();
+    }
+}
+
+const flamePositions={HALL:[[90,110],[710,110]],GALLERY:[[115,86],[685,86]],LIBRARY:[[105,90],[695,90]],STUDIO:[[130,85],[670,85]],BEDROOM:[[110,90],[690,90]],VAULT:[[140,90],[660,90]]};
+function updateFlames(){
+ const playerFlame=document.getElementById('player-flame');
+ playerFlame.style.display=gameState.hasOilLamp?'block':'none';
+ playerFlame.style.left=((player.x+player.width/2+10)/800*100)+'%';
+ playerFlame.style.top=((player.y+19)/600*100)+'%';
+ const candles=document.querySelectorAll('.wall-flame'),positions=flamePositions[gameState.currentScene];
+ candles.forEach((el,i)=>{el.style.display=positions?'block':'none';if(positions){el.style.left=positions[i][0]/8+'%';el.style.top=positions[i][1]/6+'%';}});
+}
+function gameLoop(now) {
+    if (!gameState.gameStarted) return;
+    const dt = Math.min(0.05, (now - lastTime) / 1000);
+    lastTime = now;
+    update(dt);
+    render();
+    syncTouchControls();
+    requestAnimationFrame(gameLoop);
+}
+
+// 後續章節：每一個場景都有可見的物件、線索與獨立完成狀態。
+const story = { fragments: new Set(), portrait:false, colors:[], spectrum:false, handle:false,
+  library:false, chisel:false, lens:false, sketch:false, glyph:false, statue:false,
+  letters:[], lettersDone:false, mirror:false, clock:false, warning:false, vaultIntro:false, seconds:0 };
+// 每次按 H 只揭露當前進度的一層；換階段後從第一層重新開始。
+const hintStages={
+ OUTSIDE:[['暴雨讓視線模糊，先沿唯一的小徑往前。','靠近門時，注意左側的石墩。','石墩上有油燈；帶著它走到鐵門。']],
+ HALL:[['大廳的雕像似乎隱藏了一條路。','角落的手稿談到「不對稱」；逐一觀察雕像。','找出朝向與其他三尊不同的那一尊，旋轉後去右側暗門。']],
+ GALLERY:[['少女肖像似乎少了些什麼。','探索畫廊的角落，找回四片畫布。','集齊左眼、右眼、鼻子與嘴巴後，回肖像前修復。'],
+          ['銘牌描寫的是情感變化。','先弄清熱情、冷靜、恐懼各自的顏色。','從早到晚依序放入：黃、藍、紅。']],
+ LIBRARY:[['箱子上的四位數似乎藏在書頁裡。','日記記著數字；書架的註解記著順序。','依「存在、記憶、價值、虛無」對應日記的數字。']],
+ STUDIO:[['雕塑的胸口空著一個位置。','草圖、工作檯和三座星象模型值得調查。','組合畫廊的把手與鑿頭，選擇雙子座的數字。']],
+ BEDROOM:[['三封信的語氣似乎來自不同時期。','先有創造，再有爭議，最後才是告別。','排好信後查看鏡子；它背後的時鐘有異樣。']],
+ VAULT:[['房內留下組織的備用信。','看看晶體裡的是誰，並讀信了解逃生條件。','調查晶體與控制面板，選擇要帶走或釋放什麼。']]
+};
+const hintProgress={};
+function hintPhase(scene){if(scene==='GALLERY')return story.portrait?1:0;return 0;}
+function revealHint(){const scene=gameState.currentScene, phase=hintPhase(scene), key=scene+':'+phase;
+ const steps=(hintStages[scene]||[['留意周圍不同尋常的細節。']])[phase];
+ const limit={explorer:steps.length,investigator:Math.min(2,steps.length),silence:1}[gameState.difficulty];
+ const index=Math.min(hintProgress[key]||0,limit-1);hintProgress[key]=index+1;
+ showDialog(`提示 ${index+1}/${limit}`,[steps[index]]);
+}
+const objectives = {
+ OUTSIDE:'尋找光源，接近城堡', HALL:'尋找藏在大廳的通路',
+ GALLERY:'調查畫作與散落的畫布', LIBRARY:'尋找舊箱子的開啟方法',
+ STUDIO:'完成伯爵留下的雕塑', BEDROOM:'尋找寢室深處的入口',
+ VAULT:'查清晶體與組織的祕密'
+};
+const sceneNames={OUTSIDE:'暴雨中的城堡',HALL:'入口大廳',GALLERY:'畫廊',LIBRARY:'圖書室',STUDIO:'雕刻室',BEDROOM:'伯爵寢室',VAULT:'地下密室'};
+const subtleObjectives={OUTSIDE:'循著風雨前行',HALL:'觀察大廳的痕跡',GALLERY:'理解遺失的畫作',LIBRARY:'翻閱伯爵留下的文字',STUDIO:'檢視未完成的雕塑',BEDROOM:'尋找被藏起的時間',VAULT:'面對被保存的記憶'};
+function updateObjective(){const mode=gameState.difficulty;
+ document.getElementById('objective').textContent=(mode==='explorer'?'目標：'+objectives[gameState.currentScene]:mode==='investigator'?'調查：'+subtleObjectives[gameState.currentScene]:'紀錄：'+sceneNames[gameState.currentScene])+'　｜ H 提示　ESC 設定';
+ document.getElementById('scene-name').textContent=sceneNames[gameState.currentScene];}
+const sceneNarration={
+ GALLERY:['那些被破壞的畫作，像是在等誰認出它們。','畫布的破口還很新。','腳步聲落在畫廊的空框之間。'],
+ LIBRARY:['舊箱子上的鎖仍完好。也許線索留在附近的書頁中。','書頁散落，桌上箱子的金屬扣沒有生鏽。','書架深處傳來紙張翻動的聲音。'],
+ STUDIO:['石雕胸口有一道人工鑿出的凹槽。工作檯積著石粉。','未完成的雕塑擋在房間中央。','石粉像雪一樣覆蓋地面。'],
+ BEDROOM:['鏡面與信件都很乾淨，和房裡的灰塵不相稱。','鏡中有人影一閃而逝。','鏡子沒有映出燈火。'],
+ VAULT:['晶體裡有一張臉。桌上還留著一封組織的信。','晶體的光隨著呼吸起伏。','有人在晶體裡緩慢睜眼。']
+};
+function sceneIntro(scene,fallback){const lines=sceneNarration[scene];return lines?lines[({explorer:0,investigator:1,silence:2})[gameState.difficulty]]:fallback;}
+
+function room(walls=[]){const m=Array.from({length:15},(_,y)=>Array.from({length:20},(_,x)=>x===0||x===19||y===0||y===14?1:0));
+ for(const [x,y] of walls)m[y][x]=3;return m;}
+maps.GALLERY=room([[5,3],[6,3],[13,3],[14,3],[9,6],[10,6],[8,9],[11,9]]);
+maps.LIBRARY=room([[4,4],[5,4],[6,4],[13,4],[14,4],[15,4],[4,7],[5,7],[14,7],[15,7],[9,6],[10,6]]);
+maps.STUDIO=room([[4,4],[5,4],[14,4],[15,4],[9,6],[10,6],[9,7],[10,7]]);
+maps.BEDROOM=room([[4,4],[5,4],[6,4],[13,4],[14,4],[15,4],[9,6],[10,6]]);
+maps.VAULT=room([[9,5],[10,5],[9,6],[10,6],[9,7],[10,7]]);
+function at(id,name,x,y,action){return {id,name,tileX:x,tileY:y,action};}
+function once(id,fn){return ()=>story[id]?showDialog('L（莉莉）',['這裡已經調查過了。']):fn();}
+function say(lines,cb){showDialog('L（莉莉）',lines,cb);}
+function gainSan(n){gameState.san=Math.max(1,Math.min(100,gameState.san+n));updateHUD();}
+function loseOil(n){gameState.oil=Math.max(1,gameState.oil-n);updateHUD();}
+function goScene(scene,x=9,y=12,intro=''){
+ gameState.currentScene=scene;player.x=x*40+6;player.y=y*40+2;
+ gameState.activeInteractable=null;promptEl.style.display='none';updateObjective();
+ if(rainGainNode)rainGainNode.gain.value=scene==='OUTSIDE'?0.08:0.008;
+ if(scene==='VAULT' && !story.vaultIntro){story.vaultIntro=true;showVaultArrival();}
+ else if(intro)say([sceneIntro(scene,intro)]);
+}
+// 6-1／6-2：進入密室時依試算表逐句播放，不會被房間開場獨白覆寫。
+function showVaultArrival(){
+ showScript([
+  {speaker:'L（莉莉）',text:'地下室潮濕得像一口井。中央晶體裡……是她的臉。'},
+  {speaker:'L（莉莉）',text:'這就是囚禁她靈魂和記憶的容器。'},
+  {speaker:'伯爵殘魂',text:'不！看！這就是永恆！我的繆斯，永遠不會被遺忘！'},
+  {speaker:'L（莉莉）',text:'你囚禁的不是永恆的美好，是永恆的痛苦！'},
+  {speaker:'伯爵殘魂',text:'……'},
+  {speaker:'伯爵殘魂',text:'我累了……停止它吧。成為一名真正的雕刻家……讓虛無降臨……'},
+  {speaker:'L（莉莉）',text:'他的殘影散了。晶體仍在跳動，旁邊還有一封信和控制面板。'}
+ ]);
+}
+// 可操作的舊箱密碼輪與古鐘；失敗懲罰保持設定表原規則。
+let safeDigits=[0,0,0,0],clockHour=3,clockMinute=40,clockDrag=false;
+function showPuzzle(type){gameState.isPuzzleActive=true;gameState.puzzleType=type;
+ const overlay=document.getElementById('puzzle-overlay');overlay.style.display='flex';
+ document.getElementById('safe-puzzle').style.display=type==='safe'?'block':'none';
+ document.getElementById('clock-puzzle').style.display=type==='clock'?'block':'none';
+ promptEl.style.display='none';for(const k of Object.keys(keys))keys[k]=false;
+}
+function closePuzzle(){gameState.isPuzzleActive=false;gameState.puzzleType=null;clockDrag=false;
+ document.getElementById('puzzle-overlay').style.display='none';lastTime=performance.now();}
+function puzzleFeedback(id,text,error=false){const el=document.getElementById(id);
+ el.textContent=text;el.classList.remove('error');if(error){void el.offsetWidth;el.classList.add('error');}}
+function openSafe(){safeDigits=[0,0,0,0];gameState.activeWheel=0;
+ const holder=document.getElementById('safe-wheels');holder.replaceChildren();
+ for(let i=0;i<4;i++){
+  const column=document.createElement('div');column.className='safe-wheel';
+  const up=document.createElement('button');up.textContent='▲';up.setAttribute('aria-label',`第${i+1}輪加一`);up.onclick=()=>dialWheel(i,1);
+  const digit=document.createElement('div');digit.className='wheel-digit';digit.id='safe-digit-'+i;digit.textContent='0';
+  const down=document.createElement('button');down.textContent='▼';down.setAttribute('aria-label',`第${i+1}輪減一`);down.onclick=()=>dialWheel(i,-1);
+  column.append(up,digit,down);column.onwheel=e=>{e.preventDefault();dialWheel(i,e.deltaY<0?1:-1)};holder.appendChild(column);
+ }
+ puzzleFeedback('safe-feedback','轉動四個數字輪，再扳動鎖扣。');showPuzzle('safe');
+}
+function dialWheel(i,delta){if(gameState.puzzleType!=='safe')return;
+ safeDigits[i]=(safeDigits[i]+delta%10+10)%10;
+ const el=document.getElementById('safe-digit-'+i);el.textContent=safeDigits[i];el.classList.remove('turn');void el.offsetWidth;el.classList.add('turn');
+ tone(125,.08,'square',.035);gameState.activeWheel=i;
+}
+function submitSafe(){if(gameState.puzzleType!=='safe')return;
+ if(safeDigits.join('')==='1800'){
+  closePuzzle();story.library=true;playChoiceConfirm();
+  say(['箱子的鎖舌向內縮去。獲得雕刻室鑰匙與私人信件。',
+   '「阿爾布雷希特，我們不能再資助你。你對被遺忘的恐懼，已經影響容器的創作。軟禁會持續到你想通。」']);
+ }else{
+  gainSan(-10);loseOil(1);playSFX(120,.45,'sawtooth');
+  puzzleFeedback('safe-feedback','齒輪卡死，書架劇烈震動。心智 -10、油量 -1。',true);
+ }
+}
+function openClock(){clockHour=3;clockMinute=40;showPuzzle('clock');
+ const card=document.getElementById('clock-puzzle');card.classList.remove('zooming','zoomed');
+ document.getElementById('clock-wide').style.display='flex';document.getElementById('clock-detail').style.display='none';
+ puzzleFeedback('clock-feedback','鏡中殘留的時間，究竟停在哪一刻？');updateClockUI();
+}
+function zoomClock(){playChoiceOpen();const card=document.getElementById('clock-puzzle');
+ card.classList.add('zooming');
+ setTimeout(()=>{if(gameState.puzzleType!=='clock')return;card.classList.add('zoomed');document.getElementById('clock-wide').style.display='none';document.getElementById('clock-detail').style.display='block';updateClockUI();},620);
+}
+function updateClockUI(){document.getElementById('clock-hour').textContent=String(clockHour).padStart(2,'0');
+ document.getElementById('clock-minute').textContent=String(clockMinute).padStart(2,'0');
+ document.getElementById('hour-hand').style.transform=`rotate(${clockHour*30+clockMinute*.5}deg)`;
+ document.getElementById('minute-hand').style.transform=`rotate(${clockMinute*6}deg)`;
+}
+function turnClock(which,delta){if(gameState.puzzleType!=='clock')return;
+ if(which==='hour')clockHour=((clockHour-1+delta)%12+12)%12+1;
+ else clockMinute=((clockMinute+delta)%60+60)%60;
+ tone(185,.065,'triangle',.045);updateClockUI();
+}
+function dragClockMinute(e){if(!clockDrag || gameState.puzzleType!=='clock')return;
+ const r=document.getElementById('clock-face').getBoundingClientRect();
+ const angle=(Math.atan2(e.clientX-(r.left+r.width/2),-(e.clientY-(r.top+r.height/2)))*180/Math.PI+360)%360;
+ const next=Math.round(angle/6)%60;
+ if(next!==clockMinute){clockMinute=next;updateClockUI();}
+}
+function submitClock(){if(gameState.puzzleType!=='clock')return;
+ if(clockHour===12&&clockMinute===8){closePuzzle();story.clock=true;playChoiceConfirm();say(['分針停住，時鐘面板內陷，打開通往地下的通道。']);}
+ else{gainSan(-5);playSFX(120,.35,'sawtooth');puzzleFeedback('clock-feedback','齒輪逆轉，耳邊響起低語。心智 -5。',true);}
+}
+function setupClockDrag(){const face=document.getElementById('clock-face');
+ face.addEventListener('pointerdown',e=>{clockDrag=true;face.setPointerCapture(e.pointerId);dragClockMinute(e)});
+ face.addEventListener('pointermove',dragClockMinute);
+ face.addEventListener('pointerup',()=>{clockDrag=false});face.addEventListener('pointercancel',()=>{clockDrag=false});
+}
+setupClockDrag();
+let selectedChoice=0;
+function choice(title,options){
+ gameState.isChoiceActive=true;gameState.choiceOptions=options;selectedChoice=0;
+ const panel=document.getElementById('choice-panel'),holder=document.getElementById('cinematic-options');
+ document.getElementById('choice-title').textContent=title;holder.replaceChildren();
+ options.forEach((option,i)=>{
+  const button=document.createElement('button');button.className='cinematic-option'+(i===0?' selected':'');
+  const badge=document.createElement('span');badge.className='option-index';badge.textContent=String(i+1).padStart(2,'0');
+  const label=document.createElement('span');label.className='option-label'+(/^[0-9:]+$/.test(option.label)?' numeric-answer':'');label.textContent=option.label;
+  button.append(badge,label);button.onmouseenter=()=>selectChoice(i);button.onclick=()=>choose(i);holder.appendChild(button);
+ });
+ dialogBox.style.display='none';document.getElementById('choice-backdrop').style.display='block';
+ panel.classList.remove('choice-enter','choice-exit');void panel.offsetWidth;panel.style.display='block';panel.classList.add('choice-enter');
+ playChoiceOpen();
+}
+function selectChoice(i){if(i<0||i>=gameState.choiceOptions.length||selectedChoice===i)return;
+ selectedChoice=i;document.querySelectorAll('.cinematic-option').forEach((el,n)=>el.classList.toggle('selected',n===i));playChoiceMove();}
+function choose(i){if(!gameState.isChoiceActive||!gameState.choiceOptions[i])return;
+ const f=gameState.choiceOptions[i].action;gameState.isChoiceActive=false;gameState.choiceOptions=[];
+ playChoiceConfirm();
+ const panel=document.getElementById('choice-panel');panel.classList.remove('choice-enter');panel.classList.add('choice-exit');
+ document.getElementById('choice-backdrop').style.display='none';
+ setTimeout(()=>{if(!gameState.isChoiceActive)panel.style.display='none';},240);
+ f();
+}
+function pickFragment(part){if(story.fragments.has(part))return;
+ story.fragments.add(part);gainSan(-5);playSFX(260,0.25,'triangle');
+ say([`拾起肖像的「${part}」碎片。遠處傳來一聲微弱的嘆息。`, `畫布碎片 ${story.fragments.size}/4。`]);}
+function portrait(){if(story.portrait)return say(['她的眼睛安靜地望著我。']);
+ if(story.fragments.size<4)return say([`畫布缺少碎片。目前找到 ${story.fragments.size}/4。`]);
+ story.portrait=true;gainSan(100);
+ say(['四塊畫布終於拼合。少女的目光讓我想起自己為何來到這裡。心智恢復。',
+ '【日記片段 I】只有她，我的繆斯，理解我對被遺忘的恐懼。我把她留在畫裡，讓誰都無法忘記。',
+ '遠處傳來門鎖彈開的聲音。圖書室現在可以進入。']);}
+function pickColor(color){if(story.spectrum)return say(['三聯畫已經歸位。']);
+ story.colors.push(color);playSFX(450,0.08);if(story.colors.length<3)return say([`放入「${color}」畫板。已排列 ${story.colors.length}/3。`]);
+ if(story.colors.join(',')==='黃,藍,紅'){
+ story.spectrum=true;story.handle=true;say(['熱情、冷靜、恐懼。三聯畫內陷，暗格裡有一支鑿子把手。',
+ '【信件碎片】組織要我造出捕獲記憶的晶體容器。我把這褻瀆藏在鑄造工具裡。']);
+ }else{story.colors=[];gainSan(-10);loseOil(1);say(['排列錯誤。畫框發出尖嘯；心智 -10、油量 -1。畫板已歸位，可重試。']);}}
+interactables.GALLERY=[
+ at('portrait','少女肖像',9,3,portrait),
+ at('eyeL','左眼碎片',4,5,()=>pickFragment('左眼')),
+ at('eyeR','右眼碎片',15,5,()=>pickFragment('右眼')),
+ at('nose','鼻子碎片',6,10,()=>pickFragment('鼻子')),
+ at('mouth','嘴巴碎片',14,10,()=>pickFragment('嘴巴')),
+ at('plaque','三聯畫銘牌',9,8,()=>say(['遺忘的色彩：熱情會逐漸被澆滅，恐懼在冷靜之後滋長。', '畫板背面分別寫著：黃＝熱情、藍＝冷靜、紅＝恐懼。'])),
+ at('yellow','黃色畫板',5,3,()=>pickColor('黃')),
+ at('blue','藍色畫板',13,3,()=>pickColor('藍')),
+ at('red','紅色畫板',11,9,()=>pickColor('紅')),
+ at('libraryDoor','圖書室的門',19,2,()=>story.portrait?goScene('LIBRARY',9,12,'高聳的書架包圍了書桌；桌上的舊箱子鎖著四位密碼。'):say(['門鎖還扣著。先修復少女肖像。'])),
+ at('hallBack','返回大廳',0,12,()=>goScene('HALL',17,4))
+];
+interactables.LIBRARY=[
+ at('diary','塗黑的日記',9,6,()=>say(['我的藝術，只有唯一的繆斯（1）能體會。世人只在乎商業價值（0）。', '無窮的記憶（8），終究也可能被虛無（0）吞噬。'])),
+ at('book','《藝術與存在的永恆循環》',4,4,()=>say(['頁角的親筆註解：存在決定記憶；記憶賦予價值；虛無則是終結。', '存在 → 記憶 → 價值 → 虛無。'])),
+ at('box','四位數的舊箱子',10,6,()=>story.library?say(['箱子已打開。雕刻室的鑰匙還握在手中。']):openSafe()),
+ at('studioDoor','雕刻室的門',19,2,()=>story.library?goScene('STUDIO',9,12,'石灰粉塵覆滿工作室。中央人形雕塑的胸口，留著圓形空腔。'):say(['門上鎖著。舊箱子裡也許有鑰匙。'])),
+ at('galleryBack','返回畫廊',0,12,()=>goScene('GALLERY',17,2))
+];
+interactables.STUDIO=[
+ at('sketch','沾滿石灰的草圖',4,4,()=>{story.sketch=true;say(['雕塑胸前畫著晶體透鏡。「焦點，是記憶被喚醒的唯一途徑。」']);}),
+ at('bench','鑿子頭與石板',14,4,()=>{if(story.chisel)return say(['完整鑿子已經取出。']);
+ if(!story.handle)return say(['石板卡著鑿子頭，但缺少把手。畫廊裡或許有。']);
+ story.chisel=true;say(['把手與鑿子頭接合，獲得完整鑿子。石板掀起，露出星象密碼抽屜。']);}),
+ at('libra','天秤座模型',5,8,()=>say(['底座模糊地寫著：「非對稱……它始於風，卻不屬於風。我只需要一個數字。」天秤標記 10。'])),
+ at('aquarius','水瓶座模型',14,8,()=>say(['水瓶座的底部標記 2。'])),
+ at('gemini','雙子座模型',4,10,()=>{story.glyph=true;say(['雙子座的兩張臉卻只有一道刻痕。背面刻著：7。']);}),
+ at('drawer','星象抽屜',15,10,()=>{if(!story.chisel)return say(['先修好鑿子並掀開石板。']);
+ if(story.lens)return say(['抽屜已空。']);
+ choice('星象抽屜上的數字',[7,10,2].map(n=>({label:String(n),action:()=>{
+ if(n===7){story.lens=true;say(['抽屜打開。取得精緻的石英透鏡。']);}
+ else {loseOil(2);gainSan(-10);say(['石材發出尖銳笑聲。燈火幾乎熄滅，油量 -2、心智 -10。']);}
+ }})));
+ }),
+ at('sculpture','胸口中空的雕塑',9,6,()=>{if(story.statue)return say(['光束已經照出暗門。']);
+ if(!story.lens)return say(['胸口缺少透鏡。草圖與抽屜也許能提供線索。']);
+ story.statue=true;playSFX(730,0.5);if(gameState.oil<3){endGame('噩夢般的藝術',['油燈的光太弱，只在窗邊折出一絲微光。窗鎖應聲打開。', '莉莉翻出窗外，決定把城堡的祕密留在身後。']);return;}
+ say(['石英透鏡嵌入胸口，油燈的光束穿過透鏡，照出通往主臥室的暗門。']);}),
+ at('bedroomDoor','主臥室暗門',19,2,()=>story.statue?goScene('BEDROOM',9,12,'古老落地鏡映出一個陌生女人的影子，轉瞬消失。'):say(['牆後似乎有空間。先修復中央雕塑。'])),
+ at('libraryBack','返回圖書室',0,12,()=>goScene('LIBRARY',17,2))
+];
+function pickLetter(n){if(story.lettersDone)return say(['三封信已經排好。']);story.letters.push(n);
+ const labels={1:'「你已完全被遺忘，你和容器都不再屬於我們。」',2:'「我們很高興你創造出完美晶體。組織將永存。」',3:'「但你將繆斯的記憶封入其中，這是對永恆的褻瀆。」'};
+ if(story.letters.length<3)return say([`第 ${story.letters.length} 封：${labels[n]}`]);
+ if(story.letters.join('')==='231'){story.lettersDone=true;say(['信件排好。下方露出紙籤：「永恆不是一個地方，而是一個時間。」']);}
+ else{story.letters=[];gainSan(-8);say(['時間順序不通。鏡中有什麼東西敲了敲玻璃。心智 -8；信件已重置。']);}}
+interactables.BEDROOM=[
+ at('letter1','信件：告別',4,4,()=>pickLetter(1)),
+ at('letter2','信件：創造',9,6,()=>pickLetter(2)),
+ at('letter3','信件：褻瀆',14,4,()=>pickLetter(3)),
+ at('mirror','落地鏡',5,10,()=>{if(!story.mirror){story.mirror=true;gainSan(-30);say(['鏡中的我變成了繆斯。她用我的聲音說：「時間會遺忘一切。」心智 -30。', '鏡面凝出一行不屬於我的字跡：12:08。現實中的古鐘，指針卻停在別處。']);}else say(['鏡子還映著那組時間：12:08。']);}),
+ at('clock','古董時鐘',15,10,()=>{
+  if(!story.lettersDone)return say(['古鐘齒輪卡著。床頭那疊信件似乎與它有關。']);
+  if(story.clock)return say(['鐘面已經退開，暗道露出。']);
+  openClock();
+ }),
+ at('vaultDoor','通往地下的暗道',19,2,()=>story.clock?goScene('VAULT',9,12,'晶體裡有一張臉。'):say(['時鐘背後似乎有什麼。'])),
+ at('studioBack','返回雕刻室',0,12,()=>goScene('STUDIO',17,2))
+];
+interactables.VAULT=[
+ at('warning','組織的備用逃脫信',4,5,()=>{story.warning=true;say(['「如願繼續合作，請保持容器完整。容器毀損後，所有通道都將封閉。」', '晶體裡的繆斯還活著。決定權在我手裡。']);}),
+ at('crystal','記憶晶體容器',9,6,()=>choice('面對晶體',[{label:'用完整鑿子摧毀容器',action:()=>{
+ if(!story.chisel)return say(['需要完整的鑿子。']);
+ endGame('剎那即永恆',['鑿子落下，晶體爆裂。繆斯最後的光照出一道裂縫，莉莉在城堡崩塌前逃了出去。', '暴雨停了。藝術與恐懼歸於虛無；而莉莉記得她曾經存在。']);
+ }},{label:'把手放在晶體的輔助插槽',action:()=>{gameState.san=0;updateHUD();endGame('我，究竟是誰？',['晶體奪走莉莉的記憶。她逃出了城堡，卻再也記不得自己是誰。', '她在荒野中尋找一座已被遺忘的城堡。']);}},{label:'再想一想',action:()=>{}}])),
+ at('panel','控制面板',15,7,()=>choice('面板的分離模式',[{label:'帶走核心，走組織的逃生通道',action:()=>endGame('真正的組織成員',['莉莉帶著核心晶體走出城堡。面具人說：「歡迎加入我們。」', '她離開了一座囚籠，也踏進了另一座。'])},{label:'取消',action:()=>{}}])),
+ at('echo','伯爵殘響',5,10,()=>say(['「我想記住她，卻只讓她永遠受苦……」伯爵的聲音漸漸消散。', '「真正的雕刻家，應該知道什麼時候放手。」']))
+];
+function endGame(title,lines){gameState.ended=true;gameState.isChoiceActive=false;
+ document.getElementById('ending-title').textContent=title;
+ document.getElementById('ending-body').textContent=lines.join('\n\n');
+ document.getElementById('ending').style.display='flex';
+ document.getElementById('choice-controls').style.display='none';document.getElementById('choice-panel').style.display='none';document.getElementById('choice-backdrop').style.display='none';dialogBox.style.display='none';
+}
+// 純 Canvas 像素繪圖，所有格子的外觀與碰撞完全相同。
+function pixelBox(x,y,w,h,fill,stroke='#100f14'){
+ ctx.fillStyle=stroke;ctx.fillRect(x-2,y-2,w+4,h+4);ctx.fillStyle=fill;ctx.fillRect(x,y,w,h);
+}
+function block(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),w,h);}
+function pixelFrame(x,y,w,h,wood='#684937',inner='#333640'){
+ pixelBox(x,y,w,h,wood,'#241b21');block(x+4,y+4,w-8,h-8,'#b79564');block(x+7,y+7,w-14,h-14,inner);
+ block(x+2,y+2,3,3,'#d8ae70');block(x+w-5,y+2,3,3,'#d8ae70');
+}
+function drawWallDoor(tx,ty,open=true){const x=tx*40,y=ty*40;
+ block(x,y,40,40,'#31252b');block(x+3,y+2,34,38,'#9c7853');block(x+7,y+5,26,35,open?'#261e27':'#503c38');
+ block(x+11,y+8,18,4,'#c9aa7b');block(x+9,y+24,4,4,'#dfc278');
+ if(open){block(x+17,y+16,8,18,'#13121c');block(x+20,y+18,2,15,'#6b5361');}
+}
+function drawHallDetails(){
+ ctx.save();for(let y=80;y<520;y+=38){for(let x=80;x<720;x+=43){
+  block(x,y,2,2,(x+y)%3===0?'#9b897a':'#715d56');
+ }}
+ for(let i=0;i<4;i++){let x=72+i*212;block(x,70,13,78,'#877d75');block(x+2,74,9,58,'#b2a99b');block(x-5,145,23,7,'#48404a');}
+ block(320,122,160,122,'#5a3439');block(330,132,140,102,'#713d45');
+ for(let i=0;i<6;i++){block(335+i*22,139,10,3,'#ab8053');block(335+i*22,224,10,3,'#ab8053');}
+ ctx.restore();
+}
+function drawFloor(scene,x,y,tx,ty){
+ const colors={GALLERY:['#302530','#433142','#1e1b27'],LIBRARY:['#3d3026','#4d3b2d','#271d1d'],STUDIO:['#424044','#555354','#252932'],BEDROOM:['#47343b','#59404b','#29212e'],VAULT:['#263d43','#31535b','#102329']};
+ const [base,edge,deep]=colors[scene];const seed=(tx*17+ty*31+tx*ty*7)%13;
+ block(x,y,40,40,base);block(x+1,y+1,38,2,edge);block(x+1,y+1,2,38,edge);
+ if(seed<6){block(x+5+seed*3,y+13,8,2,deep);block(x+24,y+25+seed%3,5,2,edge);}
+ if(scene==='GALLERY'&&ty>=5&&ty<=11&&tx>=8&&tx<=11){block(x+2,y,36,40,'#503039');block(x+3,y+2,34,2,'#aa8053');if(ty===5||ty===11)block(x+5,y+17,30,4,'#8a6b4e');}
+ if(scene==='LIBRARY'&&tx>=7&&tx<=12&&ty>=5&&ty<=10){block(x+1,y+1,38,38,'#604733');block(x+3,y+3,34,34,'#74543c');if((tx+ty)%2===0)block(x+10,y+9,20,20,'#8a6241');}
+ if(scene==='STUDIO'&&seed<6){block(x+11,y+8,3,2,'#a79d8e');block(x+28,y+27,2,2,'#b4a99c');}
+ if(scene==='BEDROOM'&&tx>=7&&tx<=12&&ty>=5&&ty<=10){block(x+1,y+1,38,38,'#663b4a');block(x+5,y+5,30,30,'#7a4a5b');block(x+10,y+10,20,20,'#543541');}
+ if(scene==='VAULT'&&seed<8){block(x+8,y+24,16,1,'#4f6d75');block(x+20,y+12,3,3,'#63828b');}
+}
+function drawRoomWall(scene,x,y,tx,ty){
+ const colors={GALLERY:['#4b3947','#745267'],LIBRARY:['#49352a','#806249'],STUDIO:['#505057','#7e7a75'],BEDROOM:['#5b3d47','#9a6978'],VAULT:['#344953','#64818a']};
+ const [base,trim]=colors[scene];pixelBox(x+2,y+2,36,36,base,'#1e1922');
+ block(x+5,y+5,30,3,trim);block(x+5,y+21,30,2,'#241e27');
+ if(ty===0&&tx%4===2){block(x+16,y+14,8,16,'#755339');block(x+18,y+8,4,8,'#f2b46a');block(x+17,y+10,6,5,'#ffdd96');}
+ if(scene==='VAULT'&&tx%3===0){block(x+12,y+26,18,3,'#638a91');}
+}
+function drawRoomObstacle(scene,x,y,tx,ty){
+ if(scene==='LIBRARY'){
+  pixelBox(x+2,y+2,36,36,'#614833','#231a1c');
+  for(let i=0;i<5;i++){block(x+5+i*6,y+5,4,26,['#9a654b','#756171','#bb955c','#79604b','#81758a'][(i+tx)%5]);}
+  block(x+3,y+31,34,4,'#c49a65');
+ }else if(scene==='GALLERY'){
+  pixelBox(x+2,y+6,36,32,'#5b3a3f');pixelFrame(x+7,y+4,26,28,'#95734e','#675363');
+  block(x+16,y+13,8,10,'#b39b84');block(x+15,y+24,11,3,'#342b39');
+ }else if(scene==='STUDIO'){
+  pixelBox(x+3,y+6,34,30,'#79767a','#262329');block(x+8,y+10,24,4,'#a6a2a0');
+  block(x+12,y+16,8,11,'#c4bbaa');block(x+26,y+18,4,10,'#464147');
+ }else if(scene==='BEDROOM'){
+  pixelBox(x+2,y+6,36,31,'#583d4e');block(x+5,y+8,30,8,'#b48a7c');
+  block(x+7,y+16,26,15,'#845768');block(x+7,y+31,26,3,'#b58b62');
+ }else{
+  pixelBox(x+3,y+4,34,33,'#50656d');block(x+9,y+7,22,24,'#192d37');
+  block(x+13,y+10,14,2,'#79a4a5');block(x+17,y+17,3,10,'#86bdc0');
+ }
+}
+function drawProp(item,x,y){
+ const id=item.id;ctx.save();
+ if(/Door$/.test(id)||/Back$/.test(id)){
+  const unlocked={libraryDoor:story.portrait,studioDoor:story.library,bedroomDoor:story.statue,vaultDoor:story.clock};
+  drawWallDoor(item.tileX,item.tileY,unlocked[id]??true);
+ }
+ else if(id==='portrait'){
+  pixelFrame(x-16,y-22,32,38,'#886139','#463944');block(x-8,y-13,16,18,story.portrait?'#d8b799':'#9d8b83');
+  if(story.portrait){block(x-11,y-15,22,7,'#382b30');block(x-4,y-4,3,2,'#30212a');block(x+5,y-4,3,2,'#30212a');}
+  else{block(x-10,y-6,20,13,'#2d2932');block(x-4,y+8,8,3,'#a88f79');}
+ }else if(['plaque','sketch'].includes(id)){pixelFrame(x-15,y-13,30,26,'#6d5138','#cab997');
+  block(x-9,y-5,18,2,'#6c5b58');block(x-7,y,14,2,'#6c5b58');block(x-4,y+5,9,2,'#6c5b58');}
+ else if(id==='mirror'){pixelFrame(x-12,y-24,24,47,'#775849','#527278');block(x-5,y-15,5,16,'#acc3b8');block(x+1,y+4,6,10,'#789ca1');}
+ else if(['diary','book','warning','letter1','letter2','letter3'].includes(id)){
+  pixelBox(x-12,y-7,24,19,id==='book'?'#645257':'#d3b990');block(x,y-4,2,15,'#493b39');
+  for(let i=0;i<3;i++){block(x-9,y-3+i*5,7,1,'#766459');block(x+4,y-3+i*5,6,1,'#766459');}
+ }else if(['eyeL','eyeR','nose','mouth'].includes(id)){
+  pixelBox(x-10,y-10,20,20,'#c6ab8b');block(x-5,y-2,10,3,'#41323e');block(x-2,y+1,3,4,'#75575a');
+ }else if(['yellow','blue','red'].includes(id)){
+  const col={yellow:'#dfb854',blue:'#59789d',red:'#b15361'}[id];pixelFrame(x-13,y-18,26,35,'#8c603b',col);
+  block(x-5,y-7,11,9,'#e1c3a4');block(x-3,y+4,10,3,'#ebd4bc');
+ }else if(['libra','aquarius','gemini','echo'].includes(id)){
+  pixelBox(x-14,y+9,28,6,'#6b6669');block(x-9,y-11,18,21,id==='echo'?'#665978':'#b7b0aa');
+  block(x-6,y-20,12,12,'#c9c0b2');block(x-10,y-5,4,13,'#999293');block(x+7,y-5,4,13,'#999293');
+  block(x-3,y-13,2,2,'#554750');block(x+4,y-13,2,2,'#554750');
+ }else if(id==='sculpture'||id==='crystal'){
+  pixelBox(x-16,y+11,32,8,'#5f6169');block(x-9,y-12,18,24,id==='crystal'?'#6ba3af':'#b7b1a9');
+  block(x-6,y-20,12,12,id==='crystal'?'#a6e2dc':'#d0c4b3');block(x-3,y-7,6,8,id==='crystal'?'#e8ffff':'#37353a');
+  if(id==='crystal'){block(x-3,y-17,2,3,'#223645');block(x+3,y-17,2,3,'#223645');}
+ }else if(['box','bench','drawer','panel'].includes(id)){
+  pixelBox(x-17,y-11,34,24,'#79604a');block(x-13,y-7,26,5,'#b79467');
+  block(x-11,y+1,22,8,'#47383b');block(x-3,y+2,6,5,'#dbb874');
+  if(id==='panel'){block(x-8,y-8,4,3,'#b54248');block(x+3,y-8,4,3,'#8ab7ae');}
+ }else if(id==='clock'){
+  pixelFrame(x-15,y-22,30,43,'#79573b','#d9c99e');block(x-1,y-13,2,15,'#45343a');block(x,y,8,2,'#45343a');block(x-7,y+10,14,4,'#aa8252');
+ }else pixelBox(x-10,y-10,20,20,'#967b67');
+ ctx.restore();
+}
+function drawSceneAccents(scene){
+ // 這些元素只是地板與牆面的裝飾，不增加碰撞。
+ if(scene==='GALLERY'){
+  for(const x of [95,215,535,655]){pixelFrame(x,4,46,30,'#806143','#554958');block(x+13,12,20,12,'#bea394');block(x+11,27,23,3,'#372d3c');}
+  for(const x of [90,690]){block(x,340,20,2,'#735b49');block(x+5,345,12,1,'#967250');}
+ }else if(scene==='LIBRARY'){
+  for(const x of [95,235,515,655]){
+   pixelBox(x,3,47,33,'#5d4333');for(let i=0;i<6;i++)block(x+5+i*7,7,5,23,['#875c47','#6d5d70','#b29260'][i%3]);
+   block(x+2,31,43,3,'#b39461');
+  }
+  block(308,400,185,2,'#5f4030');block(318,404,165,1,'#8b6347');
+ }else if(scene==='STUDIO'){
+  for(const [x,y] of [[105,350],[685,290],[240,380],[570,425]]){
+   block(x,y,22,2,'#bcb6a7');block(x+4,y+5,8,2,'#87837c');block(x+18,y-8,3,3,'#c3bcb1');
+  }
+  block(205,9,50,3,'#86796d');block(220,7,3,28,'#b7aa95');
+  block(570,9,48,4,'#86796d');block(580,7,10,8,'#b5afa3');
+ }else if(scene==='BEDROOM'){
+  for(const x of [120,630]){block(x,3,34,33,'#543b46');block(x+4,8,26,25,'#705a6e');block(x+9,11,16,19,'#3e354e');}
+  for(const x of [115,655]){block(x,410,32,2,'#7c5b47');block(x+3,415,26,1,'#5f4036');}
+ }else if(scene==='VAULT'){
+  for(const x of [100,210,570,680]){block(x,2,5,35,'#52757c');block(x+1,5,2,28,'#8dbabd');block(x-4,32,14,4,'#334a4d');}
+  for(const y of [365,403,441]){block(275,y,250,2,'#51747a');block(345,y+2,110,1,'#7ca2a6');}
+  block(320,173,160,2,'#67898c');block(370,178,60,1,'#93c4c4');
+ }
+}
+function drawNewScene(){
+ const scene=gameState.currentScene,map=maps[scene];ctx.save();
+ for(let y=0;y<15;y++)for(let x=0;x<20;x++){
+  const tile=map[y][x],px=x*40,py=y*40;
+  drawFloor(scene,px,py,x,y);
+  if(tile===1)drawRoomWall(scene,px,py,x,y);
+  if(tile===3)drawRoomObstacle(scene,px,py,x,y);
+ }
+ drawSceneAccents(scene);
+ for(const item of interactables[scene]||[]){
+  const used=['eyeL','eyeR','nose','mouth'].includes(item.id)&&story.fragments.has(({eyeL:'左眼',eyeR:'右眼',nose:'鼻子',mouth:'嘴巴'})[item.id]);
+  if(!used)drawProp(item,item.tileX*40+20,item.tileY*40+20);
+ }
+ ctx.restore();drawPlayer(player);
+}
+updateObjective();
+
+</script>
+</body>
+</html>
