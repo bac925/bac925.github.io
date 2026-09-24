@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>伯爵的遺忘之作 - 完整小品 v1.6</title>
+    <title>伯爵的遺忘之作 - 版本號 2.6</title>
     <style>
         * {
             box-sizing: border-box;
@@ -31,7 +31,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: linear-gradient(rgba(0,0,0,.35), rgba(5,5,10,.72)), url("background.jpg"), linear-gradient(#171923,#07090e 70%,#020204);
+            background-image: linear-gradient(rgba(0,0,0,.35), rgba(5,5,10,.72)), url("background-pixel.png"), linear-gradient(#171923,#07090e 70%,#020204);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -45,18 +45,22 @@
         /* 主選單介面層 */
         #main-menu {
             position: absolute;
+            top: 50%;
+            left: 50%;
             z-index: 30;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            background: rgba(5, 5, 8, 0.75);
+            transform: translate(-50%, -50%);
+            width: min(560px, 92vw);
+            background: rgba(5, 5, 8, 0.05);
             padding: 40px 60px;
             border: 2px solid #544233;
             border-radius: 8px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.55), inset 0 0 20px rgba(0, 0, 0, 0.20);
+            backdrop-filter: blur(2px);
             transition: opacity 0.8s ease;
         }
 
@@ -144,6 +148,15 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
+        #opening-quote {position:absolute;inset:0;z-index:23;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.16);cursor:pointer;padding:24px;}
+        #opening-quote .quote-card {max-width:min(720px,88%);padding:20px 34px;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 35px rgba(0,0,0,.45);text-align:center;}
+        #opening-quote .quote-text {color:#fff;font:normal 28px/1.7 "Microsoft JhengHei",sans-serif;letter-spacing:4px;text-shadow:0 2px 8px #000;}
+        #opening-quote .quote-hint {margin-top:9px;color:rgba(255,255,255,.52);font:12px/1.5 "Microsoft JhengHei",sans-serif;letter-spacing:1px;}
+        @media (pointer: coarse) {
+            #opening-quote .quote-text {font-size:22px;letter-spacing:3px;}
+            #opening-quote .quote-card {padding:17px 20px;}
+        }
+
         #dialog-box {
             position: absolute;
             bottom: 20px;
@@ -189,6 +202,28 @@
             100% { opacity: 0.6; }
         }
 
+        #objective-toggle {display:none;position:absolute;top:43px;left:7px;z-index:16;padding:5px 9px;background:#17131bd9;border:1px solid #8d6d50;color:#e3c79d;border-radius:4px;font:12px "Microsoft JhengHei",sans-serif;cursor:pointer;box-shadow:0 2px 8px #0008;}
+        #objective-toggle:hover {background:#3a2d28;}
+        #journal-overlay {display:none;position:absolute;inset:0;z-index:55;align-items:center;justify-content:center;background:rgba(2,3,8,.76);padding:16px;}
+        #journal-panel {position:relative;width:min(650px,92%);max-height:84%;overflow:auto;padding:24px 26px;background:linear-gradient(145deg,#27211f,#0d0e13 78%);border:2px solid #9b7a55;box-shadow:0 18px 60px #000,inset 0 0 28px #0009;}
+        #journal-panel h2 {margin:0 0 6px;color:#efd5a5;font:normal 26px/1.4 "Microsoft JhengHei",sans-serif;letter-spacing:3px;}
+        #journal-panel .journal-subtitle {margin-bottom:16px;color:#988b7d;font-size:12px;}
+        .journal-section {margin-top:16px;}
+        .journal-section h3 {margin-bottom:7px;color:#c6a878;font:15px "Microsoft JhengHei",sans-serif;letter-spacing:2px;border-bottom:1px solid #574738;padding-bottom:4px;}
+        .journal-entry {margin:8px 0;padding:9px 11px;background:#17141ad9;border-left:2px solid #826346;color:#ddd1c0;line-height:1.65;font:13px/1.65 "Microsoft JhengHei",sans-serif;}
+        .journal-entry strong {color:#e6c892;font-weight:normal;}
+        .journal-empty {color:#7f756d;text-align:center;padding:22px 8px;font-size:13px;}
+        #journal-close {position:absolute;right:9px;top:4px;background:none;border:0;color:#cbb99d;font-size:30px;cursor:pointer;}
+        #journal-close:hover {color:#fff;}
+        @media (pointer:coarse) {
+            #main-menu {padding:20px 18px;}
+            #objective-toggle {display:block;}
+            #objective.mobile-hidden {display:none!important;}
+            #objective {pointer-events:none;}
+            #journal-panel {width:94%;max-height:82%;padding:17px 16px;}
+            #journal-panel h2 {font-size:20px;}
+            .journal-entry {font-size:12px;}
+        }
         #version-info {
             position: absolute;
             bottom: 15px;
@@ -207,8 +242,51 @@
         #choice-panel.choice-exit {animation:choiceExit .23s ease-in forwards;}
         @keyframes choiceSlide {from{transform:translate(108%,-50%);opacity:.15}to{transform:translate(0,-50%);opacity:1}}
         @keyframes choiceExit {from{transform:translate(0,-50%);opacity:1}to{transform:translate(108%,-50%);opacity:0}}
+        #ending-cinematic{display:none;position:absolute;inset:0;z-index:70;overflow:hidden;background:#04050a;color:#eee5d6;align-items:center;justify-content:center;pointer-events:auto;}
+        #ending-cinematic .cinema-bg{position:absolute;inset:0;background:#05060b;transition:background .6s ease,filter .6s ease;}
+        #ending-cinematic .cinema-vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 44%,transparent 18%,rgba(0,0,0,.25) 56%,rgba(0,0,0,.92) 100%);pointer-events:none;}
+        #ending-cinematic .cinema-scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;}
+        #ending-cinematic .cinema-cg{width:min(900px,92vw);max-height:74vh;object-fit:cover;image-rendering:pixelated;image-rendering:crisp-edges;border:1px solid #8c6e50;box-shadow:0 24px 90px #000,0 0 0 4px #130e13;opacity:0;transform:scale(1.06);filter:saturate(.9) contrast(1.08);transition:opacity .55s ease,transform 2.2s cubic-bezier(.16,.72,.19,1),filter .6s ease;}
+        #ending-cinematic .cinema-caption{position:absolute;bottom:9%;left:50%;transform:translateX(-50%);width:min(720px,88vw);text-align:center;padding:12px 18px;background:rgba(4,5,9,.72);border-top:1px solid #9a7952;border-bottom:1px solid #5f4d39;box-shadow:0 8px 30px #0008;font:16px/1.8 "Microsoft JhengHei",sans-serif;letter-spacing:2px;opacity:0;transition:opacity .35s ease;z-index:5;}
+        #ending-cinematic .cinema-kicker{position:absolute;top:6%;left:50%;transform:translateX(-50%);font:11px Georgia,serif;letter-spacing:5px;color:#c8ab78;opacity:0;transition:opacity .35s ease;z-index:5;}
+        #ending-cinematic .cinema-title{position:absolute;top:12%;left:50%;transform:translateX(-50%);font:34px "Microsoft JhengHei",sans-serif;letter-spacing:8px;text-shadow:0 0 20px #000;color:#f3dbab;opacity:0;transition:opacity .45s ease;z-index:5;}
+        #ending-cinematic .cinema-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:6;}
+        #ending-cinematic .cinema-shake{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+        #ending-cinematic.shake-1 .cinema-shake{animation:cinemaShake .12s linear 0s 10;}
+        #ending-cinematic.shake-2 .cinema-shake{animation:cinemaShakeHeavy .09s linear 0s 14;}
+        #ending-cinematic .cracks{position:absolute;inset:0;width:100%;height:100%;opacity:0;transform:scale(.92);pointer-events:none;z-index:4;transition:opacity .25s ease,transform 1.4s ease;}
+        #ending-cinematic .cracks path{stroke:#d9fbff;stroke-width:3;fill:none;stroke-linecap:square;stroke-linejoin:miter;filter:drop-shadow(0 0 6px #8ce7ff);}
+        #ending-cinematic[data-ending="bad"] .cracks path{stroke:#ffb1c2;filter:drop-shadow(0 0 6px #ff4f66);}
+        #ending-cinematic[data-ending="org"] .cracks path{stroke:#d9cda6;filter:drop-shadow(0 0 5px #b68b4e);}
+        #ending-cinematic.show-cg .cinema-cg{opacity:1;transform:scale(1);}
+        #ending-cinematic.show-text .cinema-caption,#ending-cinematic.show-text .cinema-kicker,#ending-cinematic.show-title .cinema-title{opacity:1;}
+        #ending-cinematic.show-cracks .cracks{opacity:1;transform:scale(1);}
+        #ending-cinematic.flash .cinema-flash{animation:cinemaFlash .28s ease-out forwards;}
+        #ending-cinematic[data-ending="true"] .cinema-bg{background:radial-gradient(circle at 50% 44%,#15334f 0,#07101a 55%,#03050a 100%);}
+        #ending-cinematic[data-ending="bad"] .cinema-bg{background:radial-gradient(circle at 50% 45%,#4a1425 0,#170913 52%,#040409 100%);}
+        #ending-cinematic[data-ending="org"] .cinema-bg{background:radial-gradient(circle at 50% 45%,#4a3a24 0,#17131a 52%,#050509 100%);}
+        #ending-cinematic[data-ending="bad"] .cinema-cg{filter:saturate(1.2) contrast(1.15) hue-rotate(-12deg);}
+        #ending-cinematic[data-ending="org"] .cinema-cg{filter:saturate(.88) contrast(1.08) sepia(.12);}
+        @keyframes cinemaShake{0%,100%{transform:translate(0,0)}25%{transform:translate(4px,-2px)}50%{transform:translate(-3px,3px)}75%{transform:translate(2px,1px)}}
+        @keyframes cinemaShakeHeavy{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(6px,-4px) rotate(-.6deg)}50%{transform:translate(-5px,5px) rotate(.5deg)}75%{transform:translate(3px,2px) rotate(-.3deg)}}
+        @keyframes cinemaFlash{0%{opacity:0}22%{opacity:.98}100%{opacity:0}}
+        #ending{overflow:hidden;}
+        #ending::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 45%,rgba(170,125,75,.16),transparent 55%);opacity:0;transition:opacity .4s ease;}
+        #ending[data-ending="true"]::before{opacity:1;animation:endingPulse 3.2s ease-in-out infinite;}
+        #ending[data-ending="bad"]::before{background:radial-gradient(circle at 50% 45%,rgba(120,55,110,.18),transparent 55%);opacity:1;animation:endingBreath 3.8s ease-in-out infinite;}
+        #ending[data-ending="org"]::before{background:linear-gradient(115deg,rgba(50,80,105,.18),transparent 60%);opacity:1;}
+        #ending .ending-tag{font-size:11px;letter-spacing:4px;color:#a48b69;}
+        #ending .ending-mark{font-size:54px;line-height:1;color:#d5b174;text-shadow:0 0 24px #c38b4d55;}
+        #ending[data-ending="bad"] .ending-mark{color:#af7ab2;}
+        #ending[data-ending="org"] .ending-mark{color:#82a9ba;}
+        #ending-title,#ending-body,#ending .menu-btn{position:relative;z-index:1;}
+        #ending-menu-button{position:absolute!important;left:50%;bottom:22px;transform:translateX(-50%);z-index:6;margin:0;min-width:160px;}
+        @keyframes endingPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.08);opacity:1}}
+        @keyframes endingBreath{0%,100%{transform:scale(.98);opacity:.45}50%{transform:scale(1.05);opacity:.9}}
         .cinematic-option {display:flex;align-items:center;gap:16px;width:100%;text-align:left;margin:8px 0;padding:11px 15px;background:#1b1c25;border:1px solid #514947;color:#e8dfd2;cursor:pointer;font:16px "Microsoft JhengHei",sans-serif;transition:background .13s,transform .13s,border-color .13s;}
         .cinematic-option.selected,.cinematic-option:hover {background:#493b34;border-color:#dbb275;transform:translateX(-7px);box-shadow:0 0 17px #ae784250;}
+        #ending-menu-button.ending-ready{animation:endingButtonIn .7s ease both;box-shadow:0 0 22px #c79a5b44;}
+        @keyframes endingButtonIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
         .option-index {flex:none;min-width:43px;text-align:center;font:bold 24px Georgia,serif;color:#d9ae6d;border-right:1px solid #836947;padding-right:12px;}
         .option-label {font:16px/1.5 "Microsoft JhengHei",sans-serif;letter-spacing:1px;}
         .option-label.numeric-answer {font:bold 21px/1.3 Consolas,monospace;color:#f2d9ab;letter-spacing:3px;}
@@ -219,14 +297,17 @@
         .difficulty-list strong {display:block;font-size:17px;letter-spacing:2px;margin-bottom:9px;}
         .difficulty-list small {display:block;color:#b8aba1;line-height:1.55;font-size:12px;}
         @media(max-width:600px){.difficulty-list{grid-template-columns:1fr}.difficulty-list button{min-height:65px}}
+        @media(max-width:620px){.game-title{font-size:clamp(26px,8vw,34px);letter-spacing:2px}.game-subtitle{margin-bottom:22px}.menu-btn{width:min(220px,76vw);padding:10px 24px;}}
         #flame-field {position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;}
-        .flame-set {position:absolute;width:30px;height:46px;transform:translate(-50%,-67%);filter:drop-shadow(0 0 5px #f8a74d);animation:flameSway 1.7s ease-in-out infinite alternate;}
+        .flame-set {position:absolute;width:30px;height:46px;transform:translate(-50%,-22%);filter:drop-shadow(0 0 5px #f8a74d);animation:flameSway 1.7s ease-in-out infinite alternate;}
         .wall-flame:nth-child(2){animation-delay:-.7s}.wall-flame:nth-child(3){animation-delay:-1.2s}
+        #player-flame{animation:playerFlameSway 1.7s ease-in-out infinite alternate;}
+        @keyframes playerFlameSway {from{transform:translate(-50%,-22%) rotate(-3deg) scale(.5)}to{transform:translate(-50%,-22%) rotate(4deg) scale(.5)}}
         .flame-glow {position:absolute;left:-22px;top:-25px;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle,#ffb65378 0%,#f48b2333 30%,transparent 71%);animation:glowPulse 1.35s ease-in-out infinite alternate;}
         .flame-body {position:absolute;left:8px;top:6px;width:14px;height:26px;background:linear-gradient(65deg,#f36b22,#ffb839 45%,#ffdc7b);border-radius:65% 15% 55% 55%;transform:rotate(23deg);clip-path:polygon(58% 0%,95% 44%,100% 72%,80% 100%,18% 100%,0 73%,22% 45%);animation:flameDance .31s ease-in-out infinite alternate;}
         .flame-core {position:absolute;left:12px;top:17px;width:7px;height:13px;background:#fff7c8;border-radius:70% 35% 60% 40%;animation:flameDance .43s ease-in-out infinite alternate-reverse;}
         @keyframes flameDance {from{transform:rotate(-8deg) scale(.83,1.18);opacity:.8}to{transform:rotate(11deg) scale(1.18,.76);opacity:1}}
-        @keyframes flameSway {from{transform:translate(-50%,-67%) rotate(-3deg)}to{transform:translate(-50%,-67%) rotate(4deg)}}
+        @keyframes flameSway {from{transform:translate(-50%,-22%) rotate(-3deg)}to{transform:translate(-50%,-22%) rotate(4deg)}}
         @keyframes glowPulse {from{opacity:.52;transform:scale(.82)}to{opacity:1;transform:scale(1.35)}}
         #dialog-box.portrait-visible {padding-left:178px;min-height:135px;}
         #lily-portrait {display:none;position:absolute;left:-12px;bottom:0;width:170px;height:211px;overflow:hidden;filter:drop-shadow(3px 0 9px #000);animation:portraitRise .35s ease-out both;}
@@ -276,6 +357,23 @@
         .portrait-coat-seam {left:116px;bottom:0;width:3px;height:62px;background:#c6988f;transform:rotate(-21deg);opacity:.65;}
         .portrait-lamp {right:5px;bottom:5px;}
         @media(max-width:620px){#dialog-box.portrait-visible{padding-left:91px}#lily-portrait{transform:scale(.55);transform-origin:bottom left;left:0;animation:none}}
+        #story-prologue{position:absolute;inset:0;z-index:25;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.84);padding:24px;cursor:pointer;}
+        .prologue-card{width:min(820px,92%);display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,.9fr);gap:24px;align-items:center;padding:24px;background:linear-gradient(135deg,#17131aee,#090a10f7 70%);border:2px solid #9b7955;box-shadow:0 24px 80px #000,inset 0 0 40px #0008;animation:prologueEnter .45s ease-out;}
+        .prologue-image{background:#09090d;border:1px solid #5f4a39;padding:8px;box-shadow:0 0 30px #000;}
+        .prologue-image img{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;filter:saturate(.9) contrast(1.03);}
+        .prologue-kicker{font:11px Georgia,serif;letter-spacing:4px;color:#b18a61;text-transform:uppercase;margin-bottom:10px;}
+        .prologue-copy{color:#ddd0bd;font:17px/2 "Microsoft JhengHei",sans-serif;letter-spacing:1px;}
+        .prologue-copy strong{display:block;margin:10px 0;color:#f1d5a5;font-size:20px;letter-spacing:2px;}
+        @keyframes prologueEnter{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+        #ending-cg{width:min(760px,84vw);max-height:34vh;object-fit:cover;object-position:center;border:1px solid #8c6e50;box-shadow:0 18px 55px #000,0 0 0 4px #120e13;display:none;image-rendering:pixelated;image-rendering:crisp-edges;}
+        #ending[data-ending="true"]{background:radial-gradient(circle at center,#18304be6 0,#060911f2 55%,#040408fa 100%);}
+        #ending[data-ending="bad"]{background:radial-gradient(circle at center,#3a1721e8 0,#12080df4 58%,#040408fa 100%);}
+        #ending[data-ending="org"]{background:radial-gradient(circle at center,#403423df 0,#100d11f4 60%,#040408fa 100%);}
+        #ending[data-ending="true"] #ending-cg,#ending[data-ending="bad"] #ending-cg,#ending[data-ending="org"] #ending-cg{display:block;}
+        #ending[data-ending="true"] #ending-title{color:#bfe5ff!important;}
+        #ending[data-ending="bad"] #ending-title{color:#ef9c9c!important;}
+        #ending[data-ending="org"] #ending-title{color:#e7c58f!important;}
+        @media(max-width:720px){#ending-cinematic .cinema-title{font-size:22px;letter-spacing:4px;top:10%}#ending-cinematic .cinema-caption{font-size:13px;padding:10px 12px;bottom:7%}.cinema-cg{max-height:58vh!important;width:92vw!important}.prologue-card{grid-template-columns:1fr;padding:15px;gap:15px;max-height:92%;overflow:auto}.prologue-copy{font-size:14px}.prologue-copy strong{font-size:17px}.ending-cg{max-height:29vh!important;width:92vw!important;}}
         .puzzle-card {position:relative;width:min(590px,96%);max-height:96%;overflow:auto;padding:24px 26px;text-align:center;color:#e7d5b6;background:linear-gradient(145deg,#2b2421,#111116 76%);border:5px double #98754e;box-shadow:0 0 0 5px #151016,0 22px 65px #000,inset 0 0 40px #0008;animation:puzzleEnter .38s ease-out;}
         @keyframes puzzleEnter {from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
         .puzzle-kicker {font:11px Georgia,serif;letter-spacing:4px;color:#a8855e;}
@@ -336,7 +434,7 @@
         .touch-key {position:absolute;width:42px;height:42px;border-radius:8px;font-size:20px;}
         .touch-key.up {left:44px;top:0}.touch-key.down {left:44px;top:84px}.touch-key.left {left:0;top:42px}.touch-key.right {left:88px;top:42px}
         .touch-key:active,.touch-round:active,.touch-key.pressed {background:#846643;transform:translateY(3px);box-shadow:0 1px 0 #17131e;}
-        .touch-actions {display:flex;align-items:center;gap:10px;justify-content:flex-end;}
+        .touch-actions {display:flex;align-items:center;gap:7px;justify-content:flex-end;}
         .touch-round {width:63px;height:63px;border-radius:50%;font-size:14px;font-weight:bold;}
         .touch-round.primary {width:74px;height:74px;background:#68452bdc;border-color:#e2b974;}
         .touch-round.small {width:39px;height:39px;font-size:19px;}
@@ -349,7 +447,7 @@
             #hud {top:7px;left:7px;right:7px;font-size:clamp(10px,2.5vw,15px);}
             .stat-box {padding:5px 6px;}
             #scene-name {top:31px;font-size:11px;}
-            #objective {top:60px!important;left:7px!important;max-width:90%!important;padding:4px 6px!important;font-size:10px!important;}
+            #objective {top:70px!important;left:7px!important;max-width:90%!important;padding:4px 6px!important;font-size:10px!important;}
             #dialog-box {left:5px;right:5px;bottom:7px;padding:9px 11px;font-size:clamp(11px,2.8vw,14px);line-height:1.4;max-height:65%;overflow-y:auto;}
             #dialog-box.portrait-visible {padding-left:88px;min-height:82px;}
             #lily-portrait {transform:scale(.52);transform-origin:bottom left;left:0;animation:none;}
@@ -378,7 +476,7 @@
             #game-canvas-wrapper {width:min(800px,96vw,calc(96dvh*4/3));max-height:96dvh;}
             #touch-controls {bottom:7px;height:90px;align-items:end;}
             .touch-pad {transform:scale(.68);transform-origin:bottom left;margin-bottom:-7px;}
-            .touch-actions {transform:scale(.72);transform-origin:bottom right;margin-bottom:4px;}
+            .touch-actions {transform:scale(.68);transform-origin:bottom right;margin-bottom:4px;}
             #dialog-box {left:90px;right:90px;bottom:6px;max-height:65%;}
             #interaction-prompt {bottom:85px;}
         }
@@ -423,6 +521,7 @@
             <div class="touch-actions">
                 <button id="touch-hint" class="touch-round secondary" onclick="touchHint()" aria-label="顯示提示">提示</button>
                 <button id="touch-interact" class="touch-round primary" onclick="touchInteract()" aria-label="調查或繼續對話">調查</button>
+                <button id="touch-journal" class="touch-round small" onclick="openJournal()" aria-label="開啟調查筆記">📖</button>
                 <button class="touch-round small" onclick="openOptions()" aria-label="開啟設定">⚙</button>
             </div>
         </div>
@@ -433,13 +532,42 @@
         </div>
         
         <div id="hud">
-            <div class="stat-box">🕯️ 油量: <span id="oil-val" style="color: #ffaa00;">1/5</span></div>
+            <div class="stat-box" id="resource-box"><span id="resource-label">手電筒</span><span id="oil-val" style="display:none;color:#ffaa00;"></span></div>
             <div class="stat-box" id="scene-name" style="color:#e0c790;letter-spacing:2px;">暴雨中的城堡</div>
             <div class="stat-box">🧠 心智值 (SAN): <span id="san-val" style="color: #55ff55;">100/100</span></div>
         </div>
 
-        <div id="objective" style="display:none;position:absolute;top:62px;left:15px;z-index:12;padding:8px 12px;max-width:75%;background:#100e12df;border:1px solid #665044;font-size:13px;">目標：尋找光源</div>
+        <button id="objective-toggle" onclick="toggleObjective()" aria-expanded="false">⌄ 目標</button>
+        <div id="objective" style="display:none;position:absolute;top:62px;left:15px;z-index:12;padding:8px 12px;max-width:75%;background:#100e12df;border:1px solid #665044;font-size:13px;cursor:pointer;" onclick="toggleObjective()">目標：尋找光源</div>
+        <div id="journal-overlay" role="dialog" aria-modal="true" aria-label="調查筆記">
+            <div id="journal-panel">
+                <button id="journal-close" onclick="closeJournal()" aria-label="關閉調查筆記">×</button>
+                <h2>調查筆記</h2>
+                <div class="journal-subtitle">已發現的線索會自動整理在這裡。</div>
+                <div id="journal-content"></div>
+            </div>
+        </div>
         <div id="interaction-prompt">[E / SPACE] 調查</div>
+
+        <div id="opening-quote" role="dialog" aria-modal="true" aria-label="序幕題字" onclick="advanceOpeningQuote()">
+            <div class="quote-card">
+                <div class="quote-text">什麼才是真正的永存？</div>
+                <div class="quote-hint">點擊畫面或按 Enter／空白鍵繼續</div>
+            </div>
+        </div>
+
+        <div id="story-prologue" role="dialog" aria-modal="true" aria-label="神秘信件序幕" onclick="advanceStoryPrologue()">
+            <div class="prologue-card">
+                <div class="prologue-image"><img src="prologue_letter.png" alt="莉莉手上拿著帶有雙子座圖式蠟封的神秘信件"></div>
+                <div class="prologue-copy">
+                    <div class="prologue-kicker">THREE DAYS AGO</div>
+                    三天前，我收到一封沒有署名的信。
+                    <br>信封上只有一枚奇怪的蠟封——雙子座的圖式。
+                    <strong>「如果你還記得她，來城堡。」</strong>
+
+                </div>
+            </div>
+        </div>
 
         <div id="dialog-box" onclick="if(gameState.isDialogActive) advanceDialog()" title="點擊繼續">
             <div id="lily-portrait" aria-hidden="true">
@@ -492,9 +620,31 @@
                 </div>
             </div>
         </div>
-        <div id="ending" style="display:none;position:absolute;inset:0;z-index:28;background:#08080df2;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px;gap:22px;">
-            <h1 id="ending-title" style="color:#e6c487;font-size:34px;"></h1><p id="ending-body" style="white-space:pre-line;line-height:1.9;max-width:600px;"></p>
-            <button class="menu-btn" onclick="location.reload()">重新開始</button>
+        <div id="ending" style="display:none;position:absolute;inset:0;z-index:28;background:#08080df2;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px;gap:14px;">
+            <div class="ending-tag" id="ending-tag">ENDING</div>
+            <div class="ending-mark" id="ending-mark">◆</div>
+            <img id="ending-cg" src="" alt="結局 CG">
+            <h1 id="ending-title" style="color:#e6c487;font-size:34px;margin:0;"></h1>
+            <p id="ending-body" style="white-space:pre-line;line-height:1.8;max-width:700px;margin:0;"></p>
+            <button id="ending-menu-button" class="menu-btn" style="display:none;" onclick="returnToMainMenu()">返回主選單</button>
+        </div>
+        <div id="ending-cinematic" aria-hidden="true">
+            <div class="cinema-bg"></div>
+            <div class="cinema-shake">
+                <img id="ending-cinema-cg" class="cinema-cg" src="" alt="結局演出">
+            </div>
+            <svg id="ending-cracks" class="cracks" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M500 310 L458 262 L422 210 L398 150 L356 92"/><path d="M500 310 L532 262 L574 214 L618 152 L664 103"/>
+                <path d="M500 310 L466 324 L423 360 L372 398 L316 420"/><path d="M500 310 L544 324 L594 362 L645 404 L714 430"/>
+                <path d="M500 310 L494 260 L486 214 L490 164 L482 112"/><path d="M500 310 L510 358 L516 410 L512 472 L526 530"/>
+                <path d="M458 262 L438 228 L426 192"/><path d="M532 262 L554 226 L566 192"/>
+                <path d="M466 324 L438 338 L414 356"/><path d="M544 324 L568 340 L596 360"/>
+            </svg>
+            <div class="cinema-kicker" id="ending-cinema-kicker">ENDING SEQUENCE</div>
+            <div class="cinema-title" id="ending-cinema-title"></div>
+            <div class="cinema-caption" id="ending-cinema-caption"></div>
+            <div class="cinema-flash"></div>
+            <div class="cinema-vignette"></div>
         </div>
     </div>
 
@@ -504,12 +654,12 @@
         <label for="brightness-range">遊戲亮度　<span id="brightness-display">50%</span></label><input id="brightness-range" type="range" min="0" max="100" value="50" oninput="setBrightness(this.value)" style="width:100%;margin:12px 0 26px;accent-color:#c9a268;">
         <button class="menu-btn" onclick="closeOptions()" style="width:100%;">返回遊戲</button>
     </div>
-    <div id="version-info">完整小品 v1.6</div>
+    <div id="version-info">版本號 2.6</div>
 </div>
 
 <script>
 // ==========================================
-// 伯爵的遺忘之作 - 整合主選單與遊戲核心
+// 伯爵的遺忘之作 - 整合主選單與遊戲核心 - v2.6
 // ==========================================
 
 const CANVAS_WIDTH = 800;
@@ -526,6 +676,8 @@ lightCanvas.width = CANVAS_WIDTH;
 lightCanvas.height = CANVAS_HEIGHT;
 const lightCtx = lightCanvas.getContext('2d');
 
+const resourceBoxEl = document.getElementById('resource-box');
+const resourceLabelEl = document.getElementById('resource-label');
 const oilValEl = document.getElementById('oil-val');
 const sanValEl = document.getElementById('san-val');
 const dialogBox = document.getElementById('dialog-box');
@@ -534,7 +686,7 @@ const dialogText = document.getElementById('dialog-text');
 const promptEl = document.getElementById('interaction-prompt');
 
 let gameState = {
-    version: '1.6',
+    version: '2.6',
     difficulty: 'investigator',
     currentScene: 'OUTSIDE',
     oil: 1,
@@ -558,7 +710,12 @@ let gameState = {
     waterTimer: 0,
     lightningTimer: 0,
     lightningAlpha: 0,
-    gameStarted: false
+    isJournalOpen: false,
+    gameStarted: false,
+    sanWarningStage: 0,
+    openingQuoteActive: false,
+    storyPrologueActive: false,
+    endingCinematicActive: false
 };
 
 const player = {
@@ -618,6 +775,7 @@ function playClickSound() {
 function showDifficulty(){playClickSound();document.getElementById('main-menu').style.display='none';document.getElementById('difficulty-screen').style.display='block';}
 function hideDifficulty(){document.getElementById('difficulty-screen').style.display='none';document.getElementById('main-menu').style.display='flex';}
 function startGame(mode='investigator') {
+    updateHUD();
     gameState.difficulty=mode;
     document.getElementById('difficulty-screen').style.display='none';
     playClickSound();
@@ -631,7 +789,7 @@ function startGame(mode='investigator') {
     setTimeout(() => {
         menu.style.display = 'none';
         canvasWrapper.style.display = 'block';
-        document.getElementById('objective').style.display = 'block';
+        document.getElementById('objective').style.display = isCoarsePointer() ? 'none' : 'block';
         container.style.backgroundImage = 'none';
         container.style.backgroundColor = '#050508';
         container.classList.add('playing');
@@ -643,12 +801,12 @@ function startGame(mode='investigator') {
         requestAnimationFrame(gameLoop);
         updateObjective();
         const opening={explorer:'暴雨幾乎抹去了來時的足跡。石牆後似乎還留著一些未被帶走的東西。',investigator:'石牆高得看不見盡頭。今晚，只有我一個人記得自己為何而來。',silence:'雨聲太大。城堡沒有一扇窗亮著。'};
-        showDialog("L（莉莉）", ["什麼才是真正的永存？", opening[mode], "WASD／方向鍵移動；E／空白鍵調查；H 提示；ESC 設定。"]);
+        showOpeningQuote(()=>showStoryPrologue(()=>showDialog("L（莉莉）", ["那封信，我一直帶在身上。蠟封上的雙子座圖式，到現在我仍看不懂它代表什麼。", opening[mode], "WASD／方向鍵移動；E／空白鍵調查；H 提示；J／📖 調查筆記；ESC 設定。", "我得保持清醒。心智值會隨時間緩慢下降，受到驚嚇或解謎失誤也會額外下降；歸零時只會短暫恍惚，我還能繼續前進。"])));
     }, 800);
 }
 
 function openOptions() {
-    if (settings.open) return;
+    if (settings.open || gameState.isJournalOpen) return;
     settings.open=true;
     for(const k of Object.keys(keys)) keys[k]=false;
     document.getElementById('settings-panel').style.display='block';
@@ -664,11 +822,65 @@ function openCredits() {
     alert("【製作團隊】\n製作人：騷花、BAC\n程式設計：Gemini、ChatGPT-6 Sol");
 }
 
+let openingQuoteTimer = null;
+function showOpeningQuote(onComplete=null){
+    const overlay=document.getElementById('opening-quote');
+    gameState.openingQuoteActive=true;
+    overlay.style.display='flex';
+    if(openingQuoteTimer)clearTimeout(openingQuoteTimer);
+    openingQuoteTimer=setTimeout(()=>advanceOpeningQuote(),1800);
+    gameState.dialogOnComplete=onComplete;
+}
+function advanceOpeningQuote(){
+    if(!gameState.openingQuoteActive)return;
+    gameState.openingQuoteActive=false;
+    if(openingQuoteTimer){clearTimeout(openingQuoteTimer);openingQuoteTimer=null;}
+    document.getElementById('opening-quote').style.display='none';
+    const cb=gameState.dialogOnComplete;
+    gameState.dialogOnComplete=null;
+    if(cb)cb();
+}
+function showStoryPrologue(onComplete=null){
+    const overlay=document.getElementById('story-prologue');
+    gameState.storyPrologueActive=true;
+    gameState.dialogOnComplete=onComplete;
+    overlay.style.display='flex';
+}
+function advanceStoryPrologue(){
+    if(!gameState.storyPrologueActive)return;
+    gameState.storyPrologueActive=false;
+    document.getElementById('story-prologue').style.display='none';
+    const cb=gameState.dialogOnComplete;
+    gameState.dialogOnComplete=null;
+    if(cb)cb();
+}
+
 // --- 鍵盤監聽 ---
 window.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
-    if (key === 'escape') { e.preventDefault(); if(gameState.isPuzzleActive)closePuzzle();else settings.open ? closeOptions() : openOptions(); return; }
+    if ((gameState.openingQuoteActive || gameState.storyPrologueActive) && (key === 'enter' || key === ' ' || key === 'escape')) {
+        e.preventDefault();
+        if(gameState.openingQuoteActive) advanceOpeningQuote(); else advanceStoryPrologue();
+        return;
+    }
+    if (gameState.endingCinematicActive) {
+        e.preventDefault();
+        return;
+    }
+    if (key === 'escape') {
+        e.preventDefault();
+        if (!gameState.gameStarted) return;
+        if(gameState.isPuzzleActive) closePuzzle();
+        else if (gameState.isJournalOpen) closeJournal();
+        else settings.open ? closeOptions() : openOptions();
+        return;
+    }
     if (settings.open || !gameState.gameStarted || gameState.ended) return;
+    if (key === 'j' && !gameState.isDialogActive && !gameState.isChoiceActive && !gameState.isPuzzleActive) {
+        e.preventDefault();
+        toggleJournal();
+        return;
+    }
     if (gameState.isPuzzleActive) {
         if(gameState.puzzleType==='safe' && /^[0-9]$/.test(key)){dialWheel(gameState.activeWheel,Number(key)-safeDigits[gameState.activeWheel]);gameState.activeWheel=Math.min(3,gameState.activeWheel+1);}
         else if(gameState.puzzleType==='clock' && key==='enter')submitClock();
@@ -716,16 +928,17 @@ function setupTouchControls(){
  window.addEventListener('blur',()=>{for(const k of Object.keys(keys))keys[k]=false;});
 }
 function touchInteract(){
- if(!gameState.gameStarted||settings.open||gameState.ended||gameState.isPuzzleActive)return;
+ if(!gameState.gameStarted||settings.open||gameState.ended||gameState.isPuzzleActive||gameState.isJournalOpen)return;
+ if(gameState.openingQuoteActive){advanceOpeningQuote();return;}
  if(gameState.isChoiceActive){choose(selectedChoice);return;}
  if(gameState.isDialogActive){advanceDialog();return;}
  if(gameState.activeInteractable)triggerInteraction(gameState.activeInteractable);
 }
 function touchHint(){
- if(gameState.gameStarted&&!settings.open&&!gameState.ended&&!gameState.isPuzzleActive&&!gameState.isChoiceActive&&!gameState.isDialogActive)revealHint();
+ if(gameState.gameStarted&&!settings.open&&!gameState.ended&&!gameState.isPuzzleActive&&!gameState.isChoiceActive&&!gameState.isDialogActive&&!gameState.isJournalOpen)revealHint();
 }
 function syncTouchControls(){const root=document.getElementById('touch-controls');
- const blocked=settings.open||gameState.isPuzzleActive||gameState.isChoiceActive||gameState.ended;
+ const blocked=settings.open||gameState.isPuzzleActive||gameState.isChoiceActive||gameState.ended||gameState.isJournalOpen||gameState.openingQuoteActive||gameState.storyPrologueActive;
  root.style.visibility=blocked?'hidden':'visible';
  const interact=document.getElementById('touch-interact');interact.textContent=gameState.isDialogActive?'下一句':gameState.activeInteractable?'調查':'互動';
 }
@@ -812,7 +1025,7 @@ function playFallAndDropSFX() {
     fallGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
     fallGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
     fallOsc.connect(fallGain);
-    fallGain.connect(audioCtx.destination);
+    fallGain.connect(masterGain);
     fallOsc.start();
     fallOsc.stop(audioCtx.currentTime + 0.3);
 
@@ -826,7 +1039,7 @@ function playFallAndDropSFX() {
         dropGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
         dropGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
         dropOsc.connect(dropGain);
-        dropGain.connect(audioCtx.destination);
+        dropGain.connect(masterGain);
         dropOsc.start();
         dropOsc.stop(audioCtx.currentTime + 0.25);
     }, 200);
@@ -857,6 +1070,11 @@ function tone(freq,duration,type='sine',volume=.12,start=0){if(!audioCtx)return;
 function playChoiceOpen(){tone(90,.42,'sawtooth',.075);tone(175,.27,'triangle',.08,.07);tone(440,.22,'sine',.10,.16);}
 function playChoiceMove(){tone(250,.075,'triangle',.065);tone(580,.10,'sine',.045,.025);}
 function playChoiceConfirm(){tone(110,.44,'sawtooth',.10);tone(330,.36,'triangle',.10,.06);tone(660,.4,'sine',.12,.12);tone(990,.3,'sine',.07,.19);}
+
+function playEchoFadeSFX(){tone(520,.28,'sine',.07);tone(310,.42,'triangle',.055,.08);tone(150,.65,'sine',.04,.19);}
+function playChiselImpactSFX(){tone(95,.22,'square',.12);tone(180,.36,'sawtooth',.09,.03);tone(420,.18,'triangle',.08,.09);}
+function playCrystalBreakSFX(){tone(260,.16,'square',.13);tone(520,.34,'triangle',.12,.06);tone(1040,.58,'sine',.10,.18);tone(1800,.72,'sine',.055,.28);}
+function playMemoryPulseSFX(){tone(82,.9,'sine',.06);tone(165,.55,'triangle',.05,.18);}
 
 // --- 地圖與互動定義 ---
 const maps = {
@@ -1014,8 +1232,9 @@ function enterCastle() {
     }
     gameState.currentScene = 'HALL';
     updateObjective();
+    // 從戶外進入入口大廳後，角色從大廳下方正中央出現。
     player.x = 9 * TILE_SIZE + 6;
-    player.y = 12 * TILE_SIZE + 2;
+    player.y = 12 * TILE_SIZE + 4;
     gameState.switches.S001_EntranceLocked = true;
     gameState.san -= 5;
     updateHUD();
@@ -1031,7 +1250,7 @@ function enterCastle() {
 
 function enterGallery() {
     if (gameState.switches.S011_HallPuzzleDone) {
-        goScene("GALLERY", 2, 11, "畫廊裡滿是被毀壞的作品。 ");
+        goScene("GALLERY", 2, 12, "畫廊裡滿是被毀壞的作品。 ");
     } else {
         showDialog("L (莉莉)", ["這面牆壁看似有所鬆動，但目前無法開啟。"]);
     }
@@ -1077,6 +1296,20 @@ function checkCollisions(newX, newY) {
         return true;
     }
 
+    // 重要互動物件本體不可穿越：玩家仍可站在相鄰格調查。
+    const solidProps = {
+        GALLERY: [{id:'portrait', x:9*TILE_SIZE+4, y:3*TILE_SIZE+4, w:32, h:32}],
+        STUDIO:  [{id:'drawer',   x:15*TILE_SIZE+4, y:10*TILE_SIZE+4, w:32, h:32}],
+        BEDROOM: [
+            {id:'mirror', x:5*TILE_SIZE+4,  y:10*TILE_SIZE+4, w:32, h:32},
+            {id:'clock',  x:15*TILE_SIZE+4, y:10*TILE_SIZE+4, w:32, h:32}
+        ]
+    };
+    const props = solidProps[gameState.currentScene] || [];
+    for (const prop of props) {
+        if (pRight > prop.x && pLeft < prop.x + prop.w && pBottom > prop.y && pTop < prop.y + prop.h) return true;
+    }
+
     if (gameState.currentScene === 'HALL') {
         const statuesList = [
             { x: 6 * TILE_SIZE, y: 6 * TILE_SIZE },
@@ -1097,6 +1330,19 @@ function checkCollisions(newX, newY) {
         }
     }
 
+    if (gameState.currentScene === 'STUDIO') {
+        const studioStatues = [
+            { x: 5 * TILE_SIZE, y: 8 * TILE_SIZE },
+            { x: 14 * TILE_SIZE, y: 8 * TILE_SIZE },
+            { x: 4 * TILE_SIZE, y: 10 * TILE_SIZE }
+        ];
+        for (const s of studioStatues) {
+            const sLeft = s.x + 4, sRight = s.x + 36;
+            const sTop = s.y + 5, sBottom = s.y + 38;
+            if (pRight > sLeft && pLeft < sRight && pBottom > sTop && pTop < sBottom) return true;
+        }
+    }
+
     return false;
 }
 
@@ -1105,7 +1351,7 @@ let lastTime = performance.now();
 let sanTimer = 0;
 
 function update(dt) {
-    if (settings.open || gameState.isDialogActive || gameState.isChoiceActive || gameState.isPuzzleActive || gameState.ended) return;
+    if (settings.open || gameState.isDialogActive || gameState.isChoiceActive || gameState.isPuzzleActive || gameState.ended || gameState.isJournalOpen || gameState.openingQuoteActive || gameState.storyPrologueActive) return;
 
     let dx = 0, dy = 0;
     if (keys['arrowup'] || keys['w']) { dy -= 1; player.direction = 'up'; }
@@ -1165,7 +1411,20 @@ function update(dt) {
         gameState.san = Math.max(0, gameState.san - 1);
         updateHUD();
         sanTimer = 0;
-        if (gameState.san === 0 && !gameState.ended) { gameState.san = 30; showDialog("L（莉莉）", ["視野發白，幾乎忘了自己的名字。深呼吸後，我勉強找回了意識。"]); }
+
+        if (!gameState.ended && gameState.san <= 30 && gameState.san > 10 && gameState.sanWarningStage < 1) {
+            gameState.sanWarningStage = 1;
+            showDialog("L（莉莉）", ["我的思緒開始變慢了……再這樣下去，我可能會忘記自己正在找什麼。"]);
+        } else if (!gameState.ended && gameState.san <= 10 && gameState.san > 0 && gameState.sanWarningStage < 2) {
+            gameState.sanWarningStage = 2;
+            showDialog("L（莉莉）", ["我幾乎抓不住自己的念頭了。得快一點。"]);
+        }
+
+        if (gameState.san === 0 && !gameState.ended) {
+            gameState.san = 30;
+            gameState.sanWarningStage = 1;
+            showDialog("L（莉莉）", ["視野發白，幾乎忘了自己的名字。深呼吸後，我勉強找回了意識。", "我還在這裡……不能停下來。"]);
+        }
     }
 
     gameState.flickerTimer += dt * 4;
@@ -1180,6 +1439,7 @@ function checkTriggerEvents() {
     if (gameState.currentScene === 'OUTSIDE' && !gameState.flashlightBroken && pTileY <= 7) {
         gameState.flashlightBroken = true;
         gameState.hasFlashlight = false;
+        updateHUD();
         
         playFallAndDropSFX();
 
@@ -1197,6 +1457,11 @@ function checkTriggerEvents() {
     for (let item of currentList) {
         if (item.id === 'note' && gameState.switches.S002_NotePicked) continue;
         if (item.id === 'lamp_stone' && gameState.hasOilLamp) continue;
+        if (item.id === 'echo' && story.echoSeen) continue;
+        if (['eyeL','eyeR','nose','mouth'].includes(item.id)) {
+            const fragmentMap = {eyeL:'左眼',eyeR:'右眼',nose:'鼻子',mouth:'嘴巴'};
+            if (story.fragments.has(fragmentMap[item.id])) continue;
+        }
 
         let itemX = item.tileX !== undefined ? item.tileX : item.x;
         let itemY = item.tileY !== undefined ? item.tileY : item.y;
@@ -1232,8 +1497,24 @@ function checkTriggerEvents() {
 }
 
 function updateHUD() {
-    oilValEl.innerText = `${gameState.oil}/${gameState.maxOil}`;
+    if (gameState.hasOilLamp) {
+        resourceBoxEl.style.display='block';
+        resourceLabelEl.textContent='🕯️ 油量: ';
+        oilValEl.style.display='inline';
+        oilValEl.innerText = `${gameState.oil}/${gameState.maxOil}`;
+        oilValEl.style.color = gameState.oil <= 1 ? '#ff6b4a' : '#ffaa00';
+    } else if (gameState.hasFlashlight && !gameState.flashlightBroken) {
+        resourceBoxEl.style.display='block';
+        resourceLabelEl.textContent='手電筒';
+        oilValEl.style.display='none';
+        oilValEl.innerText='';
+    } else {
+        resourceBoxEl.style.display='none';
+        oilValEl.style.display='none';
+        oilValEl.innerText='';
+    }
     sanValEl.innerText = `${gameState.san}/100`;
+    sanValEl.style.color = gameState.san <= 30 ? '#ff6b6b' : '#55ff55';
 }
 
 // --- 程序化繪製 ---
@@ -1438,7 +1719,7 @@ function renderLightOverlay() {
     const flicker = Math.sin(gameState.flickerTimer) * 3;
 
     if (gameState.hasOilLamp) {
-        const tilesRadius = 1.5 + (gameState.oil - 1) * 0.5;
+        const tilesRadius = 1.0 + gameState.oil * 0.5;
         const lightRadius = tilesRadius * TILE_SIZE + flicker;
 
         const clearGradient = lightCtx.createRadialGradient(px, py, 5, px, py, lightRadius);
@@ -1491,7 +1772,7 @@ function renderLightOverlay() {
 
     if (gameState.hasOilLamp) {
         ctx.save();
-        const tilesRadius = 1.5 + (gameState.oil - 1) * 0.5;
+        const tilesRadius = 1.0 + gameState.oil * 0.5;
         const lightRadius = tilesRadius * TILE_SIZE + flicker;
         const glowGradient = ctx.createRadialGradient(px, py, 5, px, py, lightRadius);
         glowGradient.addColorStop(0, 'rgba(255, 210, 120, 0.16)');
@@ -1587,12 +1868,12 @@ function render() {
     }
 }
 
-const flamePositions={HALL:[[90,110],[710,110]],GALLERY:[[115,86],[685,86]],LIBRARY:[[105,90],[695,90]],STUDIO:[[130,85],[670,85]],BEDROOM:[[110,90],[690,90]],VAULT:[[140,90],[660,90]]};
+const flamePositions={HALL:[[90,110],[710,110]]};
 function updateFlames(){
  const playerFlame=document.getElementById('player-flame');
  playerFlame.style.display=gameState.hasOilLamp?'block':'none';
  playerFlame.style.left=((player.x+player.width/2+10)/800*100)+'%';
- playerFlame.style.top=((player.y+19)/600*100)+'%';
+ playerFlame.style.top=((player.y+25)/600*100)+'%';
  const candles=document.querySelectorAll('.wall-flame'),positions=flamePositions[gameState.currentScene];
  candles.forEach((el,i)=>{el.style.display=positions?'block':'none';if(positions){el.style.left=positions[i][0]/8+'%';el.style.top=positions[i][1]/6+'%';}});
 }
@@ -1606,18 +1887,18 @@ function gameLoop(now) {
     requestAnimationFrame(gameLoop);
 }
 
-// 後續章節：每一個場景都有可見的物件、線索與獨立完成狀態。
-const story = { fragments: new Set(), portrait:false, colors:[], spectrum:false, handle:false,
-  library:false, chisel:false, lens:false, sketch:false, glyph:false, statue:false,
-  letters:[], lettersDone:false, mirror:false, clock:false, warning:false, vaultIntro:false, seconds:0 };
+// 後續章節：每一個場景都有可見的物件、線索與獨立完成狀態；v2.6 調整提燈火焰高度、關鍵物件碰撞、結局返回按鈕與寢室信件閱讀流程。
+const story = { fragments: new Set(), portrait:false, colors:[], spectrum:false, plaqueRead:false, handle:false,
+  library:false, diaryRead:false, bookRead:false, chisel:false, lens:false, sketch:false, glyph:false, libraRead:false, aquariusRead:false, statue:false,
+  letters:[], lettersDone:false, mirror:false, clock:false, warning:false, echoSeen:false, vaultIntro:false, sculptureInvestigated:false, seconds:0 };
 // 每次按 H 只揭露當前進度的一層；換階段後從第一層重新開始。
 const hintStages={
  OUTSIDE:[['暴雨讓視線模糊，先沿唯一的小徑往前。','靠近門時，注意左側的石墩。','石墩上有油燈；帶著它走到鐵門。']],
  HALL:[['大廳的雕像似乎隱藏了一條路。','角落的手稿談到「不對稱」；逐一觀察雕像。','找出朝向與其他三尊不同的那一尊，旋轉後去右側暗門。']],
  GALLERY:[['少女肖像似乎少了些什麼。','探索畫廊的角落，找回四片畫布。','集齊左眼、右眼、鼻子與嘴巴後，回肖像前修復。'],
           ['銘牌描寫的是情感變化。','先弄清熱情、冷靜、恐懼各自的顏色。','從早到晚依序放入：黃、藍、紅。']],
- LIBRARY:[['箱子上的四位數似乎藏在書頁裡。','日記記著數字；書架的註解記著順序。','依「存在、記憶、價值、虛無」對應日記的數字。']],
- STUDIO:[['雕塑的胸口空著一個位置。','草圖、工作檯和三座星象模型值得調查。','組合畫廊的把手與鑿頭，選擇雙子座的數字。']],
+ LIBRARY:[['箱子上的四位數似乎藏在書頁裡。','日記提供數字；書架上的註解提供順序。','依「存在、記憶、價值、虛無」對應日記數字，得到 1800。']],
+ STUDIO:[['雕塑的胸口空著一個位置。','先調查未完成的人形雕塑，星象抽屜就會回應。','再調查三座星象模型，選擇符合「非對稱」的雙子座數字。']],
  BEDROOM:[['三封信的語氣似乎來自不同時期。','先有創造，再有爭議，最後才是告別。','排好信後查看鏡子；它背後的時鐘有異樣。']],
  VAULT:[['房內留下組織的備用信。','看看晶體裡的是誰，並讀信了解逃生條件。','調查晶體與控制面板，選擇要帶走或釋放什麼。']]
 };
@@ -1629,6 +1910,67 @@ function revealHint(){const scene=gameState.currentScene, phase=hintPhase(scene)
  const index=Math.min(hintProgress[key]||0,limit-1);hintProgress[key]=index+1;
  showDialog(`提示 ${index+1}/${limit}`,[steps[index]]);
 }
+function isCoarsePointer(){return window.matchMedia && window.matchMedia('(pointer: coarse)').matches;}
+function syncObjectiveToggle(){
+ const toggle=document.getElementById('objective-toggle'), objective=document.getElementById('objective');
+ if(!toggle||!objective)return;
+ const hidden=objective.style.display==='none' || objective.classList.contains('mobile-hidden');
+ toggle.setAttribute('aria-expanded',String(!hidden));
+ toggle.textContent=hidden?'⌄ 目標':'⌃ 目標';
+}
+function toggleObjective(){
+ const objective=document.getElementById('objective');
+ if(!objective || !isCoarsePointer())return;
+ const hidden=objective.style.display==='none' || objective.classList.contains('mobile-hidden');
+ objective.style.display=hidden?'block':'none';
+ objective.classList.toggle('mobile-hidden',!hidden);
+ syncObjectiveToggle();
+}
+function openJournal(){
+ if(!gameState.gameStarted || gameState.ended || gameState.isPuzzleActive)return;
+ gameState.isJournalOpen=true;
+ for(const k of Object.keys(keys)) keys[k]=false;
+ renderJournal();
+ document.getElementById('journal-overlay').style.display='flex';
+}
+function closeJournal(){
+ gameState.isJournalOpen=false;
+ document.getElementById('journal-overlay').style.display='none';
+ lastTime=performance.now();
+}
+function toggleJournal(){gameState.isJournalOpen?closeJournal():openJournal();}
+function journalBlock(title,entries){
+ if(!entries.length)return '';
+ return `<section class="journal-section"><h3>${title}</h3>${entries.map(([k,v])=>`<div class="journal-entry"><strong>${k}</strong><br>${v}</div>`).join('')}</section>`;
+}
+function renderJournal(){
+ const entries=[];
+ if(gameState.hasOilLamp)entries.push(['油燈','城堡外找到的老舊油燈，是目前唯一穩定的光源。油量不會隨時間自動下降，只會因部分解謎失誤而減少；油量也會影響照明範圍。']);
+ entries.push(['心智值','心智值會隨時間緩慢下降；恐怖事件與解謎失誤可能額外降低。歸零後會短暫恍惚並回到 30，不會直接死亡。']);
+ if(gameState.switches.S002_NotePicked)entries.push(['伯爵手稿','「非對稱才是藝術的靈魂。」手稿邊緣沾著石膏粉。']);
+ if(gameState.switches.S011_HallPuzzleDone)entries.push(['大廳機關','雕像 D 的方向與其他雕像不同；轉動後打開畫廊暗門。']);
+ const storyEntries=[];
+ if(story.fragments.size){storyEntries.push(['肖像碎片',`已找到 ${story.fragments.size}/4：${Array.from(story.fragments).join('、')}。`]);}
+ if(story.portrait)storyEntries.push(['少女肖像','四塊碎片拼合後，畫中少女揭露伯爵「讓記憶永存」的執念。']);
+ if(story.plaqueRead)storyEntries.push(['三聯畫銘牌','銘牌指出：黃＝熱情、藍＝冷靜、紅＝恐懼；排列順序為黃 → 藍 → 紅。']);
+ if(story.spectrum)storyEntries.push(['色彩順序','三聯畫已依提示完成排列：黃 → 藍 → 紅。']);
+ if(story.diaryRead)storyEntries.push(['日記數字','存在的印記（1）、記憶（8）、價值（0）、虛無（0）。']);
+ if(story.bookRead)storyEntries.push(['書頁註解','「存在 → 記憶 → 價值 → 虛無」是密碼的排列順序。']);
+ if(story.chisel)storyEntries.push(['完整鑿子','鑿子把手與鑿子頭已接合。把手上的雙子座紋樣與開場信件蠟封一致，這件工具可能原本就屬於同一個人或組織。']);
+ if(story.sculptureInvestigated)storyEntries.push(['未完成人形雕塑','胸口的圓形空腔是星象機關的啟動線索；調查後抽屜可以開始解密。']);
+ if(story.sketch)storyEntries.push(['雕塑草圖','焦點是記憶被喚醒的唯一途徑；胸口的凹槽需要透鏡。']);
+ if(story.libraRead)storyEntries.push(['天秤座模型','標記數字 10；底座寫著「非對稱……它始於風，卻不屬於風。」']);
+ if(story.aquariusRead)storyEntries.push(['水瓶座模型','標記數字 2。']);
+ if(story.glyph)storyEntries.push(['雙子座刻痕','雙子座背面只刻著一個數字：7。']);
+ if(story.lettersDone)storyEntries.push(['三封信','正確順序為：創造 → 褻瀆／爭議 → 告別。']);
+ if(story.mirror)storyEntries.push(['鏡中時間','鏡面留下的時間是 12:08，而古鐘原本停在另一個時刻。']);
+ if(story.warning)storyEntries.push(['組織逃脫信','容器若毀損，所有通道都將封閉；晶體中的繆斯仍保留著記憶。']);
+ if(story.echoSeen)storyEntries.push(['伯爵殘響','伯爵承認自己以永恆之名囚禁了繆斯，殘響已在對話後消散。']);
+ const content=document.getElementById('journal-content');
+ const html=journalBlock('已取得的線索',entries)+journalBlock('重要調查記錄',storyEntries);
+ content.innerHTML=html||'<div class="journal-empty">目前還沒有可整理的線索。走近物件、閱讀文字，調查筆記會自動更新。</div>';
+}
+
 const objectives = {
  OUTSIDE:'尋找光源，接近城堡', HALL:'尋找藏在大廳的通路',
  GALLERY:'調查畫作與散落的畫布', LIBRARY:'尋找舊箱子的開啟方法',
@@ -1638,8 +1980,12 @@ const objectives = {
 const sceneNames={OUTSIDE:'暴雨中的城堡',HALL:'入口大廳',GALLERY:'畫廊',LIBRARY:'圖書室',STUDIO:'雕刻室',BEDROOM:'伯爵寢室',VAULT:'地下密室'};
 const subtleObjectives={OUTSIDE:'循著風雨前行',HALL:'觀察大廳的痕跡',GALLERY:'理解遺失的畫作',LIBRARY:'翻閱伯爵留下的文字',STUDIO:'檢視未完成的雕塑',BEDROOM:'尋找被藏起的時間',VAULT:'面對被保存的記憶'};
 function updateObjective(){const mode=gameState.difficulty;
- document.getElementById('objective').textContent=(mode==='explorer'?'目標：'+objectives[gameState.currentScene]:mode==='investigator'?'調查：'+subtleObjectives[gameState.currentScene]:'紀錄：'+sceneNames[gameState.currentScene])+'　｜ H 提示　ESC 設定';
- document.getElementById('scene-name').textContent=sceneNames[gameState.currentScene];}
+ const objective=document.getElementById('objective');
+ objective.textContent=(mode==='explorer'?'目標：'+objectives[gameState.currentScene]:mode==='investigator'?'調查：'+subtleObjectives[gameState.currentScene]:'紀錄：'+sceneNames[gameState.currentScene])+'　｜ H 提示　J／📖 筆記　ESC 設定';
+ document.getElementById('scene-name').textContent=sceneNames[gameState.currentScene];
+ if(isCoarsePointer() && gameState.gameStarted){objective.style.display='none';objective.classList.add('mobile-hidden');}
+ syncObjectiveToggle();
+}
 const sceneNarration={
  GALLERY:['那些被破壞的畫作，像是在等誰認出它們。','畫布的破口還很新。','腳步聲落在畫廊的空框之間。'],
  LIBRARY:['舊箱子上的鎖仍完好。也許線索留在附近的書頁中。','書頁散落，桌上箱子的金屬扣沒有生鏽。','書架深處傳來紙張翻動的聲音。'],
@@ -1678,7 +2024,7 @@ function showVaultArrival(){
   {speaker:'伯爵殘魂',text:'……'},
   {speaker:'伯爵殘魂',text:'我累了……停止它吧。成為一名真正的雕刻家……讓虛無降臨……'},
   {speaker:'L（莉莉）',text:'他的殘影散了。晶體仍在跳動，旁邊還有一封信和控制面板。'}
- ]);
+ ],()=>{story.echoSeen=true;renderJournal();updateObjective();playEchoFadeSFX();});
 }
 // 可操作的舊箱密碼輪與古鐘；失敗懲罰保持設定表原規則。
 let safeDigits=[0,0,0,0],clockHour=3,clockMinute=40,clockDrag=false;
@@ -1721,7 +2067,7 @@ function submitSafe(){if(gameState.puzzleType!=='safe')return;
 function openClock(){clockHour=3;clockMinute=40;showPuzzle('clock');
  const card=document.getElementById('clock-puzzle');card.classList.remove('zooming','zoomed');
  document.getElementById('clock-wide').style.display='flex';document.getElementById('clock-detail').style.display='none';
- puzzleFeedback('clock-feedback','鏡中殘留的時間，究竟停在哪一刻？');updateClockUI();
+ puzzleFeedback('clock-feedback','鏡中留下 12:08；古鐘目前停在 03:40。把它調到正確的時間。');updateClockUI();
 }
 function zoomClock(){playChoiceOpen();const card=document.getElementById('clock-puzzle');
  card.classList.add('zooming');
@@ -1787,59 +2133,95 @@ function portrait(){if(story.portrait)return say(['她的眼睛安靜地望著�
  say(['四塊畫布終於拼合。少女的目光讓我想起自己為何來到這裡。心智恢復。',
  '【日記片段 I】只有她，我的繆斯，理解我對被遺忘的恐懼。我把她留在畫裡，讓誰都無法忘記。',
  '遠處傳來門鎖彈開的聲音。圖書室現在可以進入。']);}
-function pickColor(color){if(story.spectrum)return say(['三聯畫已經歸位。']);
- story.colors.push(color);playSFX(450,0.08);if(story.colors.length<3)return say([`放入「${color}」畫板。已排列 ${story.colors.length}/3。`]);
+function describeColor(color){
+ const descriptions={
+  '黃':'這幅畫以明亮的黃色為主，筆觸熱烈而強勢。現在還看不出它應該放在第幾個位置。',
+  '藍':'這幅畫以沉靜的藍色為主，畫面的情緒比另外兩幅更加克制。現在還看不出它應該放在第幾個位置。',
+  '紅':'這幅畫以濃烈的紅色為主，筆觸帶著壓迫感。現在還看不出它應該放在第幾個位置。'
+ };
+ say([descriptions[color]||'這幅畫的色彩很醒目，但目前找不到任何排序的線索。']);
+}
+function commitColor(color){
+ story.colors.push(color);playSFX(450,0.08);
+ if(story.colors.length<3)return say([`已確認：「${color}」放入第 ${story.colors.length} 格。`]);
  if(story.colors.join(',')==='黃,藍,紅'){
- story.spectrum=true;story.handle=true;say(['熱情、冷靜、恐懼。三聯畫內陷，暗格裡有一支鑿子把手。',
- '【信件碎片】組織要我造出捕獲記憶的晶體容器。我把這褻瀆藏在鑄造工具裡。']);
- }else{story.colors=[];gainSan(-10);loseOil(1);say(['排列錯誤。畫框發出尖嘯；心智 -10、油量 -1。畫板已歸位，可重試。']);}}
+  story.spectrum=true;story.handle=true;renderJournal();say(['黃 → 藍 → 紅。三聯畫內陷，暗格裡有一支鑿子把手。',
+  '【信件碎片】組織要我造出捕獲記憶的晶體容器。我把這褻瀆藏在鑄造工具裡。']);
+ }else{story.colors=[];gainSan(-10);loseOil(1);say(['排列錯誤。畫框發出尖嘯；心智 -10、油量 -1。畫板已歸位，可重試。']);}
+}
+function pickColor(color){
+ if(story.spectrum)return say(['三聯畫已經歸位。']);
+ if(!story.plaqueRead)return describeColor(color);
+ const slot=story.colors.length+1;
+ choice('確認畫作排列',[{label:`確認：將「${color}」放入第 ${slot} 格`,action:()=>commitColor(color)},{label:'取消',action:()=>{}}]);
+}
 interactables.GALLERY=[
  at('portrait','少女肖像',9,3,portrait),
  at('eyeL','左眼碎片',4,5,()=>pickFragment('左眼')),
  at('eyeR','右眼碎片',15,5,()=>pickFragment('右眼')),
  at('nose','鼻子碎片',6,10,()=>pickFragment('鼻子')),
  at('mouth','嘴巴碎片',14,10,()=>pickFragment('嘴巴')),
- at('plaque','三聯畫銘牌',9,8,()=>say(['遺忘的色彩：熱情會逐漸被澆滅，恐懼在冷靜之後滋長。', '畫板背面分別寫著：黃＝熱情、藍＝冷靜、紅＝恐懼。'])),
+ at('plaque','三聯畫銘牌',9,8,()=>{story.plaqueRead=true;renderJournal();say(['遺忘的色彩：熱情會逐漸被澆滅，恐懼在冷靜之後滋長。', '畫板背面分別寫著：黃＝熱情、藍＝冷靜、紅＝恐懼。']);}),
  at('yellow','黃色畫板',5,3,()=>pickColor('黃')),
  at('blue','藍色畫板',13,3,()=>pickColor('藍')),
  at('red','紅色畫板',11,9,()=>pickColor('紅')),
- at('libraryDoor','圖書室的門',19,2,()=>story.portrait?goScene('LIBRARY',9,12,'高聳的書架包圍了書桌；桌上的舊箱子鎖著四位密碼。'):say(['門鎖還扣著。先修復少女肖像。'])),
+ at('libraryDoor','圖書室的門',19,2,()=>story.portrait?goScene('LIBRARY',1,12,'高聳的書架包圍了書桌；桌上的舊箱子鎖著四位密碼。'):say(['門鎖還扣著。先修復少女肖像。'])),
  at('hallBack','返回大廳',0,12,()=>goScene('HALL',17,4))
 ];
 interactables.LIBRARY=[
- at('diary','塗黑的日記',9,6,()=>say(['我的藝術，只有唯一的繆斯（1）能體會。世人只在乎商業價值（0）。', '無窮的記憶（8），終究也可能被虛無（0）吞噬。'])),
- at('book','《藝術與存在的永恆循環》',4,4,()=>say(['頁角的親筆註解：存在決定記憶；記憶賦予價值；虛無則是終結。', '存在 → 記憶 → 價值 → 虛無。'])),
- at('box','四位數的舊箱子',10,6,()=>story.library?say(['箱子已打開。雕刻室的鑰匙還握在手中。']):openSafe()),
- at('studioDoor','雕刻室的門',19,2,()=>story.library?goScene('STUDIO',9,12,'石灰粉塵覆滿工作室。中央人形雕塑的胸口，留著圓形空腔。'):say(['門上鎖著。舊箱子裡也許有鑰匙。'])),
- at('galleryBack','返回畫廊',0,12,()=>goScene('GALLERY',17,2))
+ at('diary','塗黑的日記',9,6,()=>{story.diaryRead=true;renderJournal();say(['我的藝術，必須替她留下唯一的「存在」印記（1）。', '無窮的記憶（8），終究也可能被世人以價值（0）衡量，最後歸於虛無（0）。']);}),
+ at('book','《藝術與存在的永恆循環》',4,4,()=>{story.bookRead=true;renderJournal();say(['頁角的親筆註解：存在決定記憶；記憶賦予價值；虛無則是終結。', '存在 → 記憶 → 價值 → 虛無。']);}),
+ at('box','四位數的舊箱子',10,6,()=>{if(story.library)return say(['箱子已打開。雕刻室的鑰匙還握在手中。']); if(!story.diaryRead||!story.bookRead)return say(['鎖面沒有任何反應。日記的數字與書頁的順序似乎缺一不可。']); openSafe();}),
+ at('studioDoor','雕刻室的門',19,2,()=>story.library?goScene('STUDIO',1,12,'石灰粉塵覆滿工作室。中央人形雕塑的胸口，留著圓形空腔。'):say(['門上鎖著。舊箱子裡也許有鑰匙。'])),
+ at('galleryBack','返回畫廊',0,12,()=>goScene('GALLERY',18,2))
 ];
 interactables.STUDIO=[
  at('sketch','沾滿石灰的草圖',4,4,()=>{story.sketch=true;say(['雕塑胸前畫著晶體透鏡。「焦點，是記憶被喚醒的唯一途徑。」']);}),
- at('bench','鑿子頭與石板',14,4,()=>{if(story.chisel)return say(['完整鑿子已經取出。']);
- if(!story.handle)return say(['石板卡著鑿子頭，但缺少把手。畫廊裡或許有。']);
- story.chisel=true;say(['把手與鑿子頭接合，獲得完整鑿子。石板掀起，露出星象密碼抽屜。']);}),
- at('libra','天秤座模型',5,8,()=>say(['底座模糊地寫著：「非對稱……它始於風，卻不屬於風。我只需要一個數字。」天秤標記 10。'])),
- at('aquarius','水瓶座模型',14,8,()=>say(['水瓶座的底部標記 2。'])),
- at('gemini','雙子座模型',4,10,()=>{story.glyph=true;say(['雙子座的兩張臉卻只有一道刻痕。背面刻著：7。']);}),
- at('drawer','星象抽屜',15,10,()=>{if(!story.chisel)return say(['先修好鑿子並掀開石板。']);
- if(story.lens)return say(['抽屜已空。']);
- choice('星象抽屜上的數字',[7,10,2].map(n=>({label:String(n),action:()=>{
- if(n===7){story.lens=true;say(['抽屜打開。取得精緻的石英透鏡。']);}
- else {loseOil(2);gainSan(-10);say(['石材發出尖銳笑聲。燈火幾乎熄滅，油量 -2、心智 -10。']);}
- }})));
+ at('bench','鑿子頭與石板',14,4,()=>{
+  if(story.chisel)return say(['完整鑿子已經取出。','鑿子把手上的雙子座紋樣，和我進城前收到的信封蠟封幾乎完全一致。']);
+  if(!story.handle)return say(['石板卡著鑿子頭，但缺少把手。畫廊裡或許有。']);
+  story.chisel=true;renderJournal();
+  say([
+   '把手與鑿子頭接合，獲得完整鑿子。',
+   '我忽然注意到把手上的刻紋……是雙子座。',
+   '它和那封信上的蠟封圖式一模一樣。',
+   '「這東西……從一開始，就和我來到這裡的原因有關。」'
+  ]);
  }),
- at('sculpture','胸口中空的雕塑',9,6,()=>{if(story.statue)return say(['光束已經照出暗門。']);
- if(!story.lens)return say(['胸口缺少透鏡。草圖與抽屜也許能提供線索。']);
- story.statue=true;playSFX(730,0.5);if(gameState.oil<3){endGame('噩夢般的藝術',['油燈的光太弱，只在窗邊折出一絲微光。窗鎖應聲打開。', '莉莉翻出窗外，決定把城堡的祕密留在身後。']);return;}
- say(['石英透鏡嵌入胸口，油燈的光束穿過透鏡，照出通往主臥室的暗門。']);}),
- at('bedroomDoor','主臥室暗門',19,2,()=>story.statue?goScene('BEDROOM',9,12,'古老落地鏡映出一個陌生女人的影子，轉瞬消失。'):say(['牆後似乎有空間。先修復中央雕塑。'])),
- at('libraryBack','返回圖書室',0,12,()=>goScene('LIBRARY',17,2))
+ at('libra','天秤座模型',5,8,()=>{story.libraRead=true;renderJournal();say(['底座模糊地寫著：「非對稱……它始於風，卻不屬於風。我只需要一個數字。」天秤標記 10。']);}),
+ at('aquarius','水瓶座模型',14,8,()=>{story.aquariusRead=true;renderJournal();say(['水瓶座的底部標記 2。']);}),
+ at('gemini','雙子座模型',4,10,()=>{story.glyph=true;renderJournal();say(['雙子座的兩張臉卻只有一道刻痕。背面刻著：7。']);}),
+ at('drawer','星象抽屜',15,10,()=>{
+  if(!story.sculptureInvestigated)return say(['抽屜上的符號毫無反應。先調查中央那座未完成的人形雕塑。']);
+  if(story.lens)return say(['抽屜已空。']);
+  choice('星象抽屜上的數字',[7,10,2].map(n=>({label:String(n),action:()=>{
+   if(n===7){story.lens=true;renderJournal();say(['抽屜打開。取得精緻的石英透鏡。','三個風象星座，只有雙子座符合「非對稱」的提示。']);}
+   else {loseOil(2);gainSan(-10);say(['石材發出尖銳笑聲。燈火明顯變弱；油量 -2、心智 -10。','鎖舌重新扣上了，但這次你仍有機會重新推理。']);}
+  }})));
+ }),
+ at('sculpture','胸口中空的雕塑',9,6,()=>{
+  if(story.statue)return say(['光束已經照出暗門。']);
+  if(!story.sculptureInvestigated){story.sculptureInvestigated=true;renderJournal();say(['中央的人形雕塑還沒有完成，胸口留著一個圓形空腔。','只要調查它，房間裡的星象機關似乎就會開始回應。']);return;}
+  if(!story.lens)return say(['胸口缺少透鏡。草圖與星象抽屜也許能提供線索。']);
+  story.statue=true;playSFX(730,0.5);
+  if(gameState.oil<3){endGame('噩夢般的藝術',['石英透鏡無法得到足夠的光。窗邊只折出一絲微光，窗鎖應聲打開。','莉莉翻出窗外，決定把這座城堡與它的秘密留在身後。'],'bad');return;}
+  say(['石英透鏡嵌入胸口，油燈的光束穿過透鏡，照出通往主臥室的暗門。'] );}),
+at('bedroomDoor','主臥室暗門',19,2,()=>story.statue?goScene('BEDROOM',1,12,'古老落地鏡映出一個陌生女人的影子，轉瞬消失。'):say(['牆後似乎有空間。先修復中央雕塑。'])),
+ at('libraryBack','返回圖書室',0,12,()=>goScene('LIBRARY',18,2))
 ];
-function pickLetter(n){if(story.lettersDone)return say(['三封信已經排好。']);story.letters.push(n);
+function commitLetter(n){
  const labels={1:'「你已完全被遺忘，你和容器都不再屬於我們。」',2:'「我們很高興你創造出完美晶體。組織將永存。」',3:'「但你將繆斯的記憶封入其中，這是對永恆的褻瀆。」'};
- if(story.letters.length<3)return say([`第 ${story.letters.length} 封：${labels[n]}`]);
- if(story.letters.join('')==='231'){story.lettersDone=true;say(['信件排好。下方露出紙籤：「永恆不是一個地方，而是一個時間。」']);}
- else{story.letters=[];gainSan(-8);say(['時間順序不通。鏡中有什麼東西敲了敲玻璃。心智 -8；信件已重置。']);}}
+ story.letters.push(n);
+ if(story.letters.length<3)return say([`已放入第 ${story.letters.length} 格。`]);
+ if(story.letters.join('')==='231'){story.lettersDone=true;say(['三封信排好。下方露出紙籤：「永恆不是一個地方，而是一個時間。」']);}
+ else{story.letters=[];gainSan(-8);say(['時間順序不通。鏡中有什麼東西敲了敲玻璃。心智 -8；信件已重置。']);}
+}
+function pickLetter(n){
+ if(story.lettersDone)return say(['三封信已經排好。']);
+ const slot=story.letters.length+1;
+ const labels={1:'「你已完全被遺忘，你和你的容器都不再屬於我們。再見，阿爾布雷希特。」',2:'「我們很高興你創造出完美的晶體，它能提取並儲存記憶。我們的組織將永存。」',3:'「但你的私人執念太深，你將繆斯的記憶封印在容器中，這是對永恆（ETERNITY）的褻瀆。」'};
+ say([`【${n}號信件】`,labels[n]],()=>choice('確認信件排列',[{label:`確認：將「${n}號信件」放入第 ${slot} 格`,action:()=>commitLetter(n)},{label:'取消',action:()=>{}}]));
+}
 interactables.BEDROOM=[
  at('letter1','信件：告別',4,4,()=>pickLetter(1)),
  at('letter2','信件：創造',9,6,()=>pickLetter(2)),
@@ -1847,26 +2229,165 @@ interactables.BEDROOM=[
  at('mirror','落地鏡',5,10,()=>{if(!story.mirror){story.mirror=true;gainSan(-30);say(['鏡中的我變成了繆斯。她用我的聲音說：「時間會遺忘一切。」心智 -30。', '鏡面凝出一行不屬於我的字跡：12:08。現實中的古鐘，指針卻停在別處。']);}else say(['鏡子還映著那組時間：12:08。']);}),
  at('clock','古董時鐘',15,10,()=>{
   if(!story.lettersDone)return say(['古鐘齒輪卡著。床頭那疊信件似乎與它有關。']);
+  if(!story.mirror)return say(['鐘面還沒有告訴我答案。也許那面鏡子才是關鍵。']);
   if(story.clock)return say(['鐘面已經退開，暗道露出。']);
   openClock();
  }),
- at('vaultDoor','通往地下的暗道',19,2,()=>story.clock?goScene('VAULT',9,12,'晶體裡有一張臉。'):say(['時鐘背後似乎有什麼。'])),
- at('studioBack','返回雕刻室',0,12,()=>goScene('STUDIO',17,2))
+ at('vaultDoor','通往地下的暗道',19,2,()=>story.clock?goScene('VAULT',1,12,'晶體裡有一張臉。'):say(['時鐘背後似乎有什麼。'])),
+ at('studioBack','返回雕刻室',0,12,()=>goScene('STUDIO',18,2))
 ];
 interactables.VAULT=[
  at('warning','組織的備用逃脫信',4,5,()=>{story.warning=true;say(['「如願繼續合作，請保持容器完整。容器毀損後，所有通道都將封閉。」', '晶體裡的繆斯還活著。決定權在我手裡。']);}),
- at('crystal','記憶晶體容器',9,6,()=>choice('面對晶體',[{label:'用完整鑿子摧毀容器',action:()=>{
- if(!story.chisel)return say(['需要完整的鑿子。']);
- endGame('剎那即永恆',['鑿子落下，晶體爆裂。繆斯最後的光照出一道裂縫，莉莉在城堡崩塌前逃了出去。', '暴雨停了。藝術與恐懼歸於虛無；而莉莉記得她曾經存在。']);
- }},{label:'把手放在晶體的輔助插槽',action:()=>{gameState.san=0;updateHUD();endGame('我，究竟是誰？',['晶體奪走莉莉的記憶。她逃出了城堡，卻再也記不得自己是誰。', '她在荒野中尋找一座已被遺忘的城堡。']);}},{label:'再想一想',action:()=>{}}])),
- at('panel','控制面板',15,7,()=>choice('面板的分離模式',[{label:'帶走核心，走組織的逃生通道',action:()=>endGame('真正的組織成員',['莉莉帶著核心晶體走出城堡。面具人說：「歡迎加入我們。」', '她離開了一座囚籠，也踏進了另一座。'])},{label:'取消',action:()=>{}}])),
- at('echo','伯爵殘響',5,10,()=>say(['「我想記住她，卻只讓她永遠受苦……」伯爵的聲音漸漸消散。', '「真正的雕刻家，應該知道什麼時候放手。」']))
+ at('crystal','記憶晶體容器',9,6,()=>{
+ const options=[];
+ if(story.chisel){options.push({label:'用完整鑿子摧毀容器',action:()=>{
+   endGame('剎那即永恆',['莉莉舉起完整的鑿子，朝著晶體核心砸下。','晶體爆裂，強光瞬間吞沒地下室；城堡開始劇烈崩塌。繆斯最後的光照出一道狹窄裂縫，莉莉從裂縫逃出。','暴雨停了。藝術與恐懼終將歸於虛無，而莉莉成為唯一記得這一切的人。'],'true');
+ }});}
+ options.push({label:'把手放在晶體的輔助插槽',action:()=>{gameState.san=0;updateHUD();endGame('我，究竟是誰？',['莉莉把手放進輔助插槽。晶體的光反過來吞噬她的記憶。','她逃出了城堡，卻已分不清自己是莉莉，還是另一個被留下的繆斯。','荒野裡，她開始尋找一座早已被遺忘的城堡。'],'bad');}});
+ options.push({label:'再想一想',action:()=>{}});
+ choice('面對晶體',options);
+}),
+at('panel','控制面板',15,7,()=>choice('面板的分離模式',[{label:'帶走核心，走組織的逃生通道',action:()=>endGame('真正的組織成員',['控制面板分離出核心晶體，莉莉帶著它沿著緊急通道逃離城堡。','雨幕外，一名戴著面具的組織代表早已等在接應點。','「你做得很好，莉莉。歡迎加入我們。」','她離開了一座囚籠，也踏進了另一座更大的囚籠。'],'org')},{label:'取消',action:()=>{}}])),
+ at('echo','伯爵殘響',5,10,()=>{if(story.echoSeen)return;showDialog('伯爵殘響',['「我想記住她，卻只讓她永遠受苦……」','「真正的雕刻家，應該知道什麼時候放手。」'],()=>{story.echoSeen=true;renderJournal();});})
 ];
-function endGame(title,lines){gameState.ended=true;gameState.isChoiceActive=false;
+function prepareEndingCard(title,lines,type='true'){
+ const ending=document.getElementById('ending');
+ const endingCg=document.getElementById('ending-cg');
+ const cgMap={true:'true_ending_cg.png',bad:'bad_ending_cg.png',org:'org_ending_cg.png'};
+ ending.dataset.ending=type;
+ endingCg.src=cgMap[type]||cgMap.true;
+ endingCg.alt=type==='true'?'真結局：莉莉與破碎晶體':type==='bad'?'壞結局：記憶混淆的莉莉':'組織結局：面具組織接應';
  document.getElementById('ending-title').textContent=title;
  document.getElementById('ending-body').textContent=lines.join('\n\n');
+ const tag=document.getElementById('ending-tag'),mark=document.getElementById('ending-mark');
+ if(type==='bad'){tag.textContent='BAD ENDING / 壞結局';mark.textContent='◈';}
+ else if(type==='org'){tag.textContent='ESCAPE ENDING / 組織結局';mark.textContent='◇';}
+ else {tag.textContent='TRUE ENDING / 真結局';mark.textContent='◆';}
+}
+function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+async function startEndingCinematic(title,lines,type='true'){
+ const overlay=document.getElementById('ending-cinematic');
+ const img=document.getElementById('ending-cinema-cg');
+ const caption=document.getElementById('ending-cinema-caption');
+ const kicker=document.getElementById('ending-cinema-kicker');
+ const titleEl=document.getElementById('ending-cinema-title');
+ overlay.dataset.ending=type;
+ img.src=type==='true'?'true_ending_cg.png':type==='bad'?'bad_ending_cg.png':'org_ending_cg.png';
+ overlay.style.display='flex';
+ overlay.classList.remove('show-cg','show-text','show-title','show-cracks','flash');
+ kicker.textContent=type==='true'?'TRUE ENDING SEQUENCE':type==='bad'?'BAD ENDING SEQUENCE':'ORGANIZATION ENDING SEQUENCE';
+ titleEl.textContent=title;
+ caption.textContent='';
+ await sleep(120);
+
+ if(type==='true'){
+   caption.textContent='完整鑿子舉起。雙子座紋樣在燭光下閃了一瞬。';
+   overlay.classList.add('show-text');
+   await sleep(1100);
+   overlay.classList.add('show-cg','shake-1');
+   caption.textContent='第一擊。晶體表面裂開一道細線。';
+   overlay.classList.add('show-cracks');
+   playChiselImpactSFX();
+   await sleep(900);
+   overlay.classList.add('flash');
+   caption.textContent='第二擊。裂紋沿著核心蔓延。';
+   playChiselImpactSFX();
+   await sleep(550);
+   overlay.classList.remove('flash');
+   overlay.classList.add('flash');
+   caption.textContent='晶體爆裂——記憶像碎片一樣飛散。';
+   playCrystalBreakSFX();
+   await sleep(850);
+   overlay.classList.remove('flash');
+   caption.textContent='強光吞沒地下室。城堡開始崩塌。';
+   overlay.classList.add('shake-2');
+   await sleep(900);
+   caption.textContent='一道光照出逃生裂縫。她最後看見了繆斯的微笑。';
+   await sleep(850);
+   kicker.textContent='THE RAIN STOPS';
+   if(rainGainNode){try{rainGainNode.gain.cancelScheduledValues(audioCtx.currentTime);rainGainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.8);}catch(e){}}
+   caption.textContent='暴雨停了。這一次，被記住的不是恐懼，而是一個終於得到自由的名字。';
+   playMemoryPulseSFX();
+   await sleep(1050);
+ }else if(type==='bad'){
+   caption.textContent='莉莉把手伸進晶體的輔助插槽。';
+   overlay.classList.add('show-text','show-cg');
+   await sleep(1000);
+   caption.textContent='冰冷的光灌入意識。記憶開始一層一層脫落。';
+   playMemoryPulseSFX();
+   overlay.classList.add('show-cracks','shake-1');
+   await sleep(1200);
+   caption.textContent='她記得一座城堡……卻不再確定自己是誰。';
+   overlay.style.filter='saturate(1.45) contrast(1.22)';
+   await sleep(1100);
+   caption.textContent='名字、聲音、臉——都開始互相重疊。';
+   overlay.classList.add('shake-2');
+   await sleep(900);
+   caption.textContent='最後，只剩下一個問題。';
+   await sleep(850);
+ }else{
+   caption.textContent='控制面板亮起。核心晶體開始從容器中分離。';
+   overlay.classList.add('show-text','show-cg');
+   await sleep(1050);
+   caption.textContent='緊急通道解除鎖定。身後的城堡正在關閉所有出口。';
+   await sleep(1050);
+   caption.textContent='雨幕外，面具人早已站在接應點。';
+   overlay.classList.add('show-cracks');
+   await sleep(850);
+   caption.textContent='「你做得很好，莉莉。歡迎加入我們。」';
+   await sleep(1050);
+   caption.textContent='離開一座囚籠，也踏進另一座更大的囚籠。';
+   await sleep(850);
+ }
+
+ overlay.classList.add('show-title');
+ titleEl.style.opacity='1';
+ caption.textContent='';
+ await sleep(1500);
+ overlay.style.display='none';
+ overlay.classList.remove('show-cg','show-text','show-title','show-cracks','flash','shake-1','shake-2');
+ overlay.style.filter='';
  document.getElementById('ending').style.display='flex';
+ gameState.endingCinematicActive=false;
+ scheduleEndingMenuButton();
+}
+let endingMenuTimer=null;
+function returnToMainMenu(){
+ if(endingMenuTimer){clearTimeout(endingMenuTimer);endingMenuTimer=null;}
+ location.reload();
+}
+function revealEndingMenuButton(){
+ const btn=document.getElementById('ending-menu-button');
+ const ending=document.getElementById('ending');
+ if(!btn||!ending)return;
+ ending.style.display='flex';
+ ending.style.pointerEvents='auto';
+ btn.style.display='inline-flex';
+ btn.classList.add('ending-ready');
+ btn.focus({preventScroll:true});
+}
+function scheduleEndingMenuButton(){
+ if(endingMenuTimer)clearTimeout(endingMenuTimer);
+ const btn=document.getElementById('ending-menu-button');
+ const ending=document.getElementById('ending');
+ if(!btn||!ending)return;
+ btn.style.display='none';
+ btn.classList.remove('ending-ready');
+ ending.style.pointerEvents='auto';
+ endingMenuTimer=setTimeout(()=>{
+   endingMenuTimer=null;
+   revealEndingMenuButton();
+ },3000);
+}
+function endGame(title,lines,type='true'){
+ gameState.ended=true;
+ gameState.isChoiceActive=false;
+ gameState.endingCinematicActive=true;
+ prepareEndingCard(title,lines,type);
+ document.getElementById('ending').style.display='none';
  document.getElementById('choice-controls').style.display='none';document.getElementById('choice-panel').style.display='none';document.getElementById('choice-backdrop').style.display='none';dialogBox.style.display='none';
+ document.getElementById('ending-cinematic').style.display='flex';
+ startEndingCinematic(title,lines,type);
 }
 // 純 Canvas 像素繪圖，所有格子的外觀與碰撞完全相同。
 function pixelBox(x,y,w,h,fill,stroke='#100f14'){
@@ -2003,6 +2524,7 @@ function drawNewScene(){
  drawSceneAccents(scene);
  for(const item of interactables[scene]||[]){
   const used=['eyeL','eyeR','nose','mouth'].includes(item.id)&&story.fragments.has(({eyeL:'左眼',eyeR:'右眼',nose:'鼻子',mouth:'嘴巴'})[item.id]);
+  if(item.id==='echo' && story.echoSeen) continue;
   if(!used)drawProp(item,item.tileX*40+20,item.tileY*40+20);
  }
  ctx.restore();drawPlayer(player);
