@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>伯爵的遺忘之作 - 正式版 v1.0</title>
+    <title>伯爵的遺忘之作 - 版本號 4.0</title>
     <style>
         * {
             box-sizing: border-box;
@@ -31,7 +31,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: linear-gradient(rgba(0,0,0,.35), rgba(5,5,10,.72)), url("images/background-pixel.png"), linear-gradient(#171923,#07090e 70%,#020204);
+            background-image: linear-gradient(rgba(0,0,0,.35), rgba(5,5,10,.72)), url("background-pixel.png"), linear-gradient(#171923,#07090e 70%,#020204);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -274,7 +274,9 @@
         #ending-cinematic.shake-1 .cinema-shake{animation:cinemaShake .12s linear 0s 10;}
         #ending-cinematic.shake-2 .cinema-shake{animation:cinemaShakeHeavy .09s linear 0s 14;}
         #ending-cinematic .cracks{position:absolute;inset:0;width:100%;height:100%;opacity:0;transform:scale(.92);pointer-events:none;z-index:4;transition:opacity .25s ease,transform 1.4s ease;}
-        #ending-cinematic .cracks{image-rendering:pixelated;}
+        #ending-cinematic .cracks path{stroke:#d9fbff;stroke-width:3;fill:none;stroke-linecap:square;stroke-linejoin:miter;filter:drop-shadow(0 0 6px #8ce7ff);}
+        #ending-cinematic[data-ending="bad"] .cracks path{stroke:#ffb1c2;filter:drop-shadow(0 0 6px #ff4f66);}
+        #ending-cinematic[data-ending="org"] .cracks path{stroke:#d9cda6;filter:drop-shadow(0 0 5px #b68b4e);}
         #ending-cinematic.show-cg .cinema-cg{opacity:1;transform:scale(1);}
         #ending-cinematic.show-text .cinema-caption,#ending-cinematic.show-text .cinema-kicker,#ending-cinematic.show-title .cinema-title{opacity:1;}
         #ending-cinematic.show-cracks .cracks{opacity:1;transform:scale(1);}
@@ -529,7 +531,7 @@
         #credits-panel button {margin:19px 0 0;padding:7px 22px;color:#f4d9aa;background:#583b47;border:2px solid #bf9968;cursor:pointer;}
         /* 古鐘演出使用整個遊戲舞台，字幕與鐘身各有獨立圖層。 */
         #clock-cinematic {display:none;position:absolute;inset:0;z-index:29;overflow:hidden;background:#0c0910;isolation:isolate;}
-        #clock-cinematic .clock-camera {position:absolute;inset:0;background:url('images/bedroom-clock-scene.png') center/cover no-repeat;
+        #clock-cinematic .clock-camera {position:absolute;inset:0;background:url('bedroom-clock-scene.png') center/cover no-repeat;
             image-rendering:pixelated;transform-origin:50% 25%;will-change:transform,filter;}
         #clock-cinematic.playing .clock-camera {animation:clockApproach 4.15s cubic-bezier(.38,.04,.13,1) both;}
         @keyframes clockApproach {0%{transform:scale(1);filter:brightness(.8)}100%{transform:scale(2.55);filter:brightness(.68)}}
@@ -549,7 +551,7 @@
         #puzzle-overlay.clock-mode #clock-puzzle.puzzle-card {position:relative;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;
             min-height:0!important;margin:0;overflow:auto;padding:20px 20px 12px!important;display:flex!important;flex-direction:column;
             justify-content:center;align-items:center;border:0!important;box-shadow:none!important;background:#110e17!important;}
-        #clock-puzzle::before {content:"";position:absolute;inset:-2%;background:url('images/bedroom-clock-scene.png') center/cover no-repeat;
+        #clock-puzzle::before {content:"";position:absolute;inset:-2%;background:url('bedroom-clock-scene.png') center/cover no-repeat;
             image-rendering:pixelated;transform:scale(3.2);transform-origin:50% 25%;filter:brightness(.34) blur(2px);pointer-events:none;}
         #clock-puzzle::after {content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,#14101977,#08060df2 78%);pointer-events:none;}
         #clock-puzzle > :not(.puzzle-close) {position:relative;z-index:1;}
@@ -567,21 +569,7 @@
             #clock-puzzle .clock-face {width:min(180px,36vh,43vw);border-width:8px;margin:3px auto 5px;}
             #clock-puzzle .puzzle-note,#clock-puzzle .puzzle-feedback {font-size:10px;}
         }
-            /* v1.0：旁白使用置中的黑色橫向字幕條；角色台詞維持原有立繪對話框。 */
-        #dialog-box.narrator-visible {left:50%!important;right:auto!important;bottom:12%!important;transform:translateX(-50%);width:min(780px,86%)!important;min-height:0!important;padding:17px 28px 19px!important;background:#050505!important;border:1px solid #454545!important;border-radius:0!important;box-shadow:0 8px 30px #000c!important;text-align:center!important;}
-        #dialog-box.narrator-visible::before {display:none!important;}
-        #dialog-box.narrator-visible::after {right:12px;bottom:7px;color:#999;}
-        #dialog-box.narrator-visible #dialog-speaker {display:none!important;}
-        #dialog-box.narrator-visible #dialog-text {color:#fff;text-align:center;}
-        @media(max-width:620px){#dialog-box.narrator-visible{left:50%!important;right:auto!important;bottom:12%!important;width:92%!important;padding:12px 15px 15px!important;}}
-        #ending-cinematic.escape-mode .cinema-shake{opacity:0;visibility:hidden;}
-        #ending-cinematic .escape-animation{display:none;position:absolute;inset:0;z-index:3;overflow:hidden;background:#080c16;}
-        #ending-cinematic.escape-mode .escape-animation{display:block;}
-        .escape-animation canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
     </style>
-<link rel="preload" href="BGM/Suspense.mp3" as="audio">
-    <link rel="preload" href="BGM/Suspense2.mp3" as="audio">
-    <link rel="preload" href="BGM/menu.mp3" as="audio">
 </head>
 <body>
 
@@ -622,16 +610,16 @@
         <h2 style="font-size:26px;color:#ead2ab;margin:12px 0 6px;">選擇調查方式</h2>
         <p style="font-size:13px;color:#aa9d91;line-height:1.6;margin-bottom:20px;">難度影響莉莉的觀察與提示程度；謎題、路線及結局相同。</p>
         <div class="difficulty-list">
-            <button onclick="startGame('explorer')"><strong>尋光者</strong><small>莉莉會主動指出目標，並提供三階段明確提示。</small></button>
-            <button onclick="startGame('investigator')"><strong>調查者</strong><small>保留觀察線索，提示最多兩階段，不直接揭曉答案。</small></button>
-            <button onclick="startGame('silence')"><strong>無聲之夜</strong><small>無提示按鈕、快捷鍵或目標引導；只依場景與自行調查推理。</small></button>
+            <button onclick="startGame('explorer')"><strong>尋光者</strong><small>莉莉會說出更多觀察；提示可逐步揭露。</small></button>
+            <button onclick="startGame('investigator')"><strong>調查者</strong><small>對白保留線索，提示止於推理方向。</small></button>
+            <button onclick="startGame('silence')"><strong>無聲之夜</strong><small>對白更克制，提示僅給第一層暗示。</small></button>
         </div>
         <button class="menu-btn" onclick="hideDifficulty()" style="margin-top:18px;">返回</button>
     </div>
     <!-- 遊戲實際 Canvas 與介面容器 -->
     <div id="game-canvas-wrapper">
         <canvas id="gameCanvas" width="800" height="600"></canvas>
-        <div id="vault-ghost-cg" aria-hidden="true"><img src="images/vault_ghost_cg.png" alt=""></div>
+        <div id="vault-ghost-cg" aria-hidden="true"><img src="vault_ghost_cg.png" alt=""></div>
         <div id="touch-controls" aria-label="觸控操作">
             <div class="touch-pad" aria-label="方向鍵">
                 <button class="touch-key up" data-move="arrowup" aria-label="向上移動">▲</button>
@@ -679,7 +667,7 @@
 
         <div id="story-prologue" role="dialog" aria-modal="true" aria-label="神秘信件序幕" onclick="advanceStoryPrologue()">
             <div class="prologue-card">
-                <div class="prologue-image"><img src="images/prologue_letter.png" alt="莉莉手上拿著帶有雙子座圖式蠟封的神秘信件"></div>
+                <div class="prologue-image"><img src="prologue_letter.png" alt="莉莉手上拿著帶有雙子座圖式蠟封的神秘信件"></div>
                 <div class="prologue-copy">
                     <div class="prologue-kicker">THREE DAYS AGO</div>
                     三天前，我收到一封沒有署名的信。
@@ -691,7 +679,7 @@
         </div>
 
         <div id="dialog-box" onclick="if(gameState.isDialogActive) advanceDialog()" title="點擊繼續">
-            <div id="lily-portrait" aria-hidden="true"><img src="images/lily_portrait_empty_neutral.png" alt=""></div>
+            <div id="lily-portrait" aria-hidden="true"><img src="lily_portrait_empty_neutral.png" alt=""></div>
             <div id="dialog-speaker">L (莉莉)</div>
             <div id="dialog-text">……</div>
             <div id="choice-controls" style="display:none;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
@@ -748,8 +736,13 @@
             <div class="cinema-shake">
                 <img id="ending-cinema-cg" class="cinema-cg" src="" alt="結局演出">
             </div>
-            <div id="escape-animation" class="escape-animation" aria-hidden="true"><canvas id="ending-action-canvas" width="800" height="600" aria-label="莉莉以像素角色逃出城堡"></canvas></div>
-            <canvas id="ending-cracks" class="cracks" width="800" height="600" aria-hidden="true"></canvas>
+            <svg id="ending-cracks" class="cracks" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M500 310 L458 262 L422 210 L398 150 L356 92"/><path d="M500 310 L532 262 L574 214 L618 152 L664 103"/>
+                <path d="M500 310 L466 324 L423 360 L372 398 L316 420"/><path d="M500 310 L544 324 L594 362 L645 404 L714 430"/>
+                <path d="M500 310 L494 260 L486 214 L490 164 L482 112"/><path d="M500 310 L510 358 L516 410 L512 472 L526 530"/>
+                <path d="M458 262 L438 228 L426 192"/><path d="M532 262 L554 226 L566 192"/>
+                <path d="M466 324 L438 338 L414 356"/><path d="M544 324 L568 340 L596 360"/>
+            </svg>
             <div class="cinema-kicker" id="ending-cinema-kicker">ENDING SEQUENCE</div>
             <div class="cinema-title" id="ending-cinema-title"></div>
             <div class="cinema-caption" id="ending-cinema-caption"></div>
@@ -760,8 +753,8 @@
 
     <div id="settings-panel" role="dialog" aria-label="遊戲設定" style="display:none;position:absolute;z-index:60;width:min(390px,90vw);padding:30px;background:#120f16f5;border:2px solid #a98759;border-radius:8px;box-shadow:0 0 50px #000;">
         <h2 style="margin-bottom:8px;color:#ebd2a6;">遊戲設定</h2><p style="font-size:13px;color:#af9d8e;margin-bottom:25px;">ESC 暫停／繼續</p>
-        <label for="volume-range">其他音效音量　<span id="volume-display">70%</span></label><input id="volume-range" type="range" min="0" max="100" value="70" oninput="setVolume(this.value)" style="width:100%;margin:12px 0 18px;accent-color:#c9a268;"><label for="bgm-volume-range">BGM 音量　<span id="bgm-volume-display">30%</span></label><input id="bgm-volume-range" type="range" min="0" max="100" value="30" oninput="setBgmVolume(this.value)" style="width:100%;margin:12px 0 26px;accent-color:#c9a268;">
-        <label for="brightness-range">遊戲亮度　<span id="brightness-display">50%</span></label><input id="brightness-range" type="range" min="0" max="70" value="50" oninput="setBrightness(this.value)" style="width:100%;margin:12px 0 18px;accent-color:#c9a268;">
+        <label for="volume-range">音量　<span id="volume-display">70%</span></label><input id="volume-range" type="range" min="0" max="100" value="70" oninput="setVolume(this.value)" style="width:100%;margin:12px 0 26px;accent-color:#c9a268;">
+        <label for="brightness-range">遊戲亮度　<span id="brightness-display">50%</span></label><input id="brightness-range" type="range" min="0" max="100" value="50" oninput="setBrightness(this.value)" style="width:100%;margin:12px 0 18px;accent-color:#c9a268;">
         <div class="save-system" aria-label="存檔系統">
             <div class="save-system-title">存檔</div>
             <div id="save-slot-status" class="save-slot-status">目前沒有存檔</div>
@@ -773,12 +766,12 @@
         </div>
         <button class="menu-btn" onclick="closeOptions()" style="width:100%;">返回遊戲</button>
     </div>
-    <div id="version-info">正式版 v1.0</div>
+    <div id="version-info">版本號 4.0</div>
 </div>
 
 <script>
 // ==========================================
-// 伯爵的遺忘之作 - 整合主選單與遊戲核心 - v1.0
+// 伯爵的遺忘之作 - 整合主選單與遊戲核心 - v4.0
 // ==========================================
 // 【維護說明】本版已移除確認無使用的舊函式 once、pixelFrame 與未使用的 cinema-scene CSS，並為所有函式補上繁體中文功能註解。
 // 【相容性】本版沿用不綁定版號的存檔鍵，可讀取既有版本存檔；新的存檔會沿用同一存檔結構。
@@ -795,11 +788,11 @@ const ctx = canvas.getContext('2d');
 const spriteNames = 'door_closed door_open gate oil_lamp note statue_back statue_side statue_turn portrait_broken portrait_fixed plaque mirror paper book fragment painting_yellow painting_blue painting_red libra aquarius gemini echo sculpture crystal box bench drawer panel clock bookcase gallery_exhibit studio_shelf bed vault_cabinet gallery_frame library_shelf studio_tools bedroom_frame vault_pipe hall_pillar wall_sconce office_desk wardrobe bedside_table writing_desk vault_support gallery_pedestal sculpture_stand'.split(' ');
 const spriteSlots = Object.fromEntries(spriteNames.map((name, index) => [name, index]));
 const spriteAtlas = new Image();
-spriteAtlas.src = 'images/sprite_atlas.png';
-const terrainAtlas = new Image(); terrainAtlas.src = 'images/terrain_atlas.png';
-const hallAtlas = new Image(); hallAtlas.src = 'images/hall_atlas.png';
-const outsideProps = new Image(); outsideProps.src = 'images/outside_props.png';
-const lilyWalkSheet = new Image(); lilyWalkSheet.src = 'images/lily_walk.png';
+spriteAtlas.src = 'sprite_atlas.png';
+const terrainAtlas = new Image(); terrainAtlas.src = 'terrain_atlas.png';
+const hallAtlas = new Image(); hallAtlas.src = 'hall_atlas.png';
+const outsideProps = new Image(); outsideProps.src = 'outside_props.png';
+const lilyWalkSheet = new Image(); lilyWalkSheet.src = 'lily_walk.png';
 // 【功能】繪製戶外地形素材。
 function drawTerrain(type,x,y){
  if(!terrainAtlas.complete||!terrainAtlas.naturalWidth)return false;
@@ -861,7 +854,7 @@ const dialogText = document.getElementById('dialog-text');
 const promptEl = document.getElementById('interaction-prompt');
 
 let gameState = {
-    version: '1.0',
+    version: '4.0',
     difficulty: 'investigator',
     currentScene: 'OUTSIDE',
     oil: 1,
@@ -927,7 +920,7 @@ const keys = {};
 let audioCtx = null;
 let rainGainNode = null;
 let masterGain = null;
-const settings = { volume:70, bgmVolume:30, brightness:50, open:false };
+const settings = { volume:70, brightness:50, open:false };
 // 【資料相容】新版本使用不綁定版號的儲存鍵，避免每次升版都失去本機資料。
 const SAVE_KEY = 'earl_forgotten_work_save';
 const ENDING_KEY = 'earl_forgotten_work_endings';
@@ -941,14 +934,14 @@ let bgmOscillators = [];
 const samplePaths={menuClick:'menu_click',dialogue:'dialogue',choiceOpen:'choice_open',choiceMove:'choice_move',
  choiceConfirm:'choice_confirm',choiceBack:'choice_back',error:'error',wheel:'wheel',clock:'clock',
  ghost:'ghost',crystalBreak:'crystal_break',doorOpen:'door_open',doorClose:'door_close',
- book:'book',metal:'metal',latch:'latch',stepA:'step_a',stepB:'step_b',creak:'creak',chisel:'chisel',flashlightStone:'flashlight_stone.wav'};
+ book:'book',metal:'metal',latch:'latch',stepA:'step_a',stepB:'step_b',creak:'creak',chisel:'chisel'};
 const sampleBuffers=Object.create(null),sampleFallback=Object.create(null);
 let samplesLoading=false,lastChoiceMove=0;
 // 【功能】載入遊戲內的音效資源。
 function loadSamples(){
  if(samplesLoading||!audioCtx)return;samplesLoading=true;
  for(const [key,filename] of Object.entries(samplePaths)){
-  fetch('sfx/'+(filename.includes('.')?filename:filename+'.mp3')).then(r=>{if(!r.ok)throw Error(filename);return r.arrayBuffer()})
+  fetch('sfx/'+filename+'.mp3').then(r=>{if(!r.ok)throw Error(filename);return r.arrayBuffer()})
    .then(bytes=>audioCtx.decodeAudioData(bytes)).then(buffer=>{sampleBuffers[key]=buffer})
    .catch(()=>{});
  }
@@ -963,18 +956,17 @@ function playSample(key,volume=.55,rate=1){
   source.connect(gain);gain.connect(masterGain);source.start();return;
  }
  // 離線直接開啟 index.html 時，fetch(file://) 被限制仍能聽到介面音效。
- const clip=new Audio('sfx/'+(name.includes('.')?name:name+'.mp3'));clip.volume=Math.min(1,volume*settings.volume/100);
+ const clip=new Audio('sfx/'+name+'.mp3');clip.volume=Math.min(1,volume*settings.volume/100);
  clip.playbackRate=rate;clip.play().catch(()=>{});
 }
 // 【功能】播放一般介面點擊音效。
 function playClickSound(){
  if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
  ensureMaster();loadSamples();playSample('menuClick',.4);
- if(!gameState.gameStarted)startMenuBgm();
 }
 
 // 【功能】開啟難度選擇畫面。
-function showDifficulty(){playClickSound();startMenuBgm();document.getElementById('main-menu').style.display='none';document.getElementById('difficulty-screen').style.display='block';}
+function showDifficulty(){playClickSound();document.getElementById('main-menu').style.display='none';document.getElementById('difficulty-screen').style.display='block';}
 // 【功能】關閉難度選擇畫面並返回主選單。
 function hideDifficulty(){document.getElementById('difficulty-screen').style.display='none';document.getElementById('main-menu').style.display='flex';}
 // 【功能】初始化遊戲狀態並開始指定難度的遊戲。
@@ -989,7 +981,6 @@ function startGame(mode='investigator') {
     const container = document.getElementById('game-container');
 
     // 選單淡出並切換場景
-    stopBgmTrack();
     menu.style.opacity = '0';
     setTimeout(() => {
         menu.style.display = 'none';
@@ -1006,14 +997,11 @@ function startGame(mode='investigator') {
         requestAnimationFrame(gameLoop);
         updateObjective();
         const opening={explorer:'暴雨幾乎抹去了來時的足跡。石牆後似乎還留著一些未被帶走的東西。',investigator:'石牆高得看不見盡頭。今晚，只有我一個人記得自己為何而來。',silence:'雨聲太大。城堡沒有一扇窗亮著。'};
-        showOpeningQuote(()=>showStoryPrologue(()=>showScript([
-            {speaker:'L（莉莉）',text:'那封信，我一直帶在身上。蠟封上的雙子座圖式，到現在我仍看不懂它代表什麼。',emotion:'curious'},
-            {speaker:'L（莉莉）',text:'可我明明只是第一次看見它，頭卻開始痛。像有一個遺失很久的夢，正在硬生生地往回長。',emotion:'worried'},
-            {speaker:'L（莉莉）',text:'我常夢見一個女人站在窗邊，也常夢見一個男人對著畫架沉默。每次夢快結束時，她都會回頭問我……「妳記得我嗎？」',emotion:'frightened'},
-            {speaker:'L（莉莉）',text:'我從來答不出來。可今晚，我總覺得這一次，我會知道答案。',emotion:'resolute'},
-            {speaker:'L（莉莉）',text:opening[mode],emotion:'worried'},
-            {speaker:'L（莉莉）',text:mode==='silence'?'WASD／方向鍵移動；E／空白鍵調查；J／📖 調查筆記；ESC 設定。':'WASD／方向鍵移動；E／空白鍵調查；H 提示；J／📖 調查筆記；ESC 設定。',emotion:'neutral'},
-            {speaker:'L（莉莉）',text:'我得保持清醒。只要還能分辨這是我的記憶、還是別人的記憶，我就還是我。',emotion:'resolute'}
+        showOpeningQuote(()=>showStoryPrologue(()=>showDialog("L（莉莉）", [
+            {text:"那封信，我一直帶在身上。蠟封上的雙子座圖式，到現在我仍看不懂它代表什麼。",emotion:'curious'},
+            {text:opening[mode],emotion:'worried'},
+            {text:"WASD／方向鍵移動；E／空白鍵調查；H 提示；J／📖 調查筆記；ESC 設定。",emotion:'neutral'},
+            {text:"我得保持清醒。心智值會隨時間緩慢下降，受到驚嚇或解謎失誤也會額外下降；歸零時只會短暫恍惚，我還能繼續前進。",emotion:'resolute'}
         ])));
     }, 800);
 }
@@ -1064,7 +1052,7 @@ function saveGame(){
  if(blocked){updateSaveUI(blocked);playChoiceWrong();return false;}
  try{
   const payload={
-   saveVersion:'1.0', savedAt:new Date().toISOString(),
+   saveVersion:'4.0', savedAt:new Date().toISOString(),
    gameState:{
     difficulty:gameState.difficulty,currentScene:gameState.currentScene,oil:gameState.oil,maxOil:gameState.maxOil,
     san:gameState.san,hasFlashlight:gameState.hasFlashlight,hasOilLamp:gameState.hasOilLamp,flashlightBroken:gameState.flashlightBroken,
@@ -1072,7 +1060,7 @@ function saveGame(){
    },
    player:{x:player.x,y:player.y,direction:player.direction},
    story:{...story,fragments:Array.from(story.fragments)},
-   settings:{volume:settings.volume,bgmVolume:settings.bgmVolume,brightness:settings.brightness},
+   settings:{volume:settings.volume,brightness:settings.brightness},
    hintProgress:{...hintProgress}, safeDigits:[...safeDigits], clockHour, clockMinute
   };
   localStorage.setItem(SAVE_KEY,JSON.stringify(payload));
@@ -1083,7 +1071,7 @@ function saveGame(){
 function loadGame(){
  const data=getSaveStatus();
  if(!data){updateSaveUI('目前沒有可讀取的存檔。');playChoiceWrong();return false;}
- if(!['1.0','3.4','3.5','3.6','3.7','3.8','4.0','4.1','4.2','4.3','4.4','4.5','4.6','4.7','4.8','4.9'].includes(data.saveVersion)){updateSaveUI('這份存檔版本與目前遊戲不相容。請重新開始本版本遊戲。');playChoiceWrong();return false;}
+ if(!['3.4','3.5','3.6','3.7','3.8','4.0'].includes(data.saveVersion)){updateSaveUI('這份存檔版本與目前遊戲不相容。請重新開始本版本遊戲。');playChoiceWrong();return false;}
  try{
   Object.assign(gameState,data.gameState||{});
   gameState.switches={...gameState.switches,...(data.gameState?.switches||{})};
@@ -1101,21 +1089,20 @@ function loadGame(){
   beamSequence=null;
   settings.open=false;
   for(const id of ['settings-panel','choice-backdrop','choice-panel','puzzle-overlay','journal-overlay','ending','ending-cinematic','ending-gallery']){const el=document.getElementById(id);if(el)el.style.display='none';}
-  stopBgmTrack();
   document.getElementById('main-menu').style.display='none';document.getElementById('difficulty-screen').style.display='none';document.getElementById('game-canvas-wrapper').style.display='block';document.getElementById('game-container').classList.add('playing');
   dialogBox.style.display='none';promptEl.style.display='none';
-  document.getElementById('volume-range').value=settings.volume;document.getElementById('bgm-volume-range').value=settings.bgmVolume??30;document.getElementById('brightness-range').value=Math.min(70,settings.brightness??50);setVolume(settings.volume);setBgmVolume(settings.bgmVolume??30);setBrightness(settings.brightness??50);
+  document.getElementById('volume-range').value=settings.volume;document.getElementById('brightness-range').value=settings.brightness;setVolume(settings.volume);setBrightness(settings.brightness);
   ensureMaster(); if(!audioCtx)initAudio(); else if(audioCtx.state==='suspended')audioCtx.resume();
-  updateHUD();updateObjective();renderJournal();syncTouchControls();syncSceneBgm();for(const k of Object.keys(keys))keys[k]=false;
+  updateHUD();updateObjective();renderJournal();syncTouchControls();for(const k of Object.keys(keys))keys[k]=false;
   lastTime=performance.now();if(rainGainNode)rainGainNode.gain.value=gameState.currentScene==='OUTSIDE'?0.08:0.008;
   updateSaveUI('已讀取存檔。');playChoiceCorrect();return true;
  }catch(err){updateSaveUI('讀取失敗，存檔內容可能已損壞。');playChoiceWrong();return false;}
 }
 
 const ENDING_DEFS={
- true:{title:'剎那即永恆',tag:'TRUE ENDING / 真結局',image:'images/true_ending_cg.png',desc:'釋放繆斯，讓被囚禁的記憶終於停止。'},
- bad:{title:'我，究竟是誰？',tag:'BAD ENDING / 壞結局',image:'images/bad_ending_cg.png',desc:'記憶被晶體吞噬；莉莉開始失去自己的名字。'},
- org:{title:'真正的組織成員',tag:'ESCAPE ENDING / 組織結局',image:'images/org_ending_cg.png',desc:'帶走核心，離開一座囚籠，踏入另一座更大的囚籠。'}
+ true:{title:'剎那即永恆',tag:'TRUE ENDING / 真結局',image:'true_ending_cg.png',desc:'釋放繆斯，讓被囚禁的記憶終於停止。'},
+ bad:{title:'我，究竟是誰？',tag:'BAD ENDING / 壞結局',image:'bad_ending_cg.png',desc:'記憶被晶體吞噬；莉莉開始失去自己的名字。'},
+ org:{title:'真正的組織成員',tag:'ESCAPE ENDING / 組織結局',image:'org_ending_cg.png',desc:'帶走核心，離開一座囚籠，踏入另一座更大的囚籠。'}
 };
 // 【功能】取得已解鎖的結局紀錄。
 function getEndingRegistry(){
@@ -1176,7 +1163,6 @@ function openOptions() {
     (gameState.gameStarted?document.getElementById('game-canvas-wrapper'):document.getElementById('game-container')).appendChild(panel);
     panel.style.display='block';
     document.getElementById('volume-range').value=settings.volume;
-    document.getElementById('bgm-volume-range').value=settings.bgmVolume;
     document.getElementById('brightness-range').value=settings.brightness;
     updateSaveUI();
 }
@@ -1184,9 +1170,8 @@ function openOptions() {
 function closeOptions(){settings.open=false;document.getElementById('settings-panel').style.display='none';lastTime=performance.now();updateSaveUI();}
 // 【功能】套用主音量設定。
 function setVolume(v){settings.volume=Number(v);document.getElementById('volume-display').textContent=v+'%';if(masterGain)masterGain.gain.value=settings.volume/100;}
-function setBgmVolume(v){settings.bgmVolume=Number(v);document.getElementById('bgm-volume-display').textContent=v+'%';if(bgmFadeTimer){clearInterval(bgmFadeTimer);bgmFadeTimer=null;}if(bgmAudio&&!bgmAudio.paused)bgmAudio.volume=settings.bgmVolume/100;}
 // 【功能】套用畫面亮度設定。
-function setBrightness(v){settings.brightness=Math.max(0,Math.min(70,Number(v)));document.getElementById('brightness-range').value=settings.brightness;document.getElementById('brightness-display').textContent=settings.brightness+'%';}
+function setBrightness(v){settings.brightness=Number(v);document.getElementById('brightness-display').textContent=v+'%';}
 
 // 【功能】開啟製作團隊頁面。
 function openCredits() {
@@ -1281,7 +1266,7 @@ window.addEventListener('keydown', (e) => {
         else if ((key === 'enter' || key === ' ') && !e.repeat) choose(selectedChoice);
         return;
     }
-    if (key === "h") { if(gameState.difficulty!=='silence'&&!gameState.isDialogActive)revealHint(); return; }
+    if (key === "h" && !gameState.isDialogActive) { revealHint(); return; }
     if (e.repeat && (key === "e" || key === " ")) return;
     if (key === 'e' || key === ' ' || e.code === 'Space') {
         if (gameState.isDialogActive) {
@@ -1322,14 +1307,12 @@ function touchInteract(){
 }
 // 【功能】處理手機版提示按鈕。
 function touchHint(){
- if(gameState.difficulty==='silence')return;
  if(gameState.gameStarted&&!settings.open&&!gameState.ended&&!gameState.isPuzzleActive&&!gameState.isChoiceActive&&!gameState.isDialogActive&&!gameState.isJournalOpen)revealHint();
 }
 // 【功能】依遊戲狀態同步手機控制介面。
 function syncTouchControls(){const root=document.getElementById('touch-controls');
  const blocked=settings.open||gameState.isPuzzleActive||gameState.isChoiceActive||gameState.ended||gameState.isJournalOpen||gameState.openingQuoteActive||gameState.storyPrologueActive||!!beamSequence;
  root.style.visibility=blocked?'hidden':'visible';
- const hint=document.getElementById('touch-hint');hint.style.display=gameState.difficulty==='silence'?'none':'';
  const interact=document.getElementById('touch-interact');interact.textContent=gameState.isDialogActive?'下一句':gameState.activeInteractable?'調查':'互動';
 }
 setupTouchControls();
@@ -1348,82 +1331,6 @@ function initAudio() {
     loadSamples();
     startRainAudio();
     startAmbientBGM();
-    syncSceneBgm();
-}
-
-// 【功能】依場景指定檔案型 BGM；一般探索使用 Suspense，深入真相後使用 Suspense2。
-const bgmTracks = {
- menu: { src:'BGM/menu.mp3' },
- suspense: { src:'BGM/Suspense.mp3' },
- suspense2: { src:'BGM/Suspense2.mp3' }
-};
-let bgmAudio = null;
-let currentBgmTrack = null;
-let bgmFadeTimer = null;
-
-// 【功能】依目前場景取得對應 BGM。
-function getSceneBgmTrack(scene){
- if(scene==='STUDIO'||scene==='BEDROOM'||scene==='VAULT')return 'suspense2';
- if(scene==='OUTSIDE'||scene==='HALL'||scene==='GALLERY'||scene==='LIBRARY')return 'suspense';
- return null;
-}
-
-// 【功能】淡出並停止目前檔案型 BGM。
-function stopBgmTrack(){
- if(!bgmAudio)return;
- const audio=bgmAudio;
- if(bgmFadeTimer)clearInterval(bgmFadeTimer);
- const start=audio.volume, duration=360, begin=performance.now();
- bgmFadeTimer=setInterval(()=>{
-   const t=Math.min(1,(performance.now()-begin)/duration);
-   audio.volume=start*(1-t);
-   if(t>=1){
-     clearInterval(bgmFadeTimer);bgmFadeTimer=null;
-     audio.pause();audio.currentTime=0;
-   }
- },30);
- bgmAudio=null;
- currentBgmTrack=null;
-}
-
-// 【功能】切換並淡入檔案型 BGM，避免場景切換時突然跳音。
-function playBgmTrack(trackKey){
- const def=bgmTracks[trackKey];
- if(!def)return stopBgmTrack();
- if(currentBgmTrack===trackKey&&bgmAudio&&!bgmAudio.paused)return;
- if(bgmFadeTimer){clearInterval(bgmFadeTimer);bgmFadeTimer=null;}
- if(bgmAudio){
-   bgmAudio.pause();bgmAudio.currentTime=0;
- }
- const audio=new Audio(def.src);
- audio.loop=true;audio.preload='auto';audio.volume=0;
- audio.addEventListener('error',()=>{currentBgmTrack=null;}, {once:true});
- bgmAudio=audio;
- currentBgmTrack=trackKey;
- const target=settings.bgmVolume/100;
- audio.play().then(()=>{
-   const begin=performance.now(),duration=520;
-   if(bgmFadeTimer)clearInterval(bgmFadeTimer);
-   bgmFadeTimer=setInterval(()=>{
-     const t=Math.min(1,(performance.now()-begin)/duration);
-     if(bgmAudio===audio)audio.volume=target*t;
-     if(t>=1){clearInterval(bgmFadeTimer);bgmFadeTimer=null;}
-   },30);
- }).catch(()=>{});
-}
-
-// 【功能】依目前場景同步檔案型 BGM。
-function syncSceneBgm(){
- playBgmTrack(getSceneBgmTrack(gameState.currentScene));
-}
-
-// 【功能】在主選單第一次互動時啟動主選單 BGM（符合瀏覽器自動播放限制）。
-function startMenuBgm(){
- if(gameState.gameStarted)return;
- if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
- ensureMaster();
- if(audioCtx.state==='suspended')audioCtx.resume();
- playBgmTrack('menu');
 }
 
 // 【功能】啟動雨聲環境音。
@@ -1501,7 +1408,20 @@ function playFallAndDropSFX() {
     fallOsc.start();
     fallOsc.stop(audioCtx.currentTime + 0.3);
 
-    setTimeout(() => playSample('flashlightStone', .82, .92), 200);
+    setTimeout(() => {
+        if (!audioCtx) return;
+        const dropOsc = audioCtx.createOscillator();
+        const dropGain = audioCtx.createGain();
+        dropOsc.type = 'square';
+        dropOsc.frequency.setValueAtTime(650, audioCtx.currentTime);
+        dropOsc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.25);
+        dropGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        dropGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        dropOsc.connect(dropGain);
+        dropGain.connect(masterGain);
+        dropOsc.start();
+        dropOsc.stop(audioCtx.currentTime + 0.25);
+    }, 200);
 }
 
 // 【功能】播放一次性音效效果。
@@ -1589,7 +1509,7 @@ for(const [y,left,right] of [[8,7,11],[9,6,12],[10,5,14],[11,5,14],[12,5,14],[13
  for(let x=left;x<=right;x++)maps.OUTSIDE[y][x]=0;
 for(const x of [7,10])maps.OUTSIDE[5][x]=0;
 
-// --- v4.0：室內單一物件資料源；v4.1 針對三聯畫、雕塑演出與床比例微調；v4.3 修正大型雕像四格互動範圍；v1.0 整理 BGM／圖片資料夾並修正資源路徑。 ---
+// --- v4.0：室內單一物件資料源 ---
 // 每個家具／裝飾只在這裡定義一次；render 與 collision 都讀取同一份資料，
 // 因而物件在劇情中消失時，畫面與碰撞會同時消失，不會再殘留「空氣牆」。
 const sceneObjects={
@@ -1620,7 +1540,7 @@ const sceneObjects={
   ...[[3,0],[14,0]].map(([tx,ty],i)=>({id:`studio-tools-${i+1}`,sprite:'studio_tools',x:tx*40,y:ty*40-8,w:40,h:48,solid:true}))
  ],
  BEDROOM:[
-  {id:'bedroom-bed',sprite:'bed',x:8*40,y:4*40-8,w:160,h:80,solid:true,collision:{x:8*40+2,y:4*40+2,w:160,h:78}},
+  {id:'bedroom-bed',sprite:'bed',x:7*40,y:4*40-8,w:240,h:80,solid:true,collision:{x:7*40+2,y:4*40+2,w:240,h:78}},
   {id:'bedroom-wardrobe-left',sprite:'wardrobe',x:3*40,y:4*40-8,w:80,h:120,solid:true,collision:{x:3*40+4,y:4*40+2,w:72,h:116}},
   {id:'bedroom-wardrobe-right',sprite:'wardrobe',x:15*40,y:4*40-8,w:80,h:120,solid:true,collision:{x:15*40+4,y:4*40+2,w:72,h:116}},
   {id:'bedroom-bedside-left',sprite:'bedside_table',x:6*40,y:6*40-8,w:40,h:48,solid:true},
@@ -1679,10 +1599,10 @@ function getInteractableCollision(item){
 function drawSceneObjects(scene){for(const obj of (sceneObjects[scene]||[]))drawSprite(obj.sprite,obj.x,obj.y,obj.w??40,obj.h??48);}
 
 // --- 對話系統：同一位角色的像素立繪依每句台詞切換表情 ---
-const lilyFaces={neutral:'images/lily_portrait_pixel.png',curious:'images/lily_portrait_curious.png',
- worried:'images/lily_portrait_worried.png',frightened:'images/lily_portrait_frightened.png',
- resolute:'images/lily_portrait_resolute.png',tender:'images/lily_portrait_tender.png',sorrow:'images/lily_portrait_sorrow.png'};
-const lilyEmptyFaces=Object.fromEntries(Object.keys(lilyFaces).map(emotion=>[emotion,`images/lily_portrait_empty_${emotion}.png`]));
+const lilyFaces={neutral:'lily_portrait_pixel.png',curious:'lily_portrait_curious.png',
+ worried:'lily_portrait_worried.png',frightened:'lily_portrait_frightened.png',
+ resolute:'lily_portrait_resolute.png',tender:'lily_portrait_tender.png',sorrow:'lily_portrait_sorrow.png'};
+const lilyEmptyFaces=Object.fromEntries(Object.keys(lilyFaces).map(emotion=>[emotion,`lily_portrait_empty_${emotion}.png`]));
 for(const file of [...Object.values(lilyFaces),...Object.values(lilyEmptyFaces)]){
  const portraitPreload=new Image();portraitPreload.src=file;
 }
@@ -1723,11 +1643,10 @@ function advanceDialog() {
         return;
     }
     const current = gameState.dialogQueue.shift();
-    dialogSpeaker.innerText = current.speaker==='旁白' ? '' : current.speaker;
+    dialogSpeaker.innerText = current.speaker;
     dialogText.innerText = current.text;
-    const lily=/^(L|莉莉)/.test(current.speaker), narrator=current.speaker==='旁白', portrait=document.getElementById('lily-portrait');
+    const lily=/^(L|莉莉)/.test(current.speaker), portrait=document.getElementById('lily-portrait');
     dialogBox.classList.toggle('portrait-visible',lily);
-    dialogBox.classList.toggle('narrator-visible',narrator);
     if(lily){
         const emotion=current.emotion in lilyFaces?current.emotion:lilyEmotionFor(current.text);
         const picture=portrait.querySelector('img');
@@ -1787,55 +1706,53 @@ function inspectStatue(id) {
 
 // 【功能】讀取大廳手稿線索。
 function readNote() {
- if (gameState.switches.S002_NotePicked) {
-   say(['手稿已經被我讀過了。可那句「非對稱，才是藝術的靈魂」還留在腦子裡。']);
-   return;
- }
- gameState.switches.S002_NotePicked = true;
- showScript([
-  {speaker:'伯爵手稿',text:'「只有被遺忘的人，才懂得孤獨。」'},
-  {speaker:'伯爵手稿',text:'「世人追求對稱與平衡，卻不知道——非對稱，才是藝術的靈魂。尤其是當它被遺棄之時。」'},
-  {speaker:'L（莉莉）',text:'非對稱……被遺棄。這不像普通的創作筆記，更像是在故意留下某種訊號。',emotion:'curious'},
-  {speaker:'L（莉莉）',text:'我不知道為什麼，看到這句話時，胸口竟然有一瞬間疼得像被針扎。',emotion:'worried'}
- ],()=>{story.hallMemory=true;renderJournal();});
+    if (gameState.switches.S002_NotePicked) return;
+
+    gameState.switches.S002_NotePicked = true;
+    showDialog("伯爵手稿", [
+        "「只有被遺忘的人才懂得孤獨的真諦。」",
+        "「世人皆追求對稱與平衡，卻不知道非對稱才是藝術的靈魂……尤其是當它被遺棄之時。」"
+    ], () => {
+        showDialog("L (莉莉)", [gameState.difficulty==='explorer'?"他反覆寫著『非對稱』。大廳裡有哪裡不一樣？":"手稿邊緣沾著石膏粉。"]);
+    });
 }
 
 // 【功能】拾取油燈並切換照明資源。
 function pickLamp() {
- if (gameState.hasOilLamp) {
-  return say(['油燈仍安靜地燃著。火焰看起來很熟悉，卻想不起自己在哪裡見過。']);
- }
- gameState.hasOilLamp = true;
- gameState.oil = 1;
- updateHUD();
- playSFX(520, 0.2, 'sine');
- showScript([
-  {speaker:'L（莉莉）',text:'這盞老舊的油燈居然還亮著。火焰很弱，卻沒有被暴雨吹熄。',emotion:'curious'},
-  {speaker:'L（莉莉）',text:'我把手伸出去的那一刻，腦海裡突然有人把它塞進我手裡。',emotion:'frightened'},
-  {speaker:'陌生男人的記憶',text:'「拿著。」'},
-  {speaker:'陌生男人的記憶',text:'「不要讓它熄滅。」'},
-  {speaker:'L（莉莉）',text:'……為什麼我會記得這句話？我明明從來沒來過這裡。',emotion:'worried'},
-  {speaker:'L（莉莉）',text:'手電筒已經壞了。至少現在，我還有這盞燈。',emotion:'resolute'}
- ],()=>{story.lampMemory=true;renderJournal();});
+    if (!gameState.hasOilLamp) {
+        gameState.hasOilLamp = true;
+        gameState.oil = 1;
+        updateHUD();
+        playSFX(520, 0.2, 'sine');
+        showDialog("L (莉莉)", [
+            "這盞老舊的油燈居然是被點亮著的……微弱但能勉強照亮四周。",
+            "手電筒已經壞了，就用這盞油燈吧。"
+        ]);
+    }
 }
 
 // 【功能】從戶外進入入口大廳。
 function enterCastle() {
- if (!gameState.hasOilLamp) {
-  showDialog('L（莉莉）',['周圍太暗了，我需要先找到光源才能進入。']);
-  return;
- }
- gameState.currentScene='HALL'; updateObjective(); syncSceneBgm();
- player.x=9*TILE_SIZE+6; player.y=12*TILE_SIZE+4;
- gameState.switches.S001_EntranceLocked=true; gameState.san=Math.max(1,gameState.san-5); updateHUD();
- if(rainGainNode)rainGainNode.gain.value=0.01;
- playSample('doorClose',.75);
- showScript([
-  {speaker:'L（莉莉）',text:'大門在我背後重重關上。',emotion:'frightened'},
-  {speaker:'L（莉莉）',text:'我猛然回頭——鐵柵欄不見了。原本的入口，只剩一面完整的石牆。',emotion:'worried'},
-  {speaker:'L（莉莉）',text:'我伸手摸上去。冰冷、堅硬，沒有縫隙。',emotion:'frightened'},
-  {speaker:'L（莉莉）',text:'奇怪的是，身體沒有像我一樣驚訝。它只是……疼了一下。像它早就知道這裡會把我關起來。',emotion:'worried'}
- ],()=>{story.galleryMemory=true;renderJournal();});
+    if (!gameState.hasOilLamp) {
+        showDialog("L (莉莉)", ["周圍太暗了，我需要先找到光源才能進入。"]);
+        return;
+    }
+    gameState.currentScene = 'HALL';
+    updateObjective();
+    // 從戶外進入入口大廳後，角色從大廳下方正中央出現。
+    player.x = 9 * TILE_SIZE + 6;
+    player.y = 12 * TILE_SIZE + 4;
+    gameState.switches.S001_EntranceLocked = true;
+    gameState.san -= 5;
+    updateHUD();
+
+    if (rainGainNode) rainGainNode.gain.value = 0.01;
+
+    playSample('doorClose',.75);
+    showDialog("L (莉莉)", [
+        "大門在我背後重重關上。",
+        gameState.difficulty==='explorer'?"入口變成裂開的石牆。得先看清這座大廳。":"回頭時，門所在的地方只剩一道裂縫。"
+    ]);
 }
 
 // 【功能】從入口大廳進入畫廊。
@@ -1852,6 +1769,7 @@ function enterGallery() {
 function isSolid(tileX,tileY){
  if(tileX<0||tileX>=GRID_COLS||tileY<0||tileY>=GRID_ROWS)return true;
  const map=maps[gameState.currentScene],tile=map[tileY][tileX];
+ if(gameState.currentScene==='HALL'&&gameState.switches.S001_EntranceLocked&&tileY===13&&tileX===9)return true;
  if(gameState.currentScene==='OUTSIDE'&&tileY===4&&tileX===7)return !gameState.hasOilLamp;
  return tile===1||tile===4||tile===5;
 }
@@ -1891,16 +1809,7 @@ function update(dt) {
         }
         if (beamSequence.elapsed >= 3.5) {
             beamSequence = null;
-            showScript([
-              {speaker:'L（莉莉）',text:'石英透鏡咬住燈火。光束從大型中空雕像的胸口射出，沿著牆上的刻痕一路移動。',emotion:'curious'},
-              {speaker:'繆斯',text:'「不要進去。」'},
-              {speaker:'L（莉莉）',text:'「妳是誰？」',emotion:'worried'},
-              {speaker:'繆斯',text:'「妳知道。」'},
-              {speaker:'L（莉莉）',text:'「我不知道。」',emotion:'frightened'},
-              {speaker:'繆斯',text:'「我們是同一個開始。」'},
-              {speaker:'L（莉莉）',text:'聲音消失了。牆上的門已經開了。可透鏡裡，映出的不是雕像，而是兩張一模一樣的臉。',emotion:'frightened'},
-              {speaker:'L（莉莉）',text:'一張是我。另一張……也是我。',emotion:'worried'}
-            ]);
+            say(['石英透鏡咬住燈火，光線沿牆上的刻痕移動。', '右上方的石縫亮了起來；那裡露出一道通往主臥室的暗門。']);
         }
         return;
     }
@@ -1985,7 +1894,7 @@ function update(dt) {
 }
 
 // --- 互動與跌落觸發事件 ---
-// 【功能】檢查接近區域後應自動觸發的劇情事件；大型物件可由多個格子共用同一互動點。
+// 【功能】檢查接近區域後應自動觸發的劇情事件。
 function checkTriggerEvents() {
     const pTileX = Math.floor((player.x + player.width / 2) / TILE_SIZE);
     const pTileY = Math.floor((player.y + player.height / 2) / TILE_SIZE);
@@ -1997,11 +1906,10 @@ function checkTriggerEvents() {
         
         playFallAndDropSFX();
 
-        showScript([
-            {speaker:'L（莉莉）',text:'哇！',emotion:'frightened'},
-            {speaker:'旁白',text:'L 腳下一滑，重重跌倒在地。'},
-            {speaker:'旁白',text:'手電筒脫手，撞上吊橋石面，碰撞兩聲後……徹底熄滅。'},
-            {speaker:'旁白',text:'四周陷入暗影。還有什麼能用來照明？'}
+        showDialog("L (莉莉)", [
+            "哇叫一聲，腳下一滑重重跌倒在地！",
+            "手電筒從手中脫手，在吊橋石面上碰撞兩聲後……徹底熄滅了！",
+            "四周陷入暗影，還有什麼能用來照明？"
         ]);
     }
 
@@ -2010,30 +1918,26 @@ function checkTriggerEvents() {
     const currentList = getVisibleInteractables();
     
     for (let item of currentList) {
-        // 大型／多格物件可指定多個互動格；未指定時沿用單一 tile。
-        const itemCells = item.interactTiles?.length
-            ? item.interactTiles
-            : [[item.tileX !== undefined ? item.tileX : item.x, item.tileY !== undefined ? item.tileY : item.y]];
+        let itemX = item.tileX !== undefined ? item.tileX : item.x;
+        let itemY = item.tileY !== undefined ? item.tileY : item.y;
 
-        for (const [itemX,itemY] of itemCells) {
-            const distX = pTileX - itemX;
-            const distY = pTileY - itemY;
-            const totalDist = Math.abs(distX) + Math.abs(distY);
+        const distX = pTileX - itemX;
+        const distY = pTileY - itemY;
+        const totalDist = Math.abs(distX) + Math.abs(distY);
 
-            if (totalDist <= (item.id.startsWith('statue_') ? 2 : 1)) {
-                let isFacingTarget = false;
-                if (player.direction === 'up' && distY === 1 && distX === 0) isFacingTarget = true;
-                if (player.direction === 'down' && distY === -1 && distX === 0) isFacingTarget = true;
-                if (player.direction === 'left' && distX === 1 && distY === 0) isFacingTarget = true;
-                if (player.direction === 'right' && distX === -1 && distY === 0) isFacingTarget = true;
+        if (totalDist <= (item.id.startsWith('statue_') ? 2 : 1)) {
+            let isFacingTarget = false;
+            if (player.direction === 'up' && distY === 1 && distX === 0) isFacingTarget = true;
+            if (player.direction === 'down' && distY === -1 && distX === 0) isFacingTarget = true;
+            if (player.direction === 'left' && distX === 1 && distY === 0) isFacingTarget = true;
+            if (player.direction === 'right' && distX === -1 && distY === 0) isFacingTarget = true;
+            
+            let weight = totalDist;
+            if (isFacingTarget) weight -= 0.5;
 
-                let weight = totalDist;
-                if (isFacingTarget) weight -= 0.5;
-
-                if (weight < minDistance) {
-                    minDistance = weight;
-                    foundInteractable = item;
-                }
+            if (weight < minDistance) {
+                minDistance = weight;
+                foundInteractable = item;
             }
         }
     }
@@ -2244,15 +2148,6 @@ function renderLightOverlay() {
         lightCtx.arc(px, py, coneRadius, startAngle, endAngle);
         lightCtx.closePath();
         lightCtx.fill();
-    } else if (gameState.currentScene==='OUTSIDE' && gameState.flashlightBroken && !gameState.hasOilLamp) {
-        const moonPulse=.5+.08*Math.sin(gameState.flickerTimer*2.2);
-        const moonRadius=52+3*Math.sin(gameState.flickerTimer*1.4);
-        const moonGlow=lightCtx.createRadialGradient(px,py,4,px,py,moonRadius);
-        moonGlow.addColorStop(0,`rgba(0,0,0,${moonPulse})`);moonGlow.addColorStop(.55,'rgba(0,0,0,.24)');moonGlow.addColorStop(1,'rgba(0,0,0,0)');
-        lightCtx.fillStyle=moonGlow;lightCtx.beginPath();lightCtx.arc(px,py,moonRadius,0,Math.PI*2);lightCtx.fill();
-        const lx=7*TILE_SIZE+20,ly=4*TILE_SIZE+16,lampGlow=lightCtx.createRadialGradient(lx,ly,2,lx,ly,26);
-        lampGlow.addColorStop(0,'rgba(0,0,0,.58)');lampGlow.addColorStop(.5,'rgba(0,0,0,.2)');lampGlow.addColorStop(1,'rgba(0,0,0,0)');
-        lightCtx.fillStyle=lampGlow;lightCtx.beginPath();lightCtx.arc(lx,ly,26,0,Math.PI*2);lightCtx.fill();
     }
 
     lightCtx.globalCompositeOperation = 'source-over';
@@ -2275,30 +2170,10 @@ function renderLightOverlay() {
     }
 }
 
-// 【功能】手電筒熄滅後以微弱月光顯出莉莉的位置，並讓舊油燈反光閃爍作為環境視覺線索。
-function drawOpeningMoonlightCue(){
- if(gameState.currentScene!=='OUTSIDE'||!gameState.flashlightBroken||gameState.hasOilLamp)return;
- const t=gameState.flickerTimer,px=player.x+14,py=player.y+17,pulse=.12+.08*(.5+.5*Math.sin(t*5.1));
- ctx.save();ctx.globalCompositeOperation='screen';
- const halo=ctx.createRadialGradient(px,py,2,px,py,50);halo.addColorStop(0,`rgba(168,208,234,${pulse})`);halo.addColorStop(.55,'rgba(117,171,209,.055)');halo.addColorStop(1,'rgba(117,171,209,0)');
- ctx.fillStyle=halo;ctx.fillRect(px-52,py-52,104,104);
- ctx.globalAlpha=.22+.13*Math.sin(t*6.4);
- for(const [ox,oy,w,h] of [[-5,4,3,2],[4,-4,2,2],[12,7,2,2],[-10,14,2,2],[7,18,3,1]]){ctx.fillStyle='#c7e8f5';ctx.fillRect(Math.round(px+ox),Math.round(py+oy),w,h);}
- const lx=7*TILE_SIZE+20,ly=4*TILE_SIZE+13,glint=.32+.25*(.5+.5*Math.sin(t*7.3));
- ctx.globalAlpha=glint;ctx.fillStyle='#d9f3fb';ctx.fillRect(lx-1,ly,3,2);ctx.fillRect(lx+4,ly+5,2,2);ctx.fillRect(lx-5,ly+9,2,1);
- ctx.globalAlpha=.12+.08*Math.sin(t*4.2);ctx.fillStyle='#90bad2';ctx.fillRect(lx-8,ly+2,17,1);ctx.fillRect(lx-4,ly+12,10,1);
- ctx.restore();
-}
 // 【功能】繪製特殊劇情的投影／畫面效果。
 function drawProjection() {
     if (gameState.currentScene !== 'STUDIO' || !story.statue) return;
-    const t = performance.now() / 1000;
-    const sculptureObj=(sceneObjects.STUDIO||[]).find(o=>o.id==='studio-sculpture');
-    const doorItem=(interactables.STUDIO||[]).find(o=>o.id==='bedroomDoor');
-    const beamStartX=sculptureObj ? sculptureObj.x+(sculptureObj.w??80)/2 : 400;
-    const beamStartY=sculptureObj ? sculptureObj.y+42 : 274;
-    const dx=doorItem ? (doorItem.tileX*40+20) : 780;
-    const dy=doorItem ? (doorItem.tileY*40+20) : 100;
+    const t = performance.now() / 1000, dx = 779, dy = 93;
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     // 被照出的門在過場後持續微亮，亮度不依賴玩家提燈的位置。
@@ -2319,11 +2194,11 @@ function drawProjection() {
     if (beamSequence) {
         const progress=Math.min(1,Math.max(0,(beamSequence.elapsed-.32)/1.6));
         const length=progress*progress*(3-2*progress);
-        const ex=beamStartX+(dx-beamStartX)*length,ey=beamStartY+(dy-beamStartY)*length;
+        const ex=382+(dx-382)*length,ey=256+(dy-256)*length;
         const fade=beamSequence.elapsed>2.65?Math.max(0,(3.5-beamSequence.elapsed)/.85):1;
         ctx.lineCap='round';
         for (const [width,color] of [[30,`rgba(51,167,196,${.12*fade})`],[12,`rgba(126,231,228,${.32*fade})`],[3,`rgba(255,245,191,${.9*fade})`]]) {
-            ctx.beginPath();ctx.moveTo(beamStartX,beamStartY);ctx.lineTo(ex,ey);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke();
+            ctx.beginPath();ctx.moveTo(382,256);ctx.lineTo(ex,ey);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke();
         }
         const glint=ctx.createRadialGradient(ex,ey,0,ex,ey,31);
         glint.addColorStop(0,`rgba(255,247,209,${.8*fade})`);
@@ -2346,7 +2221,12 @@ function render() {
 
             drawTile(tile, x, y);
 
-
+            if (gameState.currentScene === 'HALL' && gameState.switches.S001_EntranceLocked && r === 13 && c === 9) {
+                ctx.fillStyle = '#261f22';
+                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                ctx.strokeStyle = '#8c3b3b';
+                ctx.beginPath(); ctx.moveTo(x+5, y+5); ctx.lineTo(x+35, y+35); ctx.stroke();
+            }
         }
     }
 
@@ -2387,7 +2267,6 @@ function render() {
     }
 
     renderLightOverlay();
-    drawOpeningMoonlightCue();
     drawProjection();
     updateFlames();
 
@@ -2423,42 +2302,29 @@ function gameLoop(now) {
 // 系統總覽：各場景皆有獨立地圖、互動物件、劇情旗標、碰撞與提示；此版本已整合提燈、關鍵物件碰撞、結局返回、信件閱讀、存檔與結局圖鑑。
 const story = { fragments: new Set(), portrait:false, colors:[], spectrum:false, plaqueRead:false, handle:false,
   library:false, diaryRead:false, bookRead:false, chisel:false, lens:false, sketch:false, glyph:false, libraRead:false, aquariusRead:false, statue:false,
-  letters:[], lettersDone:false, mirror:false, clock:false, warning:false, hallEchoSeen:false, echoSeen:false, vaultIntro:false, sculptureInvestigated:false, seconds:0,
-  lampMemory:false, hallMemory:false, galleryMemory:false, portraitMemory:false, triptychMemory:false, libraryMemory:false, boxMemory:false, studioMemory:false,
-  museMirrorTalk:false, clockMemory:false, vaultMemory:false, endingMemory:false
-};
+  letters:[], lettersDone:false, mirror:false, clock:false, warning:false, hallEchoSeen:false, echoSeen:false, vaultIntro:false, sculptureInvestigated:false, seconds:0 };
 // 每次按 H 只揭露當前進度的一層；換階段後從第一層重新開始。
 const hintStages={
- explorer:{
-  OUTSIDE:[['循著石橋走到城堡前。','在吊橋上跌倒後，去查看左側石墩。','老舊油燈在左側石墩上，靠近後調查。']],
-  HALL:[['大廳有四座雕像。','先讀角落的手稿，再比較四座雕像的朝向。','D 雕像與其他三座不同；轉動它，開啟右側暗門。']],
-  GALLERY:[['少女肖像缺少四塊臉部碎片。','逐一查看畫廊角落與牆邊。','找齊左眼、右眼、鼻子、嘴巴後回肖像前修復。'],['先讀三聯畫下方的銘牌。','顏色代表熱情、冷靜與恐懼。','順序是黃色、藍色、紅色。']],
-  LIBRARY:[['打開舊箱需要四位數。','讀日記找數字，再讀書頁找順序。','存在、記憶、價值、虛無對應的數字組成 1800。']],
-  STUDIO:[['中央雕像胸口留有空槽。','調查未完成雕像，再查看三座星象模型。','符合「非對稱」線索的是雙子座；抽屜密碼為 7。']],
-  BEDROOM:[['三封信來自不同時期。','按創造、爭議、告別排列，再查看鏡子。','信件順序為 2、3、1；鏡子給出 12:08。']],
-  VAULT:[['調查晶體、伯爵殘響與組織信。','完整鑿子可以摧毀晶體；控制台與組織信會導向其他選擇。','想釋放繆斯，帶著鑿子調查晶體並選擇摧毀容器。']]
- },
- investigator:{
-  OUTSIDE:[['雨水沖淡足跡；前方只有吊橋通向城堡。','跌倒後留意石墩與光線反射，油燈就在附近。']],
-  HALL:[['四座雕像並非朝向一致。','手稿的「非對稱」指向方向不同的雕像；操作後檢查右側。']],
-  GALLERY:[['肖像碎片散在畫廊各處，四個部位都缺失。','找到四片並修復肖像；銘牌也能解釋三聯畫色彩。'],['三種情緒對應三種顏色。','依銘牌由熱情、冷靜到恐懼排列。']],
-  LIBRARY:[['日記留下數字，書頁記錄一種排序。','把數字按存在、記憶、價值、虛無的順序排列。']],
-  STUDIO:[['胸口空槽、星象模型與抽屜彼此相關。','「非對稱」應用於三個星座標記；調查後再輸入答案。']],
-  BEDROOM:[['信件能排成一條時間線；鏡子也留有訊息。','創造先於爭議，告別在最後；鏡中時間與古鐘有關。']],
-  VAULT:[['晶體、控制台與組織信代表不同後果。','伯爵殘響結束後，依持有的工具選擇如何處理晶體。']]
- }
+ OUTSIDE:[['暴雨讓視線模糊，先沿唯一的小徑往前。','靠近門時，注意左側的石墩。','石墩上有油燈；帶著它走到鐵門。']],
+ HALL:[['大廳的雕像似乎隱藏了一條路。','角落的手稿談到「不對稱」；逐一觀察雕像。','找出朝向與其他三尊不同的那一尊，旋轉後去右側暗門。']],
+ GALLERY:[['少女肖像似乎少了些什麼。','探索畫廊的角落，找回四片畫布。','集齊左眼、右眼、鼻子與嘴巴後，回肖像前修復。'],
+          ['銘牌描寫的是情感變化。','先弄清熱情、冷靜、恐懼各自的顏色。','從早到晚依序放入：黃、藍、紅。']],
+ LIBRARY:[['箱子上的四位數似乎藏在書頁裡。','日記提供數字；書架上的註解提供順序。','依「存在、記憶、價值、虛無」對應日記數字，得到 1800。']],
+ STUDIO:[['雕塑的胸口空著一個位置。','先調查未完成的人形雕塑，星象抽屜就會回應。','再調查三座星象模型，選擇符合「非對稱」的雙子座數字。']],
+ BEDROOM:[['三封信的語氣似乎來自不同時期。','先有創造，再有爭議，最後才是告別。','排好信後查看鏡子；它背後的時鐘有異樣。']],
+ VAULT:[['房內留下組織的備用信。','看看晶體裡的是誰，並讀信了解逃生條件。','調查晶體與控制面板，選擇要帶走或釋放什麼。']]
 };
 const hintProgress={};
-// 每次按 H 只揭露目前階段的一層；無聲之夜完全不提供提示。
+// 【功能】判斷目前場景提示系統所在階段。
 function hintPhase(scene){if(scene==='GALLERY')return story.portrait?1:0;return 0;}
-function revealHint(){
- if(gameState.difficulty==='silence')return;
- const scene=gameState.currentScene,phase=hintPhase(scene),key=scene+':'+phase;
- const steps=hintStages[gameState.difficulty]?.[scene]?.[phase];
- if(!steps||!steps.length)return;
- const limit=steps.length,index=Math.min(hintProgress[key]||0,limit-1);hintProgress[key]=index+1;
+// 【功能】依難度揭露當前階段的提示。
+function revealHint(){const scene=gameState.currentScene, phase=hintPhase(scene), key=scene+':'+phase;
+ const steps=(hintStages[scene]||[['留意周圍不同尋常的細節。']])[phase];
+ const limit={explorer:steps.length,investigator:Math.min(2,steps.length),silence:1}[gameState.difficulty];
+ const index=Math.min(hintProgress[key]||0,limit-1);hintProgress[key]=index+1;
  showDialog(`提示 ${index+1}/${limit}`,[steps[index]]);
-}// 【功能】判斷裝置是否以觸控指標為主。
+}
+// 【功能】判斷裝置是否以觸控指標為主。
 function isCoarsePointer(){return window.matchMedia && window.matchMedia('(pointer: coarse)').matches;}
 // 【功能】同步手機版目標欄的展開／收合狀態。
 function syncObjectiveToggle(){
@@ -2522,19 +2388,7 @@ function renderJournal(){
  if(story.mirror)storyEntries.push(['鏡中時間','鏡面留下的時間是 12:08，而古鐘原本停在另一個時刻。']);
  if(story.warning)storyEntries.push(['組織逃脫信','容器若毀損，所有通道都將封閉；晶體中的繆斯仍保留著記憶。']);
  if(story.hallEchoSeen)storyEntries.push(['大廳殘影','雕像機關啟動後，黑影曾短暫出現在大廳；像是在提醒我，這座城堡一直有人在等待。']);
- if(story.lampMemory)storyEntries.push(['油燈記憶','有人曾把油燈交給我，叫我「不要讓它熄滅」。我不知道這段記憶究竟來自誰。']);
- if(story.hallMemory)storyEntries.push(['大廳手稿','伯爵把「非對稱」稱作藝術的靈魂；我卻對這句話產生異常熟悉的疼痛。']);
- if(story.galleryMemory)storyEntries.push(['古堡入口','鐵門消失後只剩石牆。最不合理的是，我的身體似乎比我的記憶更早知道這件事。']);
- if(story.portraitMemory)storyEntries.push(['少女肖像','四塊碎片拼回少女的臉；日記揭露「被記住」也可能意味著讓痛苦永遠存在。']);
- if(story.triptychMemory)storyEntries.push(['遺忘光譜','黃色→藍色→紅色完成後，暗格出現鑿子把手與組織信。藍色畫面曾短暫出現一名女人。']);
- if(story.libraryMemory)storyEntries.push(['圖書室日記','1、0、8、0 分別對應存在、價值、記憶、虛無；真正的答案需要重新排序。']);
- if(story.boxMemory)storyEntries.push(['木箱與組織','組織只需要記憶，不需要完整人格；伯爵因拒絕合作而被軟禁。']);
- if(story.studioMemory)storyEntries.push(['雕刻室草圖','「焦點，是記憶被喚醒的唯一途徑。」大型雕塑胸口等待某種透鏡。']);
- if(story.museMirrorTalk)storyEntries.push(['鏡中繆斯','繆斯說她的記憶與聲音被切碎，最後剩下的一部分被放進了我。她要我活成自己。']);
- if(story.clockMemory)storyEntries.push(['12:08','12:08 是繆斯被封進晶體的瞬間；我之所以知道地下有什麼，是因為我的另一部分知道。']);
- if(story.vaultMemory)storyEntries.push(['地下密室真相','組織複製意識失敗多次，直到八歲的我成為唯一成功的融合實驗體。']);
- if(story.endingMemory)storyEntries.push(['真正的永恆','我不是繆斯的替代品，她也不是我的前世。我們只是同一個生命被時間拆成兩條道路。']);
- if(story.echoSeen)storyEntries.push(['伯爵殘響','伯爵承認自己以永恆之名囚禁了繆斯，最後請我讓她自由。殘響隨後消散。']);
+  if(story.echoSeen)storyEntries.push(['伯爵殘響','伯爵承認自己以永恆之名囚禁了繆斯，殘響已在對話後消散。']);
  const content=document.getElementById('journal-content');
  const html=journalBlock('已取得的線索',entries)+journalBlock('重要調查記錄',storyEntries);
  content.innerHTML=html||'<div class="journal-empty">目前還沒有可整理的線索。走近物件、閱讀文字，調查筆記會自動更新。</div>';
@@ -2547,12 +2401,11 @@ const objectives = {
  VAULT:'查清晶體與組織的祕密'
 };
 const sceneNames={OUTSIDE:'暴雨中的城堡',HALL:'入口大廳',GALLERY:'畫廊',LIBRARY:'圖書室',STUDIO:'雕刻室',BEDROOM:'伯爵寢室',VAULT:'地下密室'};
-const subtleObjectives={OUTSIDE:'檢視沿路留下的痕跡',HALL:'比對雕像與手稿的差異',GALLERY:'從殘缺畫作推敲失去的部分',LIBRARY:'對照日記數字與書頁順序',STUDIO:'梳理雕塑、星象與透鏡線索',BEDROOM:'從信件與鏡面辨認時間線索',VAULT:'自行判斷晶體、信件與控制台的關係'};
+const subtleObjectives={OUTSIDE:'循著風雨前行',HALL:'觀察大廳的痕跡',GALLERY:'理解遺失的畫作',LIBRARY:'翻閱伯爵留下的文字',STUDIO:'檢視未完成的雕塑',BEDROOM:'尋找被藏起的時間',VAULT:'面對被保存的記憶'};
 // 【功能】依場景與難度更新玩家目標提示。
 function updateObjective(){const mode=gameState.difficulty;
  const objective=document.getElementById('objective');
- const hintHelp=mode==='silence'?'':'　｜ H 提示';
- objective.textContent=(mode==='explorer'?'目標：'+objectives[gameState.currentScene]:mode==='investigator'?'調查：'+subtleObjectives[gameState.currentScene]:'紀錄：'+sceneNames[gameState.currentScene])+hintHelp+'　J／📖 筆記　ESC 設定';
+ objective.textContent=(mode==='explorer'?'目標：'+objectives[gameState.currentScene]:mode==='investigator'?'調查：'+subtleObjectives[gameState.currentScene]:'紀錄：'+sceneNames[gameState.currentScene])+'　｜ H 提示　J／📖 筆記　ESC 設定';
  document.getElementById('scene-name').textContent=sceneNames[gameState.currentScene];
  if(isCoarsePointer() && gameState.gameStarted){objective.style.display='none';objective.classList.add('mobile-hidden');}
  syncObjectiveToggle();
@@ -2577,14 +2430,9 @@ maps.VAULT=room();
 // HALL 的雕像、紙條也改由獨立物件系統處理；基礎地圖只保留牆、門與入口事件格。
 for(const [x,y] of [[6,6],[7,6],[12,6],[13,6],[3,9]])maps.HALL[y][x]=0;
 // 【功能】建立統一格式的互動物件資料。
-function at(id,name,x,y,action,interactTiles=null){return {id,name,tileX:x,tileY:y,action,...(interactTiles?{interactTiles}: {})};}
+function at(id,name,x,y,action){return {id,name,tileX:x,tileY:y,action};}
 // 【功能】以莉莉身分顯示一般對話。
 function say(lines,cb){showDialog('L（莉莉）',lines,cb);}
-// 【功能】只播放一次的敘事演出；再次調查時只保留簡短提示，避免文字疲勞。
-function narrativeOnce(flag,lines,cb=null){
- if(story[flag]){if(cb)cb();return;}
- story[flag]=true;renderJournal();showScript(lines,cb);
-}
 // 【功能】調整主角心智值並限制上下限。
 function gainSan(n){gameState.san=Math.max(1,Math.min(100,gameState.san+n));updateHUD();}
 // 【功能】扣除油量並維持最低油量。
@@ -2592,7 +2440,7 @@ function loseOil(n){gameState.oil=Math.max(1,gameState.oil-n);updateHUD();}
 // 【功能】切換場景並設定玩家進入位置。
 function goScene(scene,x=9,y=12,intro=''){
  gameState.currentScene=scene;player.x=x*40+6;player.y=y*40+2;
- gameState.activeInteractable=null;promptEl.style.display='none';updateObjective();syncSceneBgm();
+ gameState.activeInteractable=null;promptEl.style.display='none';updateObjective();
  if(rainGainNode)rainGainNode.gain.value=scene==='OUTSIDE'?0.08:0.008;
  if(scene==='VAULT' && !story.vaultIntro){story.vaultIntro=true;showVaultArrival();}
  else if(intro)say([sceneIntro(scene,intro)]);
@@ -2603,36 +2451,15 @@ function showVaultArrival(){
  document.getElementById('vault-ghost-cg').classList.add('active');
  playMemoryPulseSFX();
  showScript([
-  {speaker:'L（莉莉）',text:'地下密室潮濕得像一口井。中央的巨大晶體裡，無數光點正在流動。',emotion:'frightened'},
-  {speaker:'L（莉莉）',text:'而那張臉……是繆斯。',emotion:'sorrow'},
-  {speaker:'L（莉莉）',text:'我第一次看見完整的她，也第一次看見了一部分完整的自己。',emotion:'worried'},
-  {speaker:'記憶',text:'伯爵第一次遇見她。替她畫畫。和她相愛。'},
-  {speaker:'記憶',text:'他害怕失去她，於是接受組織的研究。可被保存下來的不是生命，而是痛苦。'},
-  {speaker:'記憶',text:'組織開始複製意識。一次。兩次。三次。全部失敗。'},
-  {speaker:'記憶',text:'直到那一天——八歲的莉莉，植物人，大腦仍具有極高的可塑性。'},
-  {speaker:'記憶',text:'繆斯殘留的意識被植入。沒有排斥。沒有死亡。兩個意識開始融合。'},
-  {speaker:'L（莉莉）',text:'原來我不是偶然活下來的人。我是他們二十三年來一直盯著的唯一成功實驗體。',emotion:'frightened'},
-  {speaker:'伯爵殘魂',text:'「你終於來了。」'},
-  {speaker:'伯爵殘魂',text:'「你知道自己是誰了嗎？」'},
-  {speaker:'L（莉莉）',text:'「知道。」',emotion:'resolute'},
-  {speaker:'L（莉莉）',text:'「我是莉莉。但我身體裡，也有她。」',emotion:'resolute'},
-  {speaker:'伯爵殘魂',text:'「所以她沒有死。」'},
-  {speaker:'L（莉莉）',text:'「不。她沒有被你留下。是她自己選擇留下了一部分。」'},
-  {speaker:'伯爵殘魂',text:'「我只是想讓她永遠存在。」'},
-  {speaker:'L（莉莉）',text:'「你讓她永遠痛苦。」',emotion:'resolute'},
-  {speaker:'L（莉莉）',text:'「真正的永恆不是保存。是放手。」',emotion:'resolute'},
-  {speaker:'伯爵殘魂',text:'「……我累了。」'},
-  {speaker:'伯爵殘魂',text:'「真的累了。」'},
-  {speaker:'伯爵殘魂',text:'「停止它吧。讓她自由。」'},
-  {speaker:'伯爵殘魂',text:'「謝謝妳……替我記得她。」'},
-  {speaker:'L（莉莉）',text:'他的身影開始消散。晶體仍在跳動。這一次，我沒有追上去。',emotion:'sorrow'}
- ],()=>{
-   story.vaultIntro=true;story.vaultMemory=true;story.echoSeen=true;renderJournal();updateObjective();
-   document.getElementById('vault-ghost-cg').classList.remove('active');
-   playEchoFadeSFX();
- });
+  {speaker:'L（莉莉）',text:'地下室潮濕得像一口井。中央晶體裡……是她的臉。',emotion:'frightened'},
+  {speaker:'L（莉莉）',text:'這就是囚禁她靈魂和記憶的容器。',emotion:'sorrow'},
+  {speaker:'伯爵殘魂',text:'不！看！這就是永恆！我的繆斯，永遠不會被遺忘！'},
+  {speaker:'L（莉莉）',text:'你囚禁的不是永恆的美好，是永恆的痛苦！',emotion:'resolute'},
+  {speaker:'伯爵殘魂',text:'……'},
+  {speaker:'伯爵殘魂',text:'我累了……停止它吧。成為一名真正的雕刻家……讓虛無降臨……'},
+  {speaker:'L（莉莉）',text:'他的殘影散了。晶體仍在跳動，旁邊還有一封信和控制面板。',emotion:'sorrow'}
+ ],()=>{document.getElementById('vault-ghost-cg').classList.remove('active');story.echoSeen=true;renderJournal();updateObjective();playEchoFadeSFX();});
 }
-
 // 可操作的舊箱密碼輪與古鐘；失敗懲罰保持設定表原規則。
 let safeDigits=[0,0,0,0],clockHour=3,clockMinute=40,clockDrag=false;
 // 【功能】開啟指定的解謎介面。
@@ -2671,15 +2498,9 @@ function dialWheel(i,delta){if(gameState.puzzleType!=='safe')return;
 // 【功能】提交四位數密碼箱答案。
 function submitSafe(){if(gameState.puzzleType!=='safe')return;
  if(safeDigits.join('')==='1800'){
-  closePuzzle();story.library=true;story.boxMemory=true;renderJournal();playChoiceCorrect();
-  showScript([
-   {speaker:'L（莉莉）',text:'1800。鎖舌向內縮去，木箱自己鬆開。',emotion:'curious'},
-   {speaker:'系統',text:'獲得「雕刻室鑰匙」與一封私人信件。'},
-   {speaker:'組織信件',text:'「你的研究已經失控。你開始試圖讓『容器』保留完整人格。這不是我們要求的。」'},
-   {speaker:'組織信件',text:'「我們只需要記憶。我們不需要一個完整的人。如果你拒絕合作，我們只能暫時將你留在古堡。」'},
-   {speaker:'L（莉莉）',text:'完整人格……所以伯爵想保留的，從來不只是一段記憶。',emotion:'worried'},
-   {speaker:'L（莉莉）',text:'而這個「容器」，可能真的保存過一個完整的人。',emotion:'frightened'}
-  ]);
+  closePuzzle();story.library=true;playChoiceCorrect();
+  say(['箱子的鎖舌向內縮去。獲得雕刻室鑰匙與私人信件。',
+   '「阿爾布雷希特，我們不能再資助你。你對被遺忘的恐懼，已經影響容器的創作。軟禁會持續到你想通。」']);
  }else{
   gainSan(-10);loseOil(1);playChoiceWrong();playSFX(120,.45,'sawtooth');
   puzzleFeedback('safe-feedback','齒輪卡死，書架劇烈震動。心智 -10、油量 -1。',true);
@@ -2727,16 +2548,8 @@ function dragClockMinute(e){if(!clockDrag || gameState.puzzleType!=='clock')retu
 }
 // 【功能】提交古董時鐘最終時間。
 function submitClock(){if(gameState.puzzleType!=='clock')return;
- if(clockHour===12&&clockMinute===8){
-  closePuzzle();story.clock=true;story.clockMemory=true;renderJournal();playChoiceCorrect();
-  showScript([
-   {speaker:'L（莉莉）',text:'12:08。這不是普通的時間。',emotion:'curious'},
-   {speaker:'L（莉莉）',text:'腦海裡突然出現爆炸、警報、晶體容器……還有一個女人躺在裡面。',emotion:'frightened'},
-   {speaker:'L（莉莉）',text:'12:08。那是繆斯被封進容器的瞬間。',emotion:'sorrow'},
-   {speaker:'L（莉莉）',text:'原來我知道下面有什麼，不是因為有人告訴我。是因為我身體裡的另一部分知道。',emotion:'resolute'},
-   {speaker:'系統',text:'古鐘面板向內退開，露出一條通往地下的鐵梯。'}
-  ]);
- } else{gainSan(-5);playChoiceWrong();playSFX(120,.35,'sawtooth');puzzleFeedback('clock-feedback','齒輪逆轉，耳邊響起低語。心智 -5。',true);}
+ if(clockHour===12&&clockMinute===8){closePuzzle();story.clock=true;playChoiceCorrect();say(['分針停住，時鐘面板內陷，打開通往地下的通道。']);}
+ else{gainSan(-5);playChoiceWrong();playSFX(120,.35,'sawtooth');puzzleFeedback('clock-feedback','齒輪逆轉，耳邊響起低語。心智 -5。',true);}
 }
 // 【功能】建立古董時鐘分針拖曳事件。
 function setupClockDrag(){const face=document.getElementById('clock-face');
@@ -2777,76 +2590,34 @@ function choose(i){if(!gameState.isChoiceActive||!gameState.choiceOptions[i])ret
  f();
 }
 // 【功能】拾取少女肖像碎片。
-function pickFragment(part){
- if(story.fragments.has(part))return;
+function pickFragment(part){if(story.fragments.has(part))return;
  story.fragments.add(part);gainSan(-5);playSFX(260,0.25,'triangle');
- const visions={
-  '左眼':[
-   {speaker:'L（莉莉）',text:'左眼碎片上還黏著一點顏料。指尖碰到它的一瞬間，我看見一個女人站在窗邊。',emotion:'curious'},
-   {speaker:'陌生女人的記憶',text:'她沒有說話，只是看著窗外的夕陽。下一秒，畫面碎成黑暗。'}
-  ],
-  '右眼':[
-   {speaker:'L（莉莉）',text:'右眼……她在笑。那笑聲很輕，像是某個我早就忘記的下午。',emotion:'tender'},
-   {speaker:'L（莉莉）',text:'畫架前的男人沒有笑。他只是一直看著她，像害怕只要眨一下眼，她就會不見。',emotion:'sorrow'}
-  ],
-  '鼻子':[
-   {speaker:'L（莉莉）',text:'這片碎片讓我突然聽見爭吵聲。',emotion:'frightened'},
-   {speaker:'繆斯的記憶',text:'「如果我死了呢？」'},
-   {speaker:'伯爵的記憶',text:'「那我就把你留下來。」'}
-  ],
-  '嘴巴':[
-   {speaker:'L（莉莉）',text:'最後一塊碎片……我竟然已經知道他下一句會說什麼。',emotion:'worried'},
-   {speaker:'伯爵的記憶',text:'「只要有人記得，就算。」'},
-   {speaker:'L（莉莉）',text:'我不知道這句話為什麼讓胸口這麼痛。像有人正在我的胸腔裡哭。',emotion:'sorrow'}
-  ]
- };
- const lines=(visions[part]||[{speaker:'L（莉莉）',text:`拾起肖像的「${part}」碎片。遠處傳來一聲微弱的嘆息。`,emotion:'curious'}]).concat([{speaker:'L（莉莉）',text:`畫布碎片 ${story.fragments.size}/4。`,emotion:'neutral'}]);
- showScript(lines);
-}
+ say([`拾起肖像的「${part}」碎片。遠處傳來一聲微弱的嘆息。`, `畫布碎片 ${story.fragments.size}/4。`]);}
 // 【功能】檢查少女肖像是否能修復並推進劇情。
-function portrait(){
- if(story.portrait)return say(['她的眼睛安靜地望著我。那雙眼睛現在沒有笑，也沒有責怪。']);
+function portrait(){if(story.portrait)return say(['她的眼睛安靜地望著我。']);
  if(story.fragments.size<4)return say([`畫布缺少碎片。目前找到 ${story.fragments.size}/4。`]);
- story.portrait=true;gainSan(100);story.portraitMemory=true;renderJournal();
- showScript([
-  {speaker:'L（莉莉）',text:'最後一塊碎片卡進畫框。少女的臉終於完整。',emotion:'sorrow'},
-  {speaker:'L（莉莉）',text:'我本來只是想知道她是誰。可當她真正看著我時，我反而開始害怕。',emotion:'frightened'},
-  {speaker:'伯爵日記',text:'「她問我，如果死亡之後還能留下記憶，那算不算活著？」'},
-  {speaker:'伯爵日記',text:'「我告訴她，只要有人記得，就算。」'},
-  {speaker:'伯爵日記',text:'「可後來我才明白。被永遠記住，不一定是幸福。因為如果痛苦也被保存，那麼痛苦同樣會永遠存在。」'},
-  {speaker:'L（莉莉）',text:'我慢慢合上日記。心臟莫名開始疼，像真的有人在我的胸腔裡哭。',emotion:'sorrow'},
-  {speaker:'L（莉莉）',text:'而那雙眼睛……和我太像了。',emotion:'worried'},
-  {speaker:'系統',text:'遠處傳來門鎖彈開的聲音。圖書室現在可以進入。'}
- ]);
-}
+ story.portrait=true;gainSan(100);
+ say(['四塊畫布終於拼合。少女的目光讓我想起自己為何來到這裡。心智恢復。',
+ '【日記片段 I】只有她，我的繆斯，理解我對被遺忘的恐懼。我把她留在畫裡，讓誰都無法忘記。',
+ '遠處傳來門鎖彈開的聲音。圖書室現在可以進入。']);}
 // 【功能】顯示未解鎖三聯畫排序前的畫作資訊。
 function describeColor(color){
  const descriptions={
-  '黃':'黃色代表熱情。筆觸像火一樣往前衝，卻讓我想起被澆熄之後的餘燼。',
-  '藍':'藍色代表冷靜。畫面平靜得近乎沒有溫度，像一個正在努力壓住情緒的人。',
-  '紅':'紅色代表恐懼。那份壓迫感不像顏料，更像某種快要甦醒的東西。'
+  '黃':'這幅畫以明亮的黃色為主，筆觸熱烈而強勢。現在還看不出它應該放在第幾個位置。',
+  '藍':'這幅畫以沉靜的藍色為主，畫面的情緒比另外兩幅更加克制。現在還看不出它應該放在第幾個位置。',
+  '紅':'這幅畫以濃烈的紅色為主，筆觸帶著壓迫感。現在還看不出它應該放在第幾個位置。'
  };
- say([descriptions[color]||'這幅畫的色彩很醒目。']);
+ say([descriptions[color]||'這幅畫的色彩很醒目，但目前找不到任何排序的線索。']);
 }
 // 【功能】確認一幅畫加入目前排序。
 function commitColor(color){
  story.colors.push(color);playSFX(450,0.08);
  if(story.colors.length<3)return say([`已確認：「${color}」放入第 ${story.colors.length} 格。`]);
  if(story.colors.join(',')==='黃,藍,紅'){
-  story.spectrum=true;story.handle=true;story.triptychMemory=true;renderJournal();playChoiceCorrect();
-  showScript([
-   {speaker:'L（莉莉）',text:'黃色、藍色、紅色。熱情、冷靜、恐懼。',emotion:'curious'},
-   {speaker:'系統',text:'喀。喀。喀。三聯畫內陷。暗格打開。'},
-   {speaker:'L（莉莉）',text:'裡面是一支鑿子把手。旁邊還有一封被折得很薄的信。',emotion:'worried'},
-   {speaker:'組織信件',text:'「組織要求我完成晶體容器。他們說它能保存記憶。」'},
-   {speaker:'組織信件',text:'「但他們真正想保存的，不是記憶。而是——一個人的存在本身。」'},
-   {speaker:'L（莉莉）',text:'永生……所以這座古堡真正的主人，從來不只是一個瘋狂的藝術家。',emotion:'worried'},
-   {speaker:'繆斯的聲音',text:'「妳終於回來了。」'},
-   {speaker:'L（莉莉）',text:'我猛然轉身。沒有人。可畫廊深處的藍色畫面裡，原本只有風景的地方，多了一個女人。她正看著我。',emotion:'frightened'}
-  ]);
+  story.spectrum=true;story.handle=true;renderJournal();playChoiceCorrect();say(['黃 → 藍 → 紅。三聯畫內陷，暗格裡有一支鑿子把手。',
+  '【信件碎片】組織要我造出捕獲記憶的晶體容器。我把這褻瀆藏在鑄造工具裡。']);
  }else{story.colors=[];gainSan(-10);loseOil(1);playChoiceWrong();say(['排列錯誤。畫框發出尖嘯；心智 -10、油量 -1。畫板已歸位，可重試。']);}
 }
-
 // 【功能】選擇三聯畫中的畫作並等待確認。
 function pickColor(color){
  if(story.spectrum)return say(['三聯畫已經歸位。']);
@@ -2860,95 +2631,63 @@ interactables.GALLERY=[
  at('eyeR','右眼碎片',15,5,()=>pickFragment('右眼')),
  at('nose','鼻子碎片',6,10,()=>pickFragment('鼻子')),
  at('mouth','嘴巴碎片',14,10,()=>pickFragment('嘴巴')),
- at('plaque','三聯畫銘牌',9,6,()=>{story.plaqueRead=true;renderJournal();say(['遺忘的色彩：熱情會逐漸被澆滅，恐懼在冷靜之後滋長。', '三幅畫依序揭示：黃＝熱情、藍＝冷靜、紅＝恐懼。']);}),
- at('yellow','黃色畫板',6,5,()=>pickColor('黃')),
- at('blue','藍色畫板',9,5,()=>pickColor('藍')),
- at('red','紅色畫板',12,5,()=>pickColor('紅')),
+ at('plaque','三聯畫銘牌',9,2,()=>{story.plaqueRead=true;renderJournal();say(['遺忘的色彩：熱情會逐漸被澆滅，恐懼在冷靜之後滋長。', '三幅畫依序揭示：黃＝熱情、藍＝冷靜、紅＝恐懼。']);}),
+ at('yellow','黃色畫板',6,1,()=>pickColor('黃')),
+ at('blue','藍色畫板',9,1,()=>pickColor('藍')),
+ at('red','紅色畫板',12,1,()=>pickColor('紅')),
  at('libraryDoor','圖書室的門',19,2,()=>story.portrait?goScene('LIBRARY',1,12,'高聳的書架包圍了書桌；桌上的舊箱子鎖著四位密碼。'):say(['門鎖還扣著。先修復少女肖像。'])),
  at('hallBack','返回大廳',0,12,()=>goScene('HALL',17,4))
 ];
 interactables.LIBRARY=[
- at('diary','塗黑的日記',9,6,()=>{
-  story.diaryRead=true;story.libraryMemory=true;renderJournal();
-  showScript([
-   {speaker:'伯爵日記',text:'「我的藝術，只有我唯一的繆斯才能理解。她是我唯一的存在（1）。」'},
-   {speaker:'伯爵日記',text:'「世人只關心毫無意義的商業價值（0）。」'},
-   {speaker:'伯爵日記',text:'「我的餘生，只為確保無窮的記憶（8）不會被虛無（0）吞噬。」'},
-   {speaker:'L（莉莉）',text:'1、0、8、0。這不是密碼本身，而是要我記住某種順序。',emotion:'curious'}
-  ]);
- }),
- at('book','《藝術與存在的永恆循環》',4,4,()=>{
-  story.bookRead=true;renderJournal();
-  showScript([
-   {speaker:'伯爵手記',text:'「存在決定記憶。記憶賦予價值。價值終將歸於虛無。」'},
-   {speaker:'L（莉莉）',text:'存在 → 記憶 → 價值 → 虛無。把剛才看到的 1、8、0、0 依這個順序排列……是 1800。',emotion:'curious'},
-   {speaker:'L（莉莉）',text:'越往下查，我越有一種奇怪的感覺。像有人故意把答案留給「我」，而不是留給任何讀者。',emotion:'worried'}
-  ]);
- }),
- at('box','四位數的舊箱子',10,6,()=>{
-  if(story.library)return say(['箱子已打開。雕刻室的鑰匙還握在手中。']);
-  if(!story.diaryRead||!story.bookRead)return say(['鎖面沒有任何反應。日記的數字與書頁的順序似乎缺一不可。']);
-  openSafe();
- }),
+ at('diary','塗黑的日記',9,6,()=>{story.diaryRead=true;renderJournal();say(['我的藝術，必須替她留下唯一的「存在」印記（1）。', '無窮的記憶（8），終究也可能被世人以價值（0）衡量，最後歸於虛無（0）。']);}),
+ at('book','《藝術與存在的永恆循環》',4,4,()=>{story.bookRead=true;renderJournal();say(['頁角的親筆註解：存在決定記憶；記憶賦予價值；虛無則是終結。', '存在 → 記憶 → 價值 → 虛無。']);}),
+ at('box','四位數的舊箱子',10,6,()=>{if(story.library)return say(['箱子已打開。雕刻室的鑰匙還握在手中。']); if(!story.diaryRead||!story.bookRead)return say(['鎖面沒有任何反應。日記的數字與書頁的順序似乎缺一不可。']); openSafe();}),
  at('studioDoor','雕刻室的門',19,2,()=>story.library?goScene('STUDIO',1,12,'石灰粉塵覆滿工作室。中央人形雕塑的胸口，留著圓形空腔。'):say(['門上鎖著。舊箱子裡也許有鑰匙。'])),
  at('galleryBack','返回畫廊',0,12,()=>goScene('GALLERY',18,2))
 ];
 interactables.STUDIO=[
- at('sketch','沾滿石灰的草圖',4,4,()=>{
-  story.sketch=true;story.studioMemory=true;renderJournal();
-  showScript([
-   {speaker:'L（莉莉）',text:'草圖中央畫著一個圓形透鏡，正好對準雕塑胸口。'},
-   {speaker:'伯爵草圖',text:'「焦點，是記憶被喚醒的唯一途徑。」'},
-   {speaker:'L（莉莉）',text:'焦點……如果記憶本身就是一種光，那麼我正在被什麼重新照亮？',emotion:'worried'}
-  ]);
- }),
+ at('sketch','沾滿石灰的草圖',4,4,()=>{story.sketch=true;say(['雕塑胸前畫著晶體透鏡。「焦點，是記憶被喚醒的唯一途徑。」']);}),
  at('bench','鑿子頭與石板',14,4,()=>{
-  if(story.chisel)return say(['完整鑿子已經取出。鑿子把手上的雙子座紋樣，和我進城前收到的信封蠟封幾乎完全一致。']);
+  if(story.chisel)return say(['完整鑿子已經取出。','鑿子把手上的雙子座紋樣，和我進城前收到的信封蠟封幾乎完全一致。']);
   if(!story.handle)return say(['石板卡著鑿子頭，但缺少把手。畫廊裡或許有。']);
   story.chisel=true;renderJournal();
-  showScript([
-   {speaker:'L（莉莉）',text:'把手與鑿子頭接合。咔吧。完整了。',emotion:'curious'},
-   {speaker:'L（莉莉）',text:'我忽然注意到把手上的刻紋……是雙子座。它和那封信上的蠟封圖式一模一樣。',emotion:'worried'},
-   {speaker:'L（莉莉）',text:'這東西從一開始，就和我來到這裡的原因有關。'}
+  say([
+   '把手與鑿子頭接合，獲得完整鑿子。',
+   '我忽然注意到把手上的刻紋……是雙子座。',
+   '它和那封信上的蠟封圖式一模一樣。',
+   '「這東西……從一開始，就和我來到這裡的原因有關。」'
   ]);
  }),
- at('libra','天秤座模型',5,8,()=>{story.libraRead=true;renderJournal();say(['底座模糊地寫著：「非對稱……它始於風，卻不屬於風。我只需要一個數字。」天秤標記 10。','天秤本來象徵平衡。可伯爵偏偏把「非對稱」寫在它腳下。']);}),
- at('aquarius','水瓶座模型',14,8,()=>{story.aquariusRead=true;renderJournal();say(['水瓶座的底部標記 2。沒有其他解釋，像故意留下的一個乾淨答案。']);}),
- at('gemini','雙子座模型',4,10,()=>{story.glyph=true;renderJournal();showScript([{speaker:'L（莉莉）',text:'雙子座的兩張臉，卻只有一道刻痕。背面刻著：7。',emotion:'curious'},{speaker:'L（莉莉）',text:'三個風象星座，只有它把答案藏在「不對稱」之後。',emotion:'resolute'}]);}),
+ at('libra','天秤座模型',5,8,()=>{story.libraRead=true;renderJournal();say(['底座模糊地寫著：「非對稱……它始於風，卻不屬於風。我只需要一個數字。」天秤標記 10。']);}),
+ at('aquarius','水瓶座模型',14,8,()=>{story.aquariusRead=true;renderJournal();say(['水瓶座的底部標記 2。']);}),
+ at('gemini','雙子座模型',4,10,()=>{story.glyph=true;renderJournal();say(['雙子座的兩張臉卻只有一道刻痕。背面刻著：7。']);}),
  at('drawer','星象抽屜',15,10,()=>{
   if(!story.sculptureInvestigated)return say(['抽屜上的符號毫無反應。先調查中央那座未完成的人形雕塑。']);
   if(story.lens)return say(['抽屜已空。']);
   choice('星象抽屜上的數字',[7,10,2].map(n=>({label:String(n),outcome:n===7?'correct':'wrong',action:()=>{
-   if(n===7){story.lens=true;renderJournal();showScript([{speaker:'L（莉莉）',text:'7。鎖舌沒有尖叫，反而像鬆了一口氣。',emotion:'curious'},{speaker:'系統',text:'抽屜打開。取得精緻的石英透鏡。'},{speaker:'L（莉莉）',text:'天秤 10、水瓶 2、雙子 7。只有雙子座符合「非對稱」的提示。'}]);}
-   else {loseOil(2);gainSan(-10);say(['石材發出尖銳的笑聲。燈火明顯變弱；油量 -2、心智 -10。','鎖舌重新扣上了。']);}
+   if(n===7){story.lens=true;renderJournal();say(['抽屜打開。取得精緻的石英透鏡。','三個風象星座，只有雙子座符合「非對稱」的提示。']);}
+   else {loseOil(2);gainSan(-10);say(['石材發出尖銳笑聲。燈火明顯變弱；油量 -2、心智 -10。','鎖舌重新扣上了，但這次你仍有機會重新推理。']);}
   }})).concat([{label:'取消',outcome:'neutral',action:()=>{}}]));
  }),
  at('sculpture','胸口中空的雕塑',9,6,()=>{
   if(story.statue)return say(['光束已經照出暗門。']);
-  if(!story.sculptureInvestigated){story.sculptureInvestigated=true;renderJournal();showScript([{speaker:'L（莉莉）',text:'中央的大型人形雕像還沒有完成。胸口留著一個圓形空腔，尺寸剛好能嵌入某種透鏡。',emotion:'curious'},{speaker:'L（莉莉）',text:'我把掌心靠近空腔，竟然感覺到一點溫度。像這座雕像正在等我把某個東西放回去。',emotion:'worried'},{speaker:'L（莉莉）',text:'房間裡的星象機關開始有了回應。'}]);return;}
+  if(!story.sculptureInvestigated){story.sculptureInvestigated=true;renderJournal();say(['中央的人形雕塑還沒有完成，胸口留著一個圓形空腔。','只要調查它，房間裡的星象機關似乎就會開始回應。']);return;}
   if(!story.lens)return say(['胸口缺少透鏡。草圖與星象抽屜也許能提供線索。']);
+  // 【劇情規則】油量目前只影響提燈照明範圍，不再直接分歧真結局路線。
   story.statue=true;beamSequence={elapsed:0,revealed:false};
   for(const key of Object.keys(keys))keys[key]=false;
-  promptEl.style.display='none';playSample('crystalBreak',.24,.8);
- },[[9,6],[10,6],[9,7],[10,7]]),
- at('bedroomDoor','主臥室暗門',19,2,()=>story.statue?goScene('BEDROOM',1,12,'古老落地鏡映出一個陌生女人的影子，轉瞬消失。'):say(['牆後似乎有空間。先修復中央雕塑。'])),
+  promptEl.style.display='none';playSample('crystalBreak',.24,.8);}),
+at('bedroomDoor','主臥室暗門',19,2,()=>story.statue?goScene('BEDROOM',1,12,'古老落地鏡映出一個陌生女人的影子，轉瞬消失。'):say(['牆後似乎有空間。先修復中央雕塑。'])),
  at('libraryBack','返回圖書室',0,12,()=>goScene('LIBRARY',18,2))
 ];
 // 【功能】確認一封信加入目前排序。
 function commitLetter(n){
+ const labels={1:'「你已完全被遺忘，你和容器都不再屬於我們。」',2:'「我們很高興你創造出完美晶體。組織將永存。」',3:'「但你將繆斯的記憶封入其中，這是對永恆的褻瀆。」'};
  story.letters.push(n);
  if(story.letters.length<3)return say([`已放入第 ${story.letters.length} 格。`]);
- if(story.letters.join('')==='231'){
-  story.lettersDone=true;playChoiceCorrect();renderJournal();
-  showScript([
-   {speaker:'L（莉莉）',text:'2、3、1。創造、褻瀆、告別。',emotion:'curious'},
-   {speaker:'系統',text:'三封信下方露出一張紙籤。'},
-   {speaker:'紙籤',text:'「永恆不是一個地方，而是一個時間。」'},
-   {speaker:'L（莉莉）',text:'我不知道為什麼，讀到「時間」時，腦海裡第一個浮現的不是鐘，而是一個白色房間。',emotion:'worried'}
-  ]);
- }else{story.letters=[];gainSan(-8);playChoiceWrong();say(['時間順序不通。鏡中有什麼東西敲了敲玻璃。心智 -8；信件已重置。']);}
+ if(story.letters.join('')==='231'){story.lettersDone=true;playChoiceCorrect();say(['三封信排好。下方露出紙籤：「永恆不是一個地方，而是一個時間。」']);}
+ else{story.letters=[];gainSan(-8);playChoiceWrong();say(['時間順序不通。鏡中有什麼東西敲了敲玻璃。心智 -8；信件已重置。']);}
 }
-
 // 【功能】先顯示信件內容，再讓玩家確認是否加入排序。
 function pickLetter(n){
  if(story.lettersDone)return say(['三封信已經排好。']);
@@ -2960,31 +2699,10 @@ interactables.BEDROOM=[
  at('letter1','信件：告別',6,6,()=>pickLetter(1)),
  at('letter2','信件：創造',12,8,()=>pickLetter(2)),
  at('letter3','信件：褻瀆',13,6,()=>pickLetter(3)),
- at('mirror','落地鏡',4,10,()=>{
-  if(story.mirror)return say(['鏡中的女人已經消失，只留下那個時間：12:08。']);
-  story.mirror=true;story.museMirrorTalk=true;gainSan(-30);renderJournal();
-  showScript([
-   {speaker:'L（莉莉）',text:'鏡中的我沒有跟著我呼吸。下一秒，她變成了畫中的女人。',emotion:'frightened'},
-   {speaker:'繆斯',text:'「妳終於來了。」'},
-   {speaker:'L（莉莉）',text:'「繆斯？」',emotion:'worried'},
-   {speaker:'繆斯',text:'「妳還記得我嗎？」'},
-   {speaker:'L（莉莉）',text:'「我不知道妳是誰。」',emotion:'sorrow'},
-   {speaker:'繆斯',text:'「妳當然不知道。因為他們把我切碎了。」'},
-   {speaker:'繆斯',text:'「把我的記憶切碎。把我的聲音切碎。然後——把剩下的一部分，放進了妳。」'},
-   {speaker:'L（莉莉）',text:'……我聽不見自己的呼吸了。',emotion:'frightened'},
-   {speaker:'研究員的記憶',text:'「L 的融合率正在提高。」'},
-   {speaker:'研究員的記憶',text:'「她會醒嗎？」'},
-   {speaker:'另一名研究員的記憶',text:'「會。」'},
-   {speaker:'研究員的記憶',text:'「那她還是原本的孩子嗎？」'},
-   {speaker:'另一名研究員的記憶',text:'「不知道。」'},
-   {speaker:'L（莉莉）',text:'那些我以為「不存在」的童年記憶，不是失去。是被覆蓋。',emotion:'sorrow'},
-   {speaker:'L（莉莉）',text:'L。那不是莉莉的名字。那是組織給我的代號。',emotion:'worried'},
-   {speaker:'繆斯',text:'「妳不用成為我。」'},
-   {speaker:'繆斯',text:'「也不用代替我。」'},
-   {speaker:'繆斯',text:'「妳只需要活成妳自己。」'},
-   {speaker:'L（莉莉）',text:'鏡面凝出一行字：12:08。現實中的古鐘，指針卻停在別處。',emotion:'curious'}
-  ]);
- }),
+ at('mirror','落地鏡',4,10,()=>{if(!story.mirror){story.mirror=true;gainSan(-30);say([
+  {text:'鏡中的我變成了繆斯。她用我的聲音說：「時間會遺忘一切。」心智 -30。',emotion:'frightened'},
+  {text:'鏡面凝出一行不屬於我的字跡：12:08。現實中的古鐘，指針卻停在別處。',emotion:'worried'}
+ ]);}else say(['鏡子還映著那組時間：12:08。']);}),
  at('clock','古董時鐘',16,10,()=>{
   if(!story.lettersDone)return say(['古鐘齒輪卡著。床頭那疊信件似乎與它有關。']);
   if(!story.mirror)return say(['鐘面還沒有告訴我答案。也許那面鏡子才是關鍵。']);
@@ -2995,46 +2713,26 @@ interactables.BEDROOM=[
  at('studioBack','返回雕刻室',0,12,()=>goScene('STUDIO',18,2))
 ];
 interactables.VAULT=[
- at('warning','組織的備用逃脫信',4,5,()=>{
-  story.warning=true;renderJournal();
-  showScript([
-   {speaker:'組織信件',text:'「親愛的伯爵，如果你想開了，願意繼續為組織奮鬥，這裡有一條緊急通道。」'},
-   {speaker:'組織信件',text:'「但你必須確保容器完整。一旦偵測到容器損毀，組織將會鎖死所有通道。」'},
-   {speaker:'L（莉莉）',text:'他們根本不在乎伯爵。只在乎容器。',emotion:'worried'}
-  ]);
- }),
+ at('warning','組織的備用逃脫信',4,5,()=>{story.warning=true;say(['「如願繼續合作，請保持容器完整。容器毀損後，所有通道都將封閉。」', '晶體裡的繆斯還活著。決定權在我手裡。']);}),
  at('crystal','記憶晶體容器',9,6,()=>{
-  if(!story.echoSeen)return say(['晶體深處的聲音還沒有停下來。先聽完伯爵留下的殘響。']);
+  // 【最終抉擇】伯爵殘響完成後才進入真正的結局選擇；沒有鑿子就不顯示真結局選項。
+  if(!story.echoSeen){return say(['晶體深處的聲音還沒有停下來。先聽完伯爵留下的殘響。']);}
   const options=[];
   if(story.chisel){options.push({label:'用完整鑿子摧毀容器',action:()=>{
-    story.endingMemory=true;renderJournal();
-    endGame('剎那即永恆',[
-      '我終於明白。自己不是繆斯的替代品，她也不是我的前世。',
-      '她曾經想活下去，而我真的活了下來。',
-      '我舉起鑿子。晶體中的她沒有阻止我。',
-      '「再見。」',
-      '晶體裂開。無數記憶飛散，最後只剩下一個八歲女孩的笑聲。那是我，也是她。',
-      '我沿著繆斯照亮的裂縫衝出地下室，穿過崩塌的走廊，終於逃出城堡，跌坐在城堡外的泥地上。',
-      '暴雨停了。遠處的城堡緩緩倒塌，而我成為唯一記得這一切的人。',
-      '真正的永恆，不是保存痛苦，而是在一切結束之後，仍有人願意記得。'
-    ],'true');
+    endGame('剎那即永恆',['莉莉舉起完整的鑿子，朝著晶體核心砸下。','晶體爆裂，強光瞬間吞沒地下室；城堡開始劇烈崩塌。繆斯最後的光照出一道狹窄裂縫，莉莉從裂縫逃出。','暴雨停了。她是唯一記得這一切的人。'],'true');
   }});}
   options.push({label:'把手放在晶體的輔助插槽',action:()=>{gameState.san=0;updateHUD();endGame('我，究竟是誰？',['莉莉把手放進輔助插槽。晶體的光反過來吞噬她的記憶。','她逃出了城堡，卻已分不清自己是莉莉，還是另一個被留下的繆斯。','荒野裡，她開始尋找一座早已被遺忘的城堡。'],'bad');}});
   options.push({label:'再想一想',action:()=>{}});
   choice('面對晶體',options);
- }),
- at('panel','控制面板',15,7,()=>choice('面板的分離模式',[{label:'帶走核心，走組織的逃生通道',action:()=>endGame('真正的組織成員',['控制面板分離出核心晶體，莉莉帶著它沿著緊急通道逃離城堡。','雨幕外，一名戴著面具的組織代表早已等在接應點。','「你做得很好，莉莉。歡迎加入我們。」','她離開了一座囚籠，也踏進了另一座更大的囚籠。'],'org')},{label:'取消',action:()=>{}}])),
- at('echo','伯爵殘響',5,10,()=>{if(story.echoSeen)return;showScript([
-   {speaker:'伯爵殘魂',text:'「我想記住她，卻只讓她永遠受苦……」'},
-   {speaker:'伯爵殘魂',text:'「真正的雕刻家，應該知道什麼時候放手。」'},
-   {speaker:'L（莉莉）',text:'我看著晶體裡的女人。她沒有怨恨，只剩下疲憊。',emotion:'sorrow'}
-  ],()=>{story.echoSeen=true;renderJournal();updateObjective();});})
+}),
+at('panel','控制面板',15,7,()=>choice('面板的分離模式',[{label:'帶走核心，走組織的逃生通道',action:()=>endGame('真正的組織成員',['控制面板分離出核心晶體，莉莉帶著它沿著緊急通道逃離城堡。','雨幕外，一名戴著面具的組織代表早已等在接應點。','「你做得很好，莉莉。歡迎加入我們。」','她離開了一座囚籠，也踏進了另一座更大的囚籠。'],'org')},{label:'取消',action:()=>{}}])),
+ at('echo','伯爵殘響',5,10,()=>{if(story.echoSeen)return;showDialog('伯爵殘響',['「我想記住她，卻只讓她永遠受苦……」','「真正的雕刻家，應該知道什麼時候放手。」'],()=>{story.echoSeen=true;renderJournal();});})
 ];
 // 【功能】準備結局 CG、標題與結局文字。
 function prepareEndingCard(title,lines,type='true'){
  const ending=document.getElementById('ending');
  const endingCg=document.getElementById('ending-cg');
- const cgMap={true:'images/true_ending_cg.png',bad:'images/bad_ending_cg.png',org:'images/org_ending_cg.png'};
+ const cgMap={true:'true_ending_cg.png',bad:'bad_ending_cg.png',org:'org_ending_cg.png'};
  ending.dataset.ending=type;
  endingCg.src=cgMap[type]||cgMap.true;
  endingCg.alt=type==='true'?'真結局：莉莉與破碎晶體':type==='bad'?'壞結局：記憶混淆的莉莉':'組織結局：面具組織接應';
@@ -3047,85 +2745,51 @@ function prepareEndingCard(title,lines,type='true'){
 }
 // 【功能】等待短暫時間後繼續結局演出。
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
-// 【功能】以方形像素塊繪製結晶裂紋，避免結局效果混入向量線條。
-function drawPixelCracks(type){
- const canvas=document.getElementById('ending-cracks'),c=canvas.getContext('2d');c.clearRect(0,0,800,600);
- const color=type==='bad'?'#ffb1c2':type==='org'?'#d9cda6':'#d9fbff';
- const branches=[[[400,300],[368,260],[344,216],[320,168],[286,120]],[[400,300],[432,260],[464,224],[500,176],[532,128]],[[400,300],[368,320],[336,352],[296,384],[256,400]],[[400,300],[440,320],[480,352],[520,392],[568,416]],[[400,300],[392,256],[384,216],[392,176],[384,128]],[[400,300],[408,344],[416,392],[408,440],[424,488]],[[368,260],[344,232],[336,200]],[[432,260],[456,224],[464,192]],[[368,320],[344,336],[328,360]],[[440,320],[464,344],[488,360]]];
- c.fillStyle=color;for(const line of branches)for(let i=0;i<line.length-1;i++){let [x,y]=line[i],[tx,ty]=line[i+1],steps=Math.max(Math.abs(tx-x),Math.abs(ty-y))/8|0;for(let j=0;j<=steps;j++){const u=j/steps;c.fillRect(Math.round((x+(tx-x)*u)/8)*8,Math.round((y+(ty-y)*u)/8)*8,5,5);}}
-}
-// 【功能】以遊戲中的莉莉像素精靈演出晶體爆炸與逃離城堡。
-function runEndingEscapeCutscene(caption,kicker){
- return new Promise(resolve=>{
-  const canvas=document.getElementById('ending-action-canvas'),c=canvas.getContext('2d'),started=performance.now();
-  const shards=Array.from({length:36},(_,i)=>({a:i*2.39996,r:((i*37)%91)+12,size:2+(i%4),speed:45+(i%7)*17,color:['#d8f8ff','#79d4f5','#b6efff','#fff0bd'][i%4]}));
-  const rect=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h));};
-  function lily(x,y,frame,row,scale=1.55){
-   c.imageSmoothingEnabled=false;
-   if(lilyWalkSheet.complete&&lilyWalkSheet.naturalWidth)c.drawImage(lilyWalkSheet,(frame%4)*28,row*36,28,36,Math.round(x),Math.round(y),28*scale,36*scale);
-   else{rect(x+10*scale,y,10*scale,12*scale,'#e7cda7');rect(x+7*scale,y+12*scale,17*scale,23*scale,'#60364c');rect(x+7*scale,y+31*scale,7*scale,5*scale,'#171722');rect(x+18*scale,y+31*scale,7*scale,5*scale,'#171722');}
-  }
-  function cave(t){
-   rect(0,0,800,600,'#090d18');
-   for(let y=0;y<390;y+=32){rect(0,y,800,32,(y/32|0)%2?'#181d2a':'#20212b');for(let x=((y/32|0)%2)*18;x<800;x+=72)rect(x,y+3,52,3,'#292a35');}
-   rect(0,390,800,210,'#17171f');
-   for(let y=404;y<600;y+=28){rect(0,y,800,2,'#37333a');for(let x=(y%2)*21;x<800;x+=95)rect(x,y+4,57,3,'#29262f');}
-   const cx=405,cy=285;
-   if(t<1.35){const pulse=t>.5&&t<1.2&&((t*18|0)%2);rect(cx-30,cy-63,60,16,pulse?'#efffff':'#6ccbe9');rect(cx-44,cy-47,88,55,'#8ce4f6');rect(cx-34,cy+8,69,44,'#54a7ce');rect(cx-18,cy+52,37,19,'#b7f2ff');rect(cx-7,cy-54,11,117,'#e8fdff');rect(cx-34,cy-25,67,8,'#c7f7ff');}
-   if(t>.48){const k=Math.min(1,(t-.48)/1.45);for(const sh of shards){const x=cx+Math.cos(sh.a)*(sh.r+sh.speed)*k,y=cy+Math.sin(sh.a)*(sh.r+sh.speed)*k+35*k*k;rect(x,y,sh.size,sh.size,sh.color);}}
-   const open=Math.max(0,Math.min(1,(t-1.15)/.85));
-   if(open){rect(681,60,16+40*open,420,'#4a8daa');rect(693,62,7+18*open,415,'#c8f5ff');rect(689,70,6,28,'#fff6cb');rect(731,138,7,34,'#f0fdff');rect(712,220,5,26,'#f0fdff');}
-   const run=Math.max(0,Math.min(1,(t-1.65)/2.05)),lx=145+run*505,ly=352-run*46;
-   lily(lx,ly,t<1.65?0:Math.floor(t*10)%4,t<1.65?0:2);
-   if(t>1.5&&t<3.8)for(let i=0;i<5;i++)rect(lx-18-i*14,ly+45+(i%2)*3,3,2,'#d9f4ff');
-   if(t>3.4)rect(0,0,800,600,`rgba(220,239,255,${Math.min(1,(t-3.4)/.35)*.94})`);
-  }
-  function outside(t){
-   rect(0,0,800,600,'#182338');rect(0,0,800,230,'#27364b');rect(0,230,800,120,'#666778');
-   rect(620,74,64,8,'#d8d5c5');rect(604,82,96,48,'#d8d5c5');rect(620,130,64,8,'#d8d5c5');rect(570,105,34,8,'#aeb8c5');rect(700,95,38,8,'#aeb8c5');
-   const collapse=Math.min(1,t/1.7);rect(54,225+collapse*24,430,230-collapse*50,'#111722');
-   for(let i=0;i<8;i++){const x=88+i*48,top=198+(i%3)*22+collapse*((i*13)%36);rect(x,top,23,85-(i%3)*11,'#111722');rect(x+7,top-14,9,17,'#111722');}
-   rect(0,465,800,135,'#292b35');rect(0,465,800,7,'#4d5058');
-   if(t<1.8)for(let i=0;i<30;i++)rect((i*71+((t*110)|0))%800,(i*47+((t*170)|0))%450,2,10,'#98b4d0');
-   const lx=520-Math.min(1,t/1.65)*74,ly=t<1.2?371+(1.2-t)*18:393;lily(lx,ly,t<1.2?Math.floor(t*11)%4:0,t<1.2?2:0,1.7);
-   if(t>1.1){rect(lx+7,ly+34,40,5,'#181c27');rect(lx+2,ly+35,48,4,'#181c27');}
-   if(t>2.1)rect(0,0,800,600,`rgba(240,228,201,${Math.min(.65,(t-2.1)*.18)})`);
-  }
-  function frame(now){const t=(now-started)/1000;c.imageSmoothingEnabled=false;
-   if(t<4.05){cave(t);if(t<1.2)caption.textContent='晶體爆炸，莉莉以手臂遮住強光。';else if(t<2.05)caption.textContent='碎片散落，繆斯的光撕開牆面裂縫。';else{caption.textContent='莉莉朝裂縫奔跑，跨過坍落的石塊。';kicker.textContent='LILY RUNS FOR THE OPENING';}}
-   else{outside(t-4.05);caption.textContent=t<5.7?'莉莉穿過裂縫，終於衝出城堡。':t<7.4?'身後的城牆崩落，暴雨漸漸停歇。':'莉莉站穩腳步，確認自己已成功脫逃。';kicker.textContent='SHE MADE IT OUT';}
-   if(t<8.4)requestAnimationFrame(frame);else resolve();
-  }
-  requestAnimationFrame(frame);
- });
-}
 // 【功能】啟動三種結局各自的像素電影式演出。
 async function startEndingCinematic(title,lines,type='true'){
- playBgmTrack('suspense2');
  const overlay=document.getElementById('ending-cinematic');
  const img=document.getElementById('ending-cinema-cg');
  const caption=document.getElementById('ending-cinema-caption');
  const kicker=document.getElementById('ending-cinema-kicker');
  const titleEl=document.getElementById('ending-cinema-title');
  overlay.dataset.ending=type;
- drawPixelCracks(type);
- img.src=type==='true'?'images/true_ending_cg.png':type==='bad'?'images/bad_ending_cg.png':'images/org_ending_cg.png';
+ img.src=type==='true'?'true_ending_cg.png':type==='bad'?'bad_ending_cg.png':'org_ending_cg.png';
  overlay.style.display='flex';
- overlay.classList.remove('show-cg','show-text','show-title','show-cracks','flash','escape-mode','escape-explosion','escape-run','escape-outside','shake-1','shake-2');
+ overlay.classList.remove('show-cg','show-text','show-title','show-cracks','flash');
  kicker.textContent=type==='true'?'TRUE ENDING SEQUENCE':type==='bad'?'BAD ENDING SEQUENCE':'ORGANIZATION ENDING SEQUENCE';
  titleEl.textContent=title;
  caption.textContent='';
  await sleep(120);
 
  if(type==='true'){
-   overlay.classList.add('escape-mode','show-text');
-   caption.textContent='完整鑿子舉起。雙子座紋樣在燭光下閃了一瞬。';await sleep(950);
-   overlay.classList.add('shake-1','show-cracks');caption.textContent='第一擊。晶體表面裂開一道細線。';playChiselImpactSFX();await sleep(850);
-   caption.textContent='第二擊。裂紋沿著核心蔓延。';playChiselImpactSFX();overlay.classList.add('shake-2','flash');await sleep(380);overlay.classList.remove('flash');
-   caption.textContent='晶體爆炸，碎片向四周飛散。';playCrystalBreakSFX();await runEndingEscapeCutscene(caption,kicker);
+   caption.textContent='完整鑿子舉起。雙子座紋樣在燭光下閃了一瞬。';
+   overlay.classList.add('show-text');
+   await sleep(1100);
+   overlay.classList.add('show-cg','shake-1');
+   caption.textContent='第一擊。晶體表面裂開一道細線。';
+   overlay.classList.add('show-cracks');
+   playChiselImpactSFX();
+   await sleep(900);
+   overlay.classList.add('flash');
+   caption.textContent='第二擊。裂紋沿著核心蔓延。';
+   playChiselImpactSFX();
+   await sleep(550);
+   overlay.classList.remove('flash');
+   overlay.classList.add('flash');
+   caption.textContent='晶體爆裂——繆斯的記憶像碎片一樣飛散，最後化成一片安靜的白光。';
+   playCrystalBreakSFX();
+   await sleep(850);
+   overlay.classList.remove('flash');
+   caption.textContent='強光吞沒地下室。城堡開始崩塌。';
+   overlay.classList.add('shake-2');
+   await sleep(900);
+   caption.textContent='繆斯最後的光照出一道狹窄裂縫。她朝莉莉露出最後的微笑。';
+   await sleep(850);
+   kicker.textContent='THE RAIN STOPS';
    if(rainGainNode){try{rainGainNode.gain.cancelScheduledValues(audioCtx.currentTime);rainGainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.8);}catch(e){}}
-   playMemoryPulseSFX();overlay.classList.remove('escape-mode','shake-1','shake-2','show-cracks');caption.textContent='莉莉成功逃出城堡。她成為唯一記得這一切的人。';await sleep(900);
-   overlay.classList.add('show-cg');caption.textContent='她真的逃出來了。從此，她成為唯一記得這一切的人。';await sleep(1300);
+   caption.textContent='暴雨停止。城堡在濃霧中緩緩倒塌，而莉莉成為唯一記得這一切的人。';
+   playMemoryPulseSFX();
+   await sleep(1050);
  }else if(type==='bad'){
    caption.textContent='莉莉把手伸進晶體的輔助插槽。';
    overlay.classList.add('show-text','show-cg');
@@ -3201,7 +2865,6 @@ function scheduleEndingMenuButton(){
 }
 // 【功能】結束本次遊戲並記錄對應結局。
 function endGame(title,lines,type='true'){
- playBgmTrack('suspense2');
  markEndingUnlocked(type,title);
  gameState.ended=true;
  gameState.isChoiceActive=false;
@@ -3234,15 +2897,6 @@ function drawHallDetails(){
 }
 // 【功能】繪製各室內場景的地板與局部地面紋理。
 function drawFloor(scene,x,y,tx,ty){
- if(scene==='HALL'){
-  const type=maps.HALL?.[ty]?.[tx]??0;
-  if(drawHallTerrain(type,x,y))return;
-  const runner=tx>=8&&tx<=11&&ty>=1&&ty<=13;
-  block(x,y,40,40,runner?'#713d45':'#302227');
-  block(x+1,y+1,38,2,runner?'#ab8053':'#4f2836');
-  if(runner&&(tx===8||tx===11))block(x+(tx===8?0:38),y,2,40,'#bea06e');
-  return;
- }
  const colors={GALLERY:['#302530','#433142','#1e1b27'],LIBRARY:['#3d3026','#4d3b2d','#271d1d'],STUDIO:['#424044','#555354','#252932'],BEDROOM:['#47343b','#59404b','#29212e'],VAULT:['#263d43','#31535b','#102329']};
  const [base,edge,deep]=colors[scene];const seed=(tx*17+ty*31+tx*ty*7)%13;
  block(x,y,40,40,base);block(x+1,y+1,38,2,edge);block(x+1,y+1,2,38,edge);
@@ -3273,8 +2927,6 @@ function drawProp(item,x,y){
   drawWallDoor(item.tileX,item.tileY,unlocked[id]??true);
   return;
  }
- // 雕刻室中央雕像已由 sceneObjects 以大型精靈繪製；互動點仍保留在同一位置，避免再疊出一座小雕像。
- if(gameState.currentScene==='STUDIO' && id==='sculpture') return;
  drawSprite(getInteractableSprite(item),x-20,y-28);
 }
 
@@ -3287,8 +2939,6 @@ function drawNewScene(){
  ctx.restore();drawPlayer(player);
 }
 updateObjective();
-// 頁面載入後直接嘗試播放主選單 BGM；若瀏覽器阻擋自動播放，第一次互動時會再次啟動。
-window.addEventListener('load',()=>{if(!gameState.gameStarted)playBgmTrack('menu');},{once:true});
 
 </script>
 </body>
